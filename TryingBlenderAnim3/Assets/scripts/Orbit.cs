@@ -3,7 +3,7 @@ using UnityEngine;
 public class Orbit : MonoBehaviour {
 
 	private float adjustSpeed;
-	private bool needToAdjust;
+	private bool firstTimeAdjust;
 
 	public Transform target;
 	public float angularSpeed;
@@ -13,18 +13,12 @@ public class Orbit : MonoBehaviour {
 	private Vector3 initialOffset;
 	private Vector3 currentOffset;
 
-//	[SerializeField][HideInInspector]
-//	private Quaternion initialRot;
-//	private Quaternion currentRot;
-
-
 	[ContextMenu("Set Current Offset")]
 	private void SetCurrentOffset () {
 		if(target == null) {
 			return; 
 		}
 		initialOffset = transform.position - target.position;
-		//initialRot = transform.rotation;
 	}
 
 	private void Start () {
@@ -32,67 +26,60 @@ public class Orbit : MonoBehaviour {
 			Debug.LogError ("Assign a target for the camera in Unity's inspector");
 		}
 		currentOffset = initialOffset;
-		//currentRot = initialRot;
 		adjustSpeed = 500.0f;
-		needToAdjust = false;
+		firstTimeAdjust = false;
 	}
 
 	private void LateUpdate () {
 		transform.position = target.position + currentOffset;
 		bool idle = player.GetComponent<DevAnimScript>().isIdle ();
-		float movementX = Input.GetAxis ("Mouse X") * angularSpeed * Time.deltaTime;
+		float movementX = Input.GetAxis ("Mouse X") * angularSpeed * 0.5f * Time.deltaTime;
 
 
-//		float movementY = Input.GetAxis ("Mouse Y") * angularSpeed * 0.2f * Time.deltaTime;
+		float movementY = Input.GetAxis ("Mouse Y") * angularSpeed * 0.1f * Time.deltaTime * -1;
+		if (!Mathf.Approximately (movementY, 0f)) {
+			if (movementY + transform.eulerAngles.y >= 45f)
+				transform.eulerAngles.Set (transform.eulerAngles.x, 45f, transform.eulerAngles.z);
+			else if (movementY + transform.eulerAngles.y <= -45f)
+				transform.eulerAngles.Set (transform.eulerAngles.x, -45f, transform.eulerAngles.z);
+			else if(movementY + transform.eulerAngles.y > -45f && movementY + transform.eulerAngles.y < 45f) 
+				transform.Rotate (Vector3.left * movementY); 
+			else
+				Debug.LogError("Y rotation messed up");
+		}
+
 //		if (!Mathf.Approximately (movementY, 0f)) {
-//			transform.RotateAround (target.position, Vector3.right, movementY); 
+//			if (movementY + transform.eulerAngles.y > 90f)
+//				movementY = 90f - transform.eulerAngles.y;
+//			else if (movementY + transform.eulerAngles.y < -90f)
+//				movementY = -90f - transform.eulerAngles.y;
+//			transform.Rotate (Vector3.left * movementY); 
 //		}
 
 		if (!Mathf.Approximately (movementX, 0f)) {
 			if (idle) {
-				Debug.Log ("In Idle");
+				//Debug.Log ("In Idle");
 				transform.RotateAround (target.position, Vector3.up, movementX);
-				needToAdjust = true;
+				firstTimeAdjust = true;
 			} else {
-				Debug.Log ("Not In Idle");
-
-				if (transform.rotation.eulerAngles.y != target.rotation.eulerAngles.y) {
-					float speed = (target.rotation.eulerAngles.y - transform.rotation.eulerAngles.y);
-					transform.RotateAround (target.position, Vector3.up, speed);	
+				//Debug.Log ("Not In Idle");
+				if (player.GetComponent<DevAnimScript> ().adjustCounter == 0) {
+					if (transform.rotation.eulerAngles.y != target.rotation.eulerAngles.y) {
+						float speed = (target.rotation.eulerAngles.y - transform.rotation.eulerAngles.y);
+						transform.RotateAround (target.position, Vector3.up, speed);	
+					}
 				}
-
-//				if (transform.rotation.eulerAngles.y < target.rotation.eulerAngles.y) {
-//					float speed = (target.rotation.eulerAngles.y - transform.rotation.eulerAngles.y);
-//					transform.RotateAround (target.position, Vector3.up, speed);	
-//				}
-//				else if (transform.rotation.eulerAngles.y > target.rotation.eulerAngles.y) {
-//					float speed = (transform.rotation.eulerAngles.y - target.rotation.eulerAngles.y);
-//					transform.RotateAround (target.position, Vector3.down, speed);	
-//				}
-				//transform.rotation.Set (player.transform.rotation.x, player.transform.rotation.y, player.transform.rotation.z, player.transform.rotation.w);
 			}
+				
 		}
-		else if(!idle && needToAdjust)
+		else if(!idle && (firstTimeAdjust || player.GetComponent<DevAnimScript> ().adjustCounter > 0))
 		{
-			Debug.Log ("Need To Adjust");
-
-			float dif = transform.rotation.eulerAngles.y - target.rotation.eulerAngles.y;
-			if (dif != 0) {
-				player.GetComponent<DevAnimScript>().adjustToCam (dif, needToAdjust);
-				//player.transform.Rotate (Vector3.up * dif);
+			//Debug.Log ("Need To Adjust");
+			float dif = transform.eulerAngles.y - player.transform.eulerAngles.y;
+			if (!Mathf.Approximately(dif,0)) {
+				player.GetComponent<DevAnimScript>().adjustToCam (dif, firstTimeAdjust);
+				firstTimeAdjust = false;
 			}
-
-
-
-//			if (transform.rotation.eulerAngles.y > target.rotation.eulerAngles.y) {
-//				float speed = (target.rotation.eulerAngles.y - transform.rotation.eulerAngles.y);
-//				player.transform.Rotate (Vector3.up * adjustSpeed * Time.deltaTime);	
-//			} else if (transform.rotation.eulerAngles.y < target.rotation.eulerAngles.y) {
-//				player.transform.Rotate (Vector3.down * adjustSpeed * Time.deltaTime);
-//			} else
-//				needToAdjust = false;
-
-			//transform.rotation.Set (player.transform.rotation.x, player.transform.rotation.y, player.transform.rotation.z, player.transform.rotation.w);			
 		}
 		currentOffset = transform.position - target.position;
 	}

@@ -1,191 +1,86 @@
-﻿//using System.Collections;
-//using System.Collections.Generic;
-//using UnityEngine;
-//using System.Collections;
-//using System.Collections.Generic;
-//using UnityEngine;
+﻿//using UnityEngine;
 //
-//public class DevAnimScript : MonoBehaviour {
-//	public Transform CamTransform;
+//public class Orbit : MonoBehaviour {
 //
-//	private Animator myAnimator;
+//	private float adjustSpeed;
+//	private bool needToAdjust;
 //
-//	// Use this for initialization
-//	void Start () {
-//		myAnimator = GetComponent<Animator>();
+//	public Transform target;
+//	public float angularSpeed;
+//	public GameObject player;
+//
+//	[SerializeField][HideInInspector]
+//	private Vector3 initialOffset;
+//	private Vector3 currentOffset;
+//
+//	[ContextMenu("Set Current Offset")]
+//	private void SetCurrentOffset () {
+//		if(target == null) {
+//			return; 
+//		}
+//		initialOffset = transform.position - target.position;
 //	}
 //
-//	public string ToString()
-//	{
-//		if (myAnimator.GetFloat ("VSpeed") == 0 && myAnimator.GetFloat ("HorizSpeed") == 0 && myAnimator.GetBool ("shouldFrontFlip") == false && myAnimator.GetBool ("Jumping") == false);
-//		{
-//			return "Idle";
+//	private void Start () {
+//		if(target == null) {
+//			Debug.LogError ("Assign a target for the camera in Unity's inspector");
 //		}
-//		return "NotIdle";
+//		currentOffset = initialOffset;
+//		adjustSpeed = 500.0f;
+//		needToAdjust = false;
 //	}
 //
-//	// Update is called once per frame
-//	void Update () {
-//		//Debug.Log("HSpeed: " + myAnimator.GetFloat("HSpeed"));
-//
-//		myAnimator.SetFloat("VSpeed", Input.GetAxis("Vertical"));
-//		myAnimator.SetFloat("HorizSpeed", Input.GetAxis("Horizontal"));
-//
-//		//		if(Mathf.Abs(myAnimator.GetFloat("VSpeed")) > 0.0f && transform.rotation.eulerAngles.y < CamTransform.rotation.eulerAngles.y)
-//		//			transform.Rotate(Vector3.up * Time.deltaTime * 40.0f);
-//		//		else if(Mathf.Abs(myAnimator.GetFloat("VSpeed")) > 0.0f && transform.rotation.eulerAngles.y > CamTransform.rotation.eulerAngles.y)
-//		//			transform.Rotate(Vector3.down * Time.deltaTime * 40.0f);
-//
-//		//		if (Mathf.Abs (myAnimator.GetFloat ("VSpeed")) > 0.0f && transform.rotation.eulerAngles.y != CamTransform.rotation.eulerAngles.y)
-//		//			transform.rotation.Set(CamTransform.rotation.x, CamTransform.rotation.y, CamTransform.rotation.z, CamTransform.rotation.w);
-//		//		
+//	private void LateUpdate () {
+//		transform.position = target.position + currentOffset;
+//		bool idle = player.GetComponent<DevAnimScript>().isIdle ();
+//		float movementX = Input.GetAxis ("Mouse X") * angularSpeed * 0.5f * Time.deltaTime;
 //
 //
-//		if(Mathf.Abs(myAnimator.GetFloat("VSpeed")) > 0.0f && Input.GetAxis("Mouse X") > 0.2)
-//		{
-//			transform.Rotate(Vector3.up * Time.deltaTime * 100.0f);
-//		}
-//		else if(Mathf.Abs(myAnimator.GetFloat("VSpeed")) > 0.0f && Input.GetAxis("Mouse X") < -0.2)
-//		{
-//			transform.Rotate(Vector3.down * Time.deltaTime * 100.0f);
+//		float movementY = Input.GetAxis ("Mouse Y") * angularSpeed * 0.1f * Time.deltaTime * -1;
+//		if (!Mathf.Approximately (movementY, 0f)) {
+//			if (movementY + transform.eulerAngles.y >= 45f)
+//				transform.eulerAngles.Set (transform.eulerAngles.x, 45f, transform.eulerAngles.z);
+//			else if (movementY + transform.eulerAngles.y <= -45f)
+//				transform.eulerAngles.Set (transform.eulerAngles.x, -45f, transform.eulerAngles.z);
+//			else if(movementY + transform.eulerAngles.y > -45f && movementY + transform.eulerAngles.y < 45f) 
+//				transform.Rotate (Vector3.left * movementY); 
+//			else
+//				Debug.LogError("Y rotation messed up");
 //		}
 //
-//		if(Input.GetKey(KeyCode.A)||Input.GetKey(KeyCode.LeftArrow))
-//		{
-//			transform.Translate(Vector3.left * Time.deltaTime * 5);
-//		}
-//
-//		if(Input.GetKey(KeyCode.D)||Input.GetKey(KeyCode.RightArrow))
-//		{
-//			transform.Translate(Vector3.right * Time.deltaTime * 5);
-//		}
-//
-//		if(Input.GetKey(KeyCode.W)||Input.GetKey(KeyCode.UpArrow))
-//		{
-//			transform.Translate(Vector3.forward * Time.deltaTime * 10);
-//		}
-//
-//		if(Input.GetButtonDown("Jump"))
-//		{
-//			myAnimator.SetBool("Jumping", true);
-//			transform.Translate(Vector3.back * Time.deltaTime * 10);
-//			Invoke("stopJumping", 0.1f);
-//		}
-//
-//		if(Input.GetButtonDown("FrontFlip"))
-//		{
-//			myAnimator.SetBool ("shouldFrontFlip", true);
-//			//transform.Translate(Vector3.back * Time.deltaTime * 10);
-//			Invoke ("stopFrontFlip", 0.1f);
-//		}
-//	}
-//
-//	void stopJumping()
-//	{
-//		myAnimator.SetBool("Jumping", false);
-//	}
-//
-//	void stopFrontFlip()
-//	{
-//		myAnimator.SetBool ("shouldFrontFlip", false);
-//	}
-//}
-
-
-/// <summary>
-/// ////////////////////////
-/// </summary>
-
-//using System.Collections;
-//using System.Collections.Generic;
-//using UnityEngine;
-//using System.Collections;
-//using System.Collections.Generic;
-//using UnityEngine;
-//
-//public class DevAnimScript : MonoBehaviour {
-//	public Transform CamTransform;
-//
-//	private Animator myAnimator;
-//
-//	// Use this for initialization
-//	void Start () {
-//		myAnimator = GetComponent<Animator>();
-//	}
-//
-//
-//	public string toString()
-//	{
-//		if (myAnimator.GetFloat ("VSpeed") == 0 && myAnimator.GetFloat ("HorizSpeed") == 0 && myAnimator.GetBool ("ShouldFrontFlip") == false && myAnimator.GetBool ("Jumping") == false);
-//		{
-//			return "Idle";
-//		}
-//		return "NotIdle";
-//	}
-//
-//	// Update is called once per frame
-//	void Update () {
-//		//Debug.Log("HSpeed: " + myAnimator.GetFloat("HSpeed"));
-//
-//		myAnimator.SetFloat("VSpeed", Input.GetAxis("Vertical"));
-//		myAnimator.SetFloat("HorizSpeed", Input.GetAxis("Horizontal"));
-//
-//		if(Mathf.Abs(myAnimator.GetFloat("VSpeed")) > 0.0f && transform.rotation.eulerAngles.y < CamTransform.rotation.eulerAngles.y)
-//			transform.Rotate(Vector3.up * Time.deltaTime * 50);
-//		else if(Mathf.Abs(myAnimator.GetFloat("VSpeed")) > 0.0f && transform.rotation.eulerAngles.y > CamTransform.rotation.eulerAngles.y)
-//			transform.Rotate(Vector3.down * Time.deltaTime * 50);
-//
-//		//		if (Mathf.Abs (myAnimator.GetFloat ("VSpeed")) > 0.0f && transform.rotation.eulerAngles.y != CamTransform.rotation.eulerAngles.y)
-//		//			transform.rotation.Set(CamTransform.rotation.x, CamTransform.rotation.y, CamTransform.rotation.z, CamTransform.rotation.w);
-//		//		
-//
-//
-//		//		if(Mathf.Abs(myAnimator.GetFloat("VSpeed")) > 0.0f && Input.GetAxis("Mouse X") > 0.2)
-//		//		{
-//		//			transform.Rotate(Vector3.up * Time.deltaTime * 400.0f);
-//		//		}
-//		//		else if(Mathf.Abs(myAnimator.GetFloat("VSpeed")) > 0.0f && Input.GetAxis("Mouse X") < -0.2)
-//		//		{
-//		//			transform.Rotate(Vector3.down * Time.deltaTime * 400.0f);
+//		//		if (!Mathf.Approximately (movementY, 0f)) {
+//		//			if (movementY + transform.eulerAngles.y > 90f)
+//		//				movementY = 90f - transform.eulerAngles.y;
+//		//			else if (movementY + transform.eulerAngles.y < -90f)
+//		//				movementY = -90f - transform.eulerAngles.y;
+//		//			transform.Rotate (Vector3.left * movementY); 
 //		//		}
 //
-//		if(Input.GetKey(KeyCode.A)||Input.GetKey(KeyCode.LeftArrow))
-//		{
-//			transform.Translate(Vector3.left * Time.deltaTime * 5);
+//		if (!Mathf.Approximately (movementX, 0f)) {
+//			if (idle) {
+//				//Debug.Log ("In Idle");
+//				transform.RotateAround (target.position, Vector3.up, movementX);
+//				needToAdjust = true;
+//			} else {
+//				//Debug.Log ("Not In Idle");
+//				if (!player.GetComponent<DevAnimScript> ().myAnimator.GetBool ("adjustingToCam")) {
+//					if (transform.rotation.eulerAngles.y != target.rotation.eulerAngles.y) {
+//						float speed = (target.rotation.eulerAngles.y - transform.rotation.eulerAngles.y);
+//						transform.RotateAround (target.position, Vector3.up, speed);	
+//					}
+//				}
+//			}
+//
 //		}
-//
-//		if(Input.GetKey(KeyCode.D)||Input.GetKey(KeyCode.RightArrow))
+//		else if(!idle && needToAdjust)
 //		{
-//			transform.Translate(Vector3.right * Time.deltaTime * 5);
+//			//			Debug.Log ("Need To Adjust");
+//
+//			float dif = transform.eulerAngles.y - player.transform.eulerAngles.y;
+//			if (dif != 0) {
+//				player.GetComponent<DevAnimScript>().adjustToCam (dif, needToAdjust);
+//			}
 //		}
-//
-//		if(Input.GetKey(KeyCode.W)||Input.GetKey(KeyCode.UpArrow))
-//		{
-//			transform.Translate(Vector3.forward * Time.deltaTime * 10);
-//		}
-//
-//		if(Input.GetButtonDown("Jump"))
-//		{
-//			myAnimator.SetBool("Jumping", true);
-//			transform.Translate(Vector3.back * Time.deltaTime * 10);
-//			Invoke("stopJumping", 0.1f);
-//		}
-//
-//		if(Input.GetButtonDown("FrontFlip"))
-//		{
-//			myAnimator.SetBool ("shouldFrontFlip", true);
-//			//transform.Translate(Vector3.back * Time.deltaTime * 10);
-//			Invoke ("stopFrontFlip", 0.1f);
-//		}
-//	}
-//
-//	void stopJumping()
-//	{
-//		myAnimator.SetBool("Jumping", false);
-//	}
-//
-//	void stopFrontFlip()
-//	{
-//		myAnimator.SetBool ("shouldFrontFlip", false);
+//		currentOffset = transform.position - target.position;
 //	}
 //}

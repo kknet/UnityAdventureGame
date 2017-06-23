@@ -1,9 +1,11 @@
 ﻿<Properties StartupItem="Assembly-CSharp.csproj">
   <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" PreferredExecutionTarget="Unity.Instance.Unity Editor" />
-  <MonoDevelop.Ide.Workbench ActiveDocument="Assets\Dev Drake\DevAnimScript.cs">
+  <MonoDevelop.Ide.Workbench ActiveDocument="Assets\EmptyClass2.cs">
     <Files>
-      <File FileName="Assets\Dev Drake\DevAnimScript.cs" Line="23" Column="49" />
-      <File FileName="Assets\scripts\Orbit.cs" Line="40" Column="15" />
+      <File FileName="Assets\Dev Drake\DevAnimScript.cs" Line="24" Column="45" />
+      <File FileName="Assets\scripts\Orbit.cs" Line="22" Column="3" />
+      <File FileName="Assets\EmptyClass.cs" Line="103" Column="4" />
+      <File FileName="Assets\EmptyClass2.cs" Line="86" Column="4" />
     </Files>
   </MonoDevelop.Ide.Workbench>
   <MonoDevelop.Ide.DebuggingService.Breakpoints>
