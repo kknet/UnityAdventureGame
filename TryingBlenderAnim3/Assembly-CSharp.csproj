@@ -46,13 +46,10 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-     <Compile Include="Assets\Dev Drake\DevAnimScript.cs" />
      <Compile Include="Assets\EmptyClass.cs" />
      <Compile Include="Assets\EmptyClass2.cs" />
-     <Compile Include="Assets\scripts\CameraFollow.cs" />
-     <Compile Include="Assets\scripts\MouseOrbitImproved.cs" />
+     <Compile Include="Assets\scripts\DevAnimScript.cs" />
      <Compile Include="Assets\scripts\Orbit.cs" />
-     <Compile Include="Assets\scripts\ThirdPersonCamera.cs" />
      <Compile Include="Assets\scripts\WeaponsToggleScript.cs" />
      <None Include="Assets\Standard Assets\Characters\FirstPersonCharacter\FirstPersonCharacterGuidelines.txt" />
      <None Include="Assets\Ancient Weapons Pack\Materials &amp; Textures\Gem\Shaders\Gem.shader" />

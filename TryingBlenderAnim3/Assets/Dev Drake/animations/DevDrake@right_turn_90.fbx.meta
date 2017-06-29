@@ -301,12 +301,12 @@ ModelImporter:
     armStretch: 0.05
     legStretch: 0.05
     feetSpacing: 0
-    rootMotionBoneName: mixamorig:Hips
+    rootMotionBoneName: 
     rootMotionBoneRotation: {x: 0, y: 0, z: 0, w: 1}
     hasTranslationDoF: 0
-    hasExtraRoot: 1
+    hasExtraRoot: 0
     skeletonHasParents: 1
-  lastHumanDescriptionAvatarSource: {fileID: 9000000, guid: e4424746d14826e459e9ef1a1930a8d0,
+  lastHumanDescriptionAvatarSource: {fileID: 9000000, guid: f224873a1fa88df43a98d8185ae9126d,
     type: 3}
   animationType: 2
   humanoidOversampling: 1
