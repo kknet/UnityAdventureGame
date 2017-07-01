@@ -47,6 +47,7 @@
   </ItemGroup>
   <ItemGroup>
      <Compile Include="Assets\Ancient Weapons Pack\DemoScene\rotateAllObjects.js" />
+     <None Include="Assets\Long Sword with sheath\readme.txt" />
      <None Include="Assets\Standard Assets\Characters\FirstPersonCharacter\FirstPersonCharacterGuidelines.txt" />
      <None Include="Assets\Ancient Weapons Pack\Materials &amp; Textures\Gem\Shaders\Gem.shader" />
  <Reference Include="UnityEngine.UI">

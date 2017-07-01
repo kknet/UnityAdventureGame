@@ -14,8 +14,9 @@ public class WeaponToggle : MonoBehaviour {
 		weaponsTable = new Dictionary<string, GameObject> ();
 		allWeps = GameObject.FindGameObjectsWithTag ("Weapons");
 		myAnimator = GameObject.Find ("DevDrake").GetComponent<Animator> ();
-		weaponOut = "Scimitar";
+		weaponOut = "";
 		initTable ();
+		setOutInactive ();
 	}
 
 	void initTable(){
@@ -28,15 +29,21 @@ public class WeaponToggle : MonoBehaviour {
 
 
 	// Update is called once per frame
-	void Update () {	
-		if (Input.GetKeyDown(KeyCode.Alpha0)) {
-			StartSheath ();
+	void Update () {
+		if (Input.GetKeyDown (KeyCode.C)) {
+			if (weaponOut != "")
+				StartSheath ();
 		}
-//		else if (Input.GetKeyDown(KeyCode.Alpha1)) {	
-//			if (weaponOut == "Scimitar")
-//				return;
-//			weaponOut = "Scimitar";
-//		}
+		if (Input.GetKeyDown(KeyCode.Alpha1)) {	
+			if (weaponOut == "Scimitar"){
+				return;
+			}
+			if (weaponOut != "") {
+				StartSheath ();
+			}
+			weaponOut = "Scimitar";
+			StartDraw ();
+		}
 	}
 
 
@@ -53,16 +60,24 @@ public class WeaponToggle : MonoBehaviour {
 		myAnimator.SetBool(("WeaponDrawn"), false);
 	}
 
-//	void StartDraw(){
-//		GameObject.Find (weaponOut + "Out").SetActive(true);
-//		myAnimator.SetBool ("Sheathing", true);
-//	}
-	
-//	void setAllInactive()
-//	{
-////		allWeps = GameObject.FindGameObjectsWithTag ("Weapons");
-//		foreach (GameObject g in allWeps) {
-//			g.SetActive (false);
-//		}		
-//	}
+	//assumes that previous weapon (if any) has been sheathed
+	void StartDraw(){
+		myAnimator.SetBool ("Drawing", true);
+	}
+	public void FinishDrawing(){
+		weaponsTable[weaponOut + "Out"].SetActive(true);
+		weaponsTable[weaponOut + "In"].SetActive(false);
+		myAnimator.SetBool ("Drawing", false);
+		myAnimator.SetBool(("WeaponDrawn"), true);
+	}
+		
+	void setOutInactive()
+	{
+		foreach (GameObject g in allWeps) {
+			if (g.name.Contains ("Out"))
+				g.SetActive (false);
+			else
+				g.SetActive (true);
+		}		
+	}
 }
