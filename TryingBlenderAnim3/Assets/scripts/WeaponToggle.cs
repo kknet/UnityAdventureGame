@@ -6,6 +6,8 @@ public class WeaponToggle : MonoBehaviour {
 
 	GameObject[] allWeps;
 	Dictionary <string, GameObject> weaponsTable;
+	GameObject ShieldIn;
+	GameObject ShieldOut;
 	public string weaponOut;
 	public Animator myAnimator;
 
@@ -14,9 +16,14 @@ public class WeaponToggle : MonoBehaviour {
 		weaponsTable = new Dictionary<string, GameObject> ();
 		allWeps = GameObject.FindGameObjectsWithTag ("Weapons");
 		myAnimator = GameObject.Find ("DevDrake").GetComponent<Animator> ();
+		ShieldIn = GameObject.Find ("ShieldIn");
+		ShieldOut = GameObject.Find ("ShieldOut");
+		ShieldIn.SetActive (true);
+		ShieldOut.SetActive (false);
 		weaponOut = "";
 		initTable ();
 		setOutInactive ();
+
 	}
 
 	void initTable(){
@@ -55,6 +62,8 @@ public class WeaponToggle : MonoBehaviour {
 	public void FinishSheath(){
 		weaponsTable[weaponOut + "Out"].SetActive(false);
 		weaponsTable[weaponOut + "In"].SetActive(true);
+		ShieldIn.SetActive (true);
+		ShieldOut.SetActive (false);
 		weaponOut = "";
 		myAnimator.SetBool ("Sheathing", false);
 		myAnimator.SetBool(("WeaponDrawn"), false);
@@ -62,11 +71,17 @@ public class WeaponToggle : MonoBehaviour {
 
 	//assumes that previous weapon (if any) has been sheathed
 	void StartDraw(){
+		if (weaponOut == "") {
+			Debug.LogAssertion ("In StartDraw but weaponOut is blank");
+			return;
+		}
 		myAnimator.SetBool ("Drawing", true);
 	}
 	public void FinishDrawing(){
 		weaponsTable[weaponOut + "Out"].SetActive(true);
 		weaponsTable[weaponOut + "In"].SetActive(false);
+		ShieldIn.SetActive (false);
+		ShieldOut.SetActive (true);
 		myAnimator.SetBool ("Drawing", false);
 		myAnimator.SetBool(("WeaponDrawn"), true);
 	}
