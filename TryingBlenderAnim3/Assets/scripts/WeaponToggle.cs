@@ -4,12 +4,12 @@ using UnityEngine;
 
 public class WeaponToggle : MonoBehaviour {
 
-	public string weaponOut;
 	public Animator myAnimator;
 	public AudioSource Sheath;
 	public AudioSource Unsheath;
 
-
+	private string weaponOut;
+	private string newWeaponOut;
 	GameObject[] allWeps;
 	Dictionary <string, GameObject> weaponsTable;
 	GameObject ShieldIn;
@@ -35,8 +35,8 @@ public class WeaponToggle : MonoBehaviour {
 		foreach (GameObject g in allWeps) {
 			weaponsTable.Add (g.name, g);
 		}
-		if(weaponOut!="")
-			weaponsTable[weaponOut + "In"].SetActive(false);
+//		if(weaponOut!="")
+//			weaponsTable[weaponOut + "In"].SetActive(false);
 	}
 
 
@@ -55,9 +55,8 @@ public class WeaponToggle : MonoBehaviour {
 
 			//a weapon is already equipped (not a scimitar)
 			if (weaponOut!="") {
-				StartSheath ();
-				weaponOut = "Scimitar";
-				Invoke ("StartDraw", 0.5f);
+				newWeaponOut = "Scimitar";
+				StartSwitch ();
 
 			//no weapon is already equipped
 			} else {
@@ -66,7 +65,31 @@ public class WeaponToggle : MonoBehaviour {
 				Invoke ("StartDraw", 0.5f);
 			}
 		}
+		else if (Input.GetKeyDown(KeyCode.Alpha2)) {	
+			if (weaponOut == "Spear"){
+				return;
+			}
+
+			//a weapon is already equipped (not a scimitar)
+			if (weaponOut!="") {
+				newWeaponOut = "Spear";
+				StartSwitch ();
+
+			//no weapon is already equipped
+			} else {
+				StartShieldDraw ();
+				weaponOut = "Spear";
+				Invoke ("StartDraw", 0.5f);
+			}
+		}
 	}
+
+	void StartSwitch(){
+		myAnimator.SetBool ("SwitchingWeps", true);
+		Sheath.PlayDelayed (0.2f);
+		Unsheath.PlayDelayed (1f);
+	}
+
 
 	void StartShieldSheath(){
 		if (weaponOut!="") {
@@ -93,9 +116,7 @@ public class WeaponToggle : MonoBehaviour {
 		ShieldOut.SetActive (true);
 //		isShieldOut = true;
 	}
-
-
-
+		
 	void StartSheath() {
 		if (weaponOut!="") {
 			myAnimator.SetBool ("Sheathing", true);
@@ -103,13 +124,18 @@ public class WeaponToggle : MonoBehaviour {
 		}
 	}
 	public void FinishSheath(){
-
 		weaponsTable[weaponOut + "Out"].SetActive(false);
 		weaponsTable[weaponOut + "In"].SetActive(true);
 
 //		ShieldIn.SetActive (true);
 //		ShieldOut.SetActive (false);
-		weaponOut = "";
+
+		if (myAnimator.GetBool ("SwitchingWeps")) {
+			weaponOut = newWeaponOut;
+		} else {
+			weaponOut = "";
+		}
+		newWeaponOut = "";
 		myAnimator.SetBool ("Sheathing", false);
 		myAnimator.SetBool(("WeaponDrawn"), false);
 	}
@@ -120,7 +146,7 @@ public class WeaponToggle : MonoBehaviour {
 			Debug.LogAssertion ("In StartDraw but weaponOut is blank");
 			return;
 		}
-		Unsheath.PlayDelayed (1.1f);
+		Unsheath.PlayDelayed (0.3f);
 		myAnimator.SetBool ("Drawing", true);
 	}
 
@@ -130,7 +156,8 @@ public class WeaponToggle : MonoBehaviour {
 //		ShieldIn.SetActive (false);
 //		ShieldOut.SetActive (true);
 		myAnimator.SetBool ("Drawing", false);
-		myAnimator.SetBool(("WeaponDrawn"), true);
+		myAnimator.SetBool ("SwitchingWeps", false);
+		myAnimator.SetBool("WeaponDrawn", true);
 	}
 		
 
