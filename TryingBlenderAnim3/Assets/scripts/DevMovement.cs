@@ -4,16 +4,26 @@ using UnityEngine;
 
 public class DevMovement : MonoBehaviour {
 	public Transform CamTransform;
-
 	public Animator myAnimator;
-	private float needToRot;
 	public int adjustCounter;
+	public AudioSource footstep1;
+	public AudioSource footstep2;
+	public AudioSource footstep3;
+	public AudioSource footstep4;
+	public AudioSource land;
+	public AudioSource flipJump;
+
+	private float needToRot;
+	private int runCounter;
+
 
 	// Use this for initialization
 	void Start () {
 		myAnimator = GetComponent<Animator>();
 		needToRot = 0;
 		adjustCounter = 0;
+//		runIsPaused = false;
+		runCounter = 0;
 	}
 
 	public void adjustToCam(float dif, bool firstTimeAdjust)
@@ -45,6 +55,7 @@ public class DevMovement : MonoBehaviour {
 		return false;
 	}
 
+
 	// Update is called once per frame
 	void Update () {
 
@@ -62,19 +73,20 @@ public class DevMovement : MonoBehaviour {
 //			transform.Translate(Vector3.right * Time.deltaTime * 5);
 //		}
 
-		if(Input.GetKey(KeyCode.W)||Input.GetKey(KeyCode.UpArrow))
-		{
-			transform.Translate(Vector3.forward * Time.deltaTime * 7);
+		if ((Input.GetKey (KeyCode.W) || Input.GetKey (KeyCode.UpArrow)) && !Input.GetButtonDown ("Jump") && !Input.GetButtonDown ("FrontFlip")) {
+			transform.Translate (Vector3.forward * Time.deltaTime * 7);
+		} else {
+			stopFootstepSound ();
 		}
 		if(Input.GetButtonDown("Jump") && myAnimator.GetFloat("VSpeed") > 0 && adjustCounter == 0)
 		{
 			myAnimator.SetBool("Jumping", true);
-			Invoke("stopJumping", 0.7f);
+			Invoke("stopJumping", 0.9f);
 		}
 		else if(Input.GetButtonDown("FrontFlip") && myAnimator.GetFloat("VSpeed") > 0 && adjustCounter == 0)
 		{
 			myAnimator.SetBool ("shouldFrontFlip", true);
-			Invoke ("stopFrontFlip", 0.7f);
+			Invoke ("stopFrontFlip", 1.0f);
 		}
 		if(adjustCounter == 0) {
 			if (!myAnimator.GetBool ("Jumping") && !myAnimator.GetBool ("shouldFrontFlip")) {
@@ -87,6 +99,29 @@ public class DevMovement : MonoBehaviour {
 		}
 	}
 
+	void runningSound(){
+		if (runCounter == 0)
+			footstep1.Play ();
+		else if (runCounter == 1)
+			footstep2.Play ();
+		else if (runCounter == 2)
+			footstep3.Play ();
+		else if (runCounter == 3)
+			footstep4.Play ();
+		++runCounter;
+		if (runCounter == 4)
+			runCounter = 0;
+
+	}
+
+	void flipTakeOffSound(){
+		flipJump.Play ();
+	}
+
+	void landingSound(){
+		land.Play ();
+	}
+
 	void stopJumping()
 	{
 		myAnimator.SetBool("Jumping", false);
@@ -95,5 +130,16 @@ public class DevMovement : MonoBehaviour {
 	void stopFrontFlip()
 	{
 		myAnimator.SetBool ("shouldFrontFlip", false);
+	}
+
+	void stopFootstepSound(){
+		if (footstep1.isPlaying)
+			footstep1.Stop ();
+		if (footstep2.isPlaying)
+			footstep2.Stop ();
+		if (footstep3.isPlaying)
+			footstep3.Stop ();
+		if (footstep4.isPlaying)
+			footstep4.Stop ();
 	}
 }
