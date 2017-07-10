@@ -158,8 +158,15 @@ ModelImporter:
       bodyMask: 01000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000
       curves: []
       events:
-      - time: 0.060797237
+      - time: 0.011566468
         functionName: setApplyTrans
+        data: 
+        objectReferenceParameter: {instanceID: 0}
+        floatParameter: 0
+        intParameter: 0
+        messageOptions: 0
+      - time: 0.7628184
+        functionName: landingSound
         data: 
         objectReferenceParameter: {instanceID: 0}
         floatParameter: 0
@@ -167,6 +174,13 @@ ModelImporter:
         messageOptions: 0
       - time: 0.7939927
         functionName: stopJumping
+        data: 
+        objectReferenceParameter: {instanceID: 0}
+        floatParameter: 0
+        intParameter: 0
+        messageOptions: 0
+      - time: 0
+        functionName: flipTakeOffSound
         data: 
         objectReferenceParameter: {instanceID: 0}
         floatParameter: 0
