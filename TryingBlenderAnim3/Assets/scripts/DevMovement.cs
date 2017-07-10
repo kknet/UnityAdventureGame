@@ -13,6 +13,8 @@ public class DevMovement : MonoBehaviour {
 	public AudioSource land;
 	public AudioSource flipJump;
 
+
+	private bool applyJumpTrans;
 	private float needToRot;
 	private int runCounter;
 
@@ -24,6 +26,7 @@ public class DevMovement : MonoBehaviour {
 		adjustCounter = 0;
 //		runIsPaused = false;
 		runCounter = 0;
+		applyJumpTrans = false;
 	}
 
 	public void adjustToCam(float dif, bool firstTimeAdjust)
@@ -73,20 +76,23 @@ public class DevMovement : MonoBehaviour {
 //			transform.Translate(Vector3.right * Time.deltaTime * 5);
 //		}
 
-		if ((Input.GetKey (KeyCode.W) || Input.GetKey (KeyCode.UpArrow)) && !Input.GetButtonDown ("Jump") && !Input.GetButtonDown ("FrontFlip")) {
-			transform.Translate (Vector3.forward * Time.deltaTime * 7);
+		if ((Input.GetKey (KeyCode.W) || Input.GetKey (KeyCode.UpArrow)) && !myAnimator.GetBool("Jumping") && !myAnimator.GetBool("shouldFrontFlip")) {
+			transform.Translate (Vector3.forward * Time.deltaTime * 5f);
 		} else {
 			stopFootstepSound ();
 		}
+
+		if (applyJumpTrans) {
+			transform.Translate (Vector3.forward * Time.deltaTime * 10f);
+		}
+
 		if(Input.GetButtonDown("Jump") && myAnimator.GetFloat("VSpeed") > 0 && adjustCounter == 0)
 		{
 			myAnimator.SetBool("Jumping", true);
-			Invoke("stopJumping", 0.9f);
 		}
 		else if(Input.GetButtonDown("FrontFlip") && myAnimator.GetFloat("VSpeed") > 0 && adjustCounter == 0)
 		{
 			myAnimator.SetBool ("shouldFrontFlip", true);
-			Invoke ("stopFrontFlip", 1.0f);
 		}
 		if(adjustCounter == 0) {
 			if (!myAnimator.GetBool ("Jumping") && !myAnimator.GetBool ("shouldFrontFlip")) {
@@ -114,6 +120,10 @@ public class DevMovement : MonoBehaviour {
 
 	}
 
+	void setApplyTrans(){
+		applyJumpTrans = !applyJumpTrans;
+	}
+
 	void flipTakeOffSound(){
 		flipJump.Play ();
 	}
@@ -125,11 +135,13 @@ public class DevMovement : MonoBehaviour {
 	void stopJumping()
 	{
 		myAnimator.SetBool("Jumping", false);
+		applyJumpTrans = false;
 	}
 
 	void stopFrontFlip()
 	{
 		myAnimator.SetBool ("shouldFrontFlip", false);
+		applyJumpTrans = false;
 	}
 
 	void stopFootstepSound(){
