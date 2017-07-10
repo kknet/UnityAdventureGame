@@ -83,16 +83,18 @@ public class DevMovement : MonoBehaviour {
 		}
 
 		if (applyJumpTrans) {
-			transform.Translate (Vector3.forward * Time.deltaTime * 10f);
+			transform.Translate (Vector3.forward * Time.deltaTime * 8f);
 		}
 
 		if(Input.GetButtonDown("Jump") && myAnimator.GetFloat("VSpeed") > 0 && adjustCounter == 0)
 		{
 			myAnimator.SetBool("Jumping", true);
+			Invoke ("stopJumping", 0.8f);
 		}
 		else if(Input.GetButtonDown("FrontFlip") && myAnimator.GetFloat("VSpeed") > 0 && adjustCounter == 0)
 		{
 			myAnimator.SetBool ("shouldFrontFlip", true);
+			Invoke ("stopFrontFlip", 2.1f);
 		}
 		if(adjustCounter == 0) {
 			if (!myAnimator.GetBool ("Jumping") && !myAnimator.GetBool ("shouldFrontFlip")) {
@@ -120,9 +122,15 @@ public class DevMovement : MonoBehaviour {
 
 	}
 
-	void setApplyTrans(){
-		applyJumpTrans = !applyJumpTrans;
+	void onApplyTrans(){
+		applyJumpTrans = true;
 	}
+
+	void offApplyTrans(){
+		applyJumpTrans = false;
+	}
+
+
 
 	void flipTakeOffSound(){
 		flipJump.Play ();

@@ -166,7 +166,7 @@ ModelImporter:
         intParameter: 0
         messageOptions: 0
       - time: 0.24089636
-        functionName: setApplyTrans
+        functionName: onApplyTrans
         data: 
         objectReferenceParameter: {instanceID: 0}
         floatParameter: 0
@@ -180,7 +180,7 @@ ModelImporter:
         intParameter: 0
         messageOptions: 0
       - time: 0.6581168
-        functionName: stopFrontFlip
+        functionName: offApplyTrans
         data: 
         objectReferenceParameter: {instanceID: 0}
         floatParameter: 0
