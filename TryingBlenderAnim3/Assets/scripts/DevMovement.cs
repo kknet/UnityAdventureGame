@@ -76,7 +76,7 @@ public class DevMovement : MonoBehaviour {
 //			transform.Translate(Vector3.right * Time.deltaTime * 5);
 //		}
 
-		if ((Input.GetKey (KeyCode.W) || Input.GetKey (KeyCode.UpArrow)) && !myAnimator.GetBool("Jumping") && !myAnimator.GetBool("shouldFrontFlip")) {
+		if ((Input.GetKey (KeyCode.W) || Input.GetKey (KeyCode.UpArrow)) && !myAnimator.GetBool("Jumping") && !myAnimator.GetBool("shouldFrontFlip") && !myAnimator.GetBool("doAttack") && !myAnimator.GetBool("isBlocking")) {
 			transform.Translate (Vector3.forward * Time.deltaTime * 5f);
 		} else {
 			stopFootstepSound ();

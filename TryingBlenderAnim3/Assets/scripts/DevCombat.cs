@@ -13,10 +13,28 @@ public class DevCombat : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
-		if (Input.GetKeyDown (KeyCode.Mouse0)) {
+		//if attack button is pressed while an attack is already ongoing, ignore the button press
+
+		if (Input.GetKeyDown (KeyCode.Mouse0) && !myAnimator.GetBool ("doAttack") && !myAnimator.GetBool("isBlocking")) {
+
 			myAnimator.SetBool ("doAttack", true);
-			Invoke ("stopAttack", 0.3f);
+			switch (myAnimator.GetInteger ("quickAttack")) {
+			case 1:
+				Invoke ("stopAttack", 1.14f);
+				break;
+			case 2:
+				Invoke ("stopAttack", 1.1f);
+				break;
+			case 3:
+				Invoke ("stopAttack", 0.97f);
+				break;
+			default:
+				Debug.LogAssertion ("quickAttack is not set to 1-3, look at DevCombat.cs script");
+				break;
+			}
+
 		} else if (Input.GetKey (KeyCode.Mouse1)) {
+			myAnimator.SetBool ("doAttack", false);
 			myAnimator.SetBool ("isBlocking", true);
 		}
 
