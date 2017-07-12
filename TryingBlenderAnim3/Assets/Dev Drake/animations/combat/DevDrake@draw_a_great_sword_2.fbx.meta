@@ -170,7 +170,7 @@ ModelImporter:
       name: draw_a_great_sword_1
       takeName: mixamo.com
       firstFrame: 0
-      lastFrame: 13
+      lastFrame: 10.1
       wrapMode: 0
       orientationOffsetY: 0
       level: 0
@@ -190,7 +190,7 @@ ModelImporter:
       bodyMask: 01000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000
       curves: []
       events:
-      - time: 0.83531773
+      - time: 1
         functionName: FinishSheath
         data: 
         objectReferenceParameter: {instanceID: 0}
