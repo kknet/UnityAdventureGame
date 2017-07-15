@@ -75,18 +75,20 @@ public class DevMovement : MonoBehaviour {
 //		{
 //			transform.Translate(Vector3.right * Time.deltaTime * 5);
 //		}
+		AnimatorStateInfo anim = myAnimator.GetCurrentAnimatorStateInfo(0);
 
-		if ((Input.GetKey (KeyCode.W) || Input.GetKey (KeyCode.UpArrow)) 
-			&& !myAnimator.GetBool("Jumping") && !myAnimator.GetBool("shouldFrontFlip") && 
-			player.GetComponent<DevCombat>().notInCombatMove()) {
-//				Debug.Log ("Running!");
-				transform.Translate (Vector3.forward * Time.deltaTime * 5f);
+		if (anim.IsTag("Running") && myAnimator.GetFloat("VSpeed") > 0.5f) {
+			transform.Translate (Vector3.forward * Time.deltaTime * 5f * myAnimator.GetFloat("VSpeed"));
 		} else {
 			stopFootstepSound ();
 		}
 
-		if (applyJumpTrans && player.GetComponent<DevCombat>().notInCombatMove()) {
-			transform.Translate (Vector3.forward * Time.deltaTime * 8f);
+		if (applyJumpTrans && anim.IsTag("Jumps")) {
+			if(anim.IsName("running_jump")) {
+				transform.Translate (Vector3.forward * Time.deltaTime * 8f);
+			} else {
+				transform.Translate (Vector3.forward * Time.deltaTime * 12f);
+			}
 		}
 
 		if(Input.GetButtonDown("Jump") && myAnimator.GetFloat("VSpeed") > 0 && adjustCounter == 0 
