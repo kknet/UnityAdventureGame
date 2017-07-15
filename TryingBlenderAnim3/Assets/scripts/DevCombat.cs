@@ -13,12 +13,15 @@ public class DevCombat : MonoBehaviour {
 
 	// Update is called once per frame
 	void Update () {
+		
+
 		//if attack button is pressed while an attack is already ongoing, ignore the button press
-		if(!myAnimator.GetBool("WeaponDrawn")){
-			myAnimator.SetBool ("doAttack", false);
-			myAnimator.SetBool ("isBlocking", false);
-			return;	
-		} 
+
+//		if(!myAnimator.GetBool("WeaponDrawn")){
+//			myAnimator.SetBool ("doAttack", false);
+//			myAnimator.SetBool ("isBlocking", false);
+//			return;	
+//		} 
 
 		//if holding RMB, block
 		if (Input.GetKey (KeyCode.Mouse1)) {

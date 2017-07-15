@@ -62,7 +62,7 @@ public class DevMovement : MonoBehaviour {
 	// Update is called once per frame
 	void Update () {
 
-		myAnimator.SetFloat("VSpeed", Input.GetAxis("Vertical"));
+		myAnimator.SetFloat ("VSpeed", Input.GetAxis ("Vertical"));
 
 //		myAnimator.SetFloat("HorizSpeed", Input.GetAxis("Horizontal"));
 
@@ -76,11 +76,11 @@ public class DevMovement : MonoBehaviour {
 //			transform.Translate(Vector3.right * Time.deltaTime * 5);
 //		}
 
-
-
-		if ((Input.GetKey (KeyCode.W) || Input.GetKey (KeyCode.UpArrow)) && !myAnimator.GetBool("Jumping") &&
-			!myAnimator.GetBool("shouldFrontFlip") && player.GetComponent<DevCombat>().notInCombatMove()) {
-			transform.Translate (Vector3.forward * Time.deltaTime * 5f);
+		if ((Input.GetKey (KeyCode.W) || Input.GetKey (KeyCode.UpArrow)) 
+			&& !myAnimator.GetBool("Jumping") && !myAnimator.GetBool("shouldFrontFlip") && 
+			player.GetComponent<DevCombat>().notInCombatMove()) {
+				Debug.Log ("Running!");
+				transform.Translate (Vector3.forward * Time.deltaTime * 5f);
 		} else {
 			stopFootstepSound ();
 		}
@@ -120,7 +120,6 @@ public class DevMovement : MonoBehaviour {
 		++runCounter;
 		if (runCounter == 4)
 			runCounter = 0;
-
 	}
 
 	void onApplyTrans(){
