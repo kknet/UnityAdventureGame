@@ -13,7 +13,10 @@ public class DevCombat : MonoBehaviour {
 
 	// Update is called once per frame
 	void Update () {
-		
+//		int layerIndex = 0;
+//		Debug.Log (myAnimator.GetCurrentAnimatorStateInfo (0).fullPathHash);
+
+//		Debug.Log ("in combat: " + !notInCombatMove());
 
 		//if attack button is pressed while an attack is already ongoing, ignore the button press
 
@@ -39,8 +42,13 @@ public class DevCombat : MonoBehaviour {
 		}
 	}
 
-	public bool notInCombatMove(){
-		return !myAnimator.GetBool ("doAttack") && !myAnimator.GetBool ("isBlocking");
+	public bool notInCombatMove() {
+		return !isAttacking() && !myAnimator.GetBool ("isBlocking");
+	}
+
+	bool isAttacking() {
+		AnimatorStateInfo info = myAnimator.GetCurrentAnimatorStateInfo (0);
+		return info.IsName ("quick_1") || info.IsName ("quick_2") || info.IsName ("quick_3");
 	}
 
 	public void stopAttack(){

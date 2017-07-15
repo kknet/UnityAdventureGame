@@ -79,7 +79,7 @@ public class DevMovement : MonoBehaviour {
 		if ((Input.GetKey (KeyCode.W) || Input.GetKey (KeyCode.UpArrow)) 
 			&& !myAnimator.GetBool("Jumping") && !myAnimator.GetBool("shouldFrontFlip") && 
 			player.GetComponent<DevCombat>().notInCombatMove()) {
-				Debug.Log ("Running!");
+//				Debug.Log ("Running!");
 				transform.Translate (Vector3.forward * Time.deltaTime * 5f);
 		} else {
 			stopFootstepSound ();
