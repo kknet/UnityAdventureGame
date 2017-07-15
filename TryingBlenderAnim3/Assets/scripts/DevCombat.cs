@@ -10,41 +10,37 @@ public class DevCombat : MonoBehaviour {
 	void Start () {
 		myAnimator = GetComponent<Animator>();
 	}
-	
+
 	// Update is called once per frame
 	void Update () {
 		//if attack button is pressed while an attack is already ongoing, ignore the button press
+		if(!myAnimator.GetBool("WeaponDrawn")){
+			myAnimator.SetBool ("doAttack", false);
+			myAnimator.SetBool ("isBlocking", false);
+			return;	
+		} 
 
-		if (Input.GetKeyDown (KeyCode.Mouse0) && !myAnimator.GetBool ("doAttack") && !myAnimator.GetBool("isBlocking")) {
-
-			myAnimator.SetBool ("doAttack", true);
-			switch (myAnimator.GetInteger ("quickAttack")) {
-			case 1:
-				Invoke ("stopAttack", 1.14f);
-				break;
-			case 2:
-				Invoke ("stopAttack", 1.1f);
-				break;
-			case 3:
-				Invoke ("stopAttack", 0.97f);
-				break;
-			default:
-				Debug.LogAssertion ("quickAttack is not set to 1-3, look at DevCombat.cs script");
-				break;
-			}
-
-		} else if (Input.GetKey (KeyCode.Mouse1)) {
+		//if holding RMB, block
+		if (Input.GetKey (KeyCode.Mouse1)) {
 			myAnimator.SetBool ("doAttack", false);
 			myAnimator.SetBool ("isBlocking", true);
-		}
+		} else {
+			myAnimator.SetBool ("isBlocking", false);		
 
-		if (Input.GetKeyUp (KeyCode.Mouse1)) {
-			myAnimator.SetBool ("isBlocking", false);
+			//otherwise, if clicked LMB, attack
+			if (Input.GetKeyDown (KeyCode.Mouse0)) {
+				myAnimator.SetBool ("doAttack", true);
+			} else {
+				myAnimator.SetBool ("doAttack", false);
+			}
 		}
-
 	}
 
-	void stopAttack(){
+	public bool notInCombatMove(){
+		return !myAnimator.GetBool ("doAttack") && !myAnimator.GetBool ("isBlocking");
+	}
+
+	public void stopAttack(){
 		myAnimator.SetBool ("doAttack", false);
 		switch (myAnimator.GetInteger ("quickAttack")) {
 			case 1:

@@ -42,6 +42,7 @@ public class WeaponToggle : MonoBehaviour {
 
 	// Update is called once per frame
 	void Update () {
+
 		if (Input.GetKeyDown (KeyCode.C)) {
 			if (weaponOut != "") {
 				StartSheath ();
@@ -89,6 +90,7 @@ public class WeaponToggle : MonoBehaviour {
 		Sheath.PlayDelayed (0.2f);
 		myAnimator.SetBool ("Drawing", true);
 		Unsheath.PlayDelayed (0.3f);
+		myAnimator.SetBool ("WeaponDrawn", true);
 	}
 
 
@@ -138,7 +140,12 @@ public class WeaponToggle : MonoBehaviour {
 		}
 		newWeaponOut = "";
 		myAnimator.SetBool ("Sheathing", false);
-		myAnimator.SetBool ("WeaponDrawn", false);
+
+		if (myAnimator.GetBool ("SwitchingWeps")) {
+			myAnimator.SetBool ("WeaponDrawn", true);
+		} else {
+			myAnimator.SetBool ("WeaponDrawn", false);
+		}
 	}
 
 	//assumes that previous weapon (if any) has been sheathed

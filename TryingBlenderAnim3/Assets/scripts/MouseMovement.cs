@@ -46,7 +46,15 @@ public class MouseMovement : MonoBehaviour {
 
 	private void HorizontalRotation(){
 		bool idle = player.GetComponent<DevMovement>().isIdle ();
+		bool combating = !player.GetComponent<DevCombat>().notInCombatMove();
 		float movementX = Input.GetAxis ("Mouse X") * sensitivityX * Time.deltaTime;
+//		if (combating) {
+//			if (!Mathf.Approximately (movementX, 0f)) {
+//				transform.RotateAround (player.transform.position, Vector3.up, movementX);
+//				firstTimeAdjust = true;
+//			}
+//			return;
+//		}
 		if (!Mathf.Approximately (movementX, 0f)) {
 			if (idle) {
 //				deltaHoriz = movementX;

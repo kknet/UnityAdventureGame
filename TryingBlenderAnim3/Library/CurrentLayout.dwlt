@@ -20,7 +20,7 @@ MonoBehaviour:
   m_ShowMode: 4
   m_Title: 
   m_RootView: {fileID: 2}
-  m_MinSize: {x: 950, y: 442}
+  m_MinSize: {x: 950, y: 445}
   m_MaxSize: {x: 10000, y: 10000}
 --- !u!114 &2
 MonoBehaviour:
@@ -43,7 +43,7 @@ MonoBehaviour:
     y: 0
     width: 1280
     height: 982
-  m_MinSize: {x: 950, y: 442}
+  m_MinSize: {x: 950, y: 445}
   m_MaxSize: {x: 10000, y: 10000}
 --- !u!114 &3
 MonoBehaviour:
@@ -107,10 +107,10 @@ MonoBehaviour:
     y: 30
     width: 1280
     height: 932
-  m_MinSize: {x: 713, y: 392}
-  m_MaxSize: {x: 18008, y: 14042}
+  m_MinSize: {x: 713, y: 395}
+  m_MaxSize: {x: 18008, y: 14045}
   vertical: 0
-  controlID: 16832
+  controlID: 1070
 --- !u!114 &6
 MonoBehaviour:
   m_ObjectHideFlags: 52
@@ -156,10 +156,10 @@ MonoBehaviour:
     y: 0
     width: 645
     height: 932
-  m_MinSize: {x: 234, y: 392}
-  m_MaxSize: {x: 10004, y: 14042}
+  m_MinSize: {x: 234, y: 395}
+  m_MaxSize: {x: 10004, y: 14045}
   vertical: 1
-  controlID: 16810
+  controlID: 1093
 --- !u!114 &8
 MonoBehaviour:
   m_ObjectHideFlags: 52
@@ -178,16 +178,16 @@ MonoBehaviour:
     y: 0
     width: 645
     height: 525
-  m_MinSize: {x: 104, y: 121}
-  m_MaxSize: {x: 4004, y: 4021}
-  m_ActualView: {fileID: 14}
+  m_MinSize: {x: 102, y: 124}
+  m_MaxSize: {x: 4002, y: 4024}
+  m_ActualView: {fileID: 11}
   m_Panes:
   - {fileID: 13}
   - {fileID: 14}
   - {fileID: 11}
   - {fileID: 15}
-  m_Selected: 1
-  m_LastSelected: 2
+  m_Selected: 2
+  m_LastSelected: 1
 --- !u!114 &9
 MonoBehaviour:
   m_ObjectHideFlags: 52
@@ -344,9 +344,9 @@ MonoBehaviour:
     height: 911
   m_TreeViewState:
     scrollPos: {x: 0, y: 0}
-    m_SelectedIDs: c0300000
-    m_LastClickedID: 0
-    m_ExpandedIDs: 0afbffff56fbffff6cfbffffd6fbffffe6fbffff00000000ee2e0000
+    m_SelectedIDs: f02e0000
+    m_LastClickedID: 12016
+    m_ExpandedIDs: e6fbffff00000000
     m_RenameOverlay:
       m_UserAcceptedRename: 0
       m_Name: 
@@ -429,16 +429,19 @@ MonoBehaviour:
     - {fileID: 1107940940928886232, guid: 9ea4f799bd9a9dd49b201833f1096038, type: 2}
     - {fileID: 1102349133504015604, guid: 9ea4f799bd9a9dd49b201833f1096038, type: 2}
     m_ValueSerializationHelper:
-    - {x: 848.6001, y: 82}
+    - {x: 943.6001, y: 109}
     - {x: 446.6, y: 196.6}
     - {x: 457.40002, y: 95.600006}
-    - {x: 580.6, y: 618.80005}
+    - {x: 489.59998, y: 619.80005}
     - {x: 446.6, y: 196.6}
   m_PreviewAnimator: {fileID: 0}
   m_AnimatorController: {fileID: 9100000, guid: 9ea4f799bd9a9dd49b201833f1096038,
     type: 2}
   m_BreadCrumbs:
   - m_Target: {fileID: 1107884758355002826, guid: 9ea4f799bd9a9dd49b201833f1096038,
+      type: 2}
+    m_ScrollPosition: {x: 0, y: 0}
+  - m_Target: {fileID: 1107940940928886232, guid: 9ea4f799bd9a9dd49b201833f1096038,
       type: 2}
     m_ScrollPosition: {x: 0, y: 0}
   stateMachineGraph: {fileID: 0}
@@ -548,9 +551,9 @@ MonoBehaviour:
   m_DepthBufferBits: 0
   m_Pos:
     serializedVersion: 2
-    x: 265
+    x: 264
     y: -408
-    width: 640
+    width: 641
     height: 386
 --- !u!114 &17
 MonoBehaviour:
@@ -589,19 +592,19 @@ MonoBehaviour:
     m_ShowAllHits: 0
     m_SearchArea: 0
     m_Folders:
-    - Assets/Dev Drake/animations/combat/sword_attacks
+    - Assets/scripts
   m_ViewMode: 1
   m_StartGridSize: 64
   m_LastFolders:
-  - Assets/Dev Drake/animations/combat/sword_attacks
+  - Assets/scripts
   m_LastFoldersGridSize: -1
   m_LastProjectPath: C:\Users\rsa\Documents\GitHub\UnityAdventureGame\TryingBlenderAnim3
   m_IsLocked: 0
   m_FolderTreeState:
     scrollPos: {x: 0, y: 79}
-    m_SelectedIDs: 78280000
-    m_LastClickedID: 10360
-    m_ExpandedIDs: 00000000d4240000d225000016280000342b00005c2c0000de2c00007c2d00008c2d0000cc2d0000222e0000183100001a3100001c31000000ca9a3bffffff7f
+    m_SelectedIDs: 0a2a0000
+    m_LastClickedID: 10762
+    m_ExpandedIDs: 00000000d4240000d225000016280000342b00005c2c0000de2c00007c2d00008c2d0000cc2d0000222e000030310000323100003431000000ca9a3bffffff7f
     m_RenameOverlay:
       m_UserAcceptedRename: 0
       m_Name: 
@@ -629,7 +632,7 @@ MonoBehaviour:
     scrollPos: {x: 0, y: 0}
     m_SelectedIDs: 
     m_LastClickedID: 0
-    m_ExpandedIDs: 00000000d4240000d225000016280000342b00005c2c0000de2c00007c2d00008c2d0000cc2d0000222e0000183100001a3100001c31000000ca9a3bffffff7f
+    m_ExpandedIDs: 00000000d4240000d225000016280000342b00005c2c0000de2c00007c2d00008c2d0000cc2d0000222e000030310000323100003431000000ca9a3bffffff7f
     m_RenameOverlay:
       m_UserAcceptedRename: 0
       m_Name: 
