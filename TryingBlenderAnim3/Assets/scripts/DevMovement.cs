@@ -19,7 +19,6 @@ public class DevMovement : MonoBehaviour {
 	private float needToRot;
 	private int runCounter;
 
-
 	// Use this for initialization
 	void Start () {
 		myAnimator = GetComponent<Animator>();
@@ -62,23 +61,28 @@ public class DevMovement : MonoBehaviour {
 	// Update is called once per frame
 	void Update () {
 
+		Debug.Log (transform.eulerAngles.y);
+
 		myAnimator.SetFloat ("VSpeed", Input.GetAxis ("Vertical"));
+		myAnimator.SetFloat ("HorizSpeed", Input.GetAxis("Horizontal"));
 
-//		myAnimator.SetFloat("HorizSpeed", Input.GetAxis("Horizontal"));
-
-//		if(Input.GetKey(KeyCode.A)||Input.GetKey(KeyCode.LeftArrow))
-//		{
-//			transform.Translate(Vector3.left * Time.deltaTime * 5);
-//		}
-//
-//		else if(Input.GetKey(KeyCode.D)||Input.GetKey(KeyCode.RightArrow))
-//		{
-//			transform.Translate(Vector3.right * Time.deltaTime * 5);
-//		}
 		AnimatorStateInfo anim = myAnimator.GetCurrentAnimatorStateInfo(0);
 
-		if (anim.IsTag("Running") && myAnimator.GetFloat("VSpeed") > 0.5f) {
-			transform.Translate (Vector3.forward * Time.deltaTime * 5f * myAnimator.GetFloat("VSpeed"));
+		if (Input.GetKey (KeyCode.A) || Input.GetKey (KeyCode.LeftArrow) || Input.GetKey (KeyCode.D) || Input.GetKey (KeyCode.RightArrow)) {
+			if(myAnimator.GetFloat("VSpeed") < -0.5f) 
+				transform.Translate(Vector3.right * Time.deltaTime * 1 * myAnimator.GetFloat("HorizSpeed"));
+			else if(myAnimator.GetFloat("VSpeed") > 0.5f) 
+				transform.Translate(Vector3.right * Time.deltaTime * 2 * myAnimator.GetFloat("HorizSpeed"));
+			else
+				transform.Translate(Vector3.right * Time.deltaTime * 3 * myAnimator.GetFloat("HorizSpeed"));
+		}
+			
+
+		if (anim.IsTag("Running")) {
+			if(myAnimator.GetFloat("VSpeed") > 0.5f)
+				transform.Translate (Vector3.forward * Time.deltaTime * 5f * myAnimator.GetFloat("VSpeed"));
+			else if(myAnimator.GetFloat("VSpeed") < -0.5f)
+				transform.Translate (Vector3.forward * Time.deltaTime * 2f * myAnimator.GetFloat("VSpeed"));
 		} else {
 			stopFootstepSound ();
 		}
@@ -108,6 +112,14 @@ public class DevMovement : MonoBehaviour {
 				transform.Rotate (Vector3.up * Input.GetAxis("Mouse X") * Time.deltaTime * Camera.main.GetComponent<MouseMovement>().sensitivityX);
 			}
 		}
+	}
+
+	void rotateRight(){
+		transform.Rotate(new Vector3(0f, 9f, 0f)); 
+	}
+
+	void rotateLeft(){
+		transform.Rotate(new Vector3(0f, -9f, 0f));  
 	}
 
 	void runningSound(){
@@ -163,5 +175,14 @@ public class DevMovement : MonoBehaviour {
 			footstep3.Stop ();
 		if (footstep4.isPlaying)
 			footstep4.Stop ();
+	}
+
+
+	void stopTurnRight(){
+		myAnimator.SetBool ("TurnRight", false);
+	}
+
+	void stopTurnLeft(){
+		myAnimator.SetBool ("TurnLeft", false);
 	}
 }
