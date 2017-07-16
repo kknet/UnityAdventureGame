@@ -74,7 +74,7 @@ public class DevMovement : MonoBehaviour {
 			else if(myAnimator.GetFloat("VSpeed") > 0.5f) 
 				transform.Translate(Vector3.right * Time.deltaTime * 2 * myAnimator.GetFloat("HorizSpeed"));
 			else
-				transform.Translate(Vector3.right * Time.deltaTime * 3 * myAnimator.GetFloat("HorizSpeed"));
+				transform.Translate(Vector3.right * Time.deltaTime * 4 * myAnimator.GetFloat("HorizSpeed"));
 		}
 			
 
@@ -82,7 +82,7 @@ public class DevMovement : MonoBehaviour {
 			if(myAnimator.GetFloat("VSpeed") > 0.5f)
 				transform.Translate (Vector3.forward * Time.deltaTime * 5f * myAnimator.GetFloat("VSpeed"));
 			else if(myAnimator.GetFloat("VSpeed") < -0.5f)
-				transform.Translate (Vector3.forward * Time.deltaTime * 2f * myAnimator.GetFloat("VSpeed"));
+				transform.Translate (Vector3.forward * Time.deltaTime * 4f * myAnimator.GetFloat("VSpeed"));
 		} 
 
 		if (Mathf.Approximately(myAnimator.GetFloat("VSpeed"), 0f) && Mathf.Approximately(myAnimator.GetFloat("HorizSpeed"), 0f)) {
