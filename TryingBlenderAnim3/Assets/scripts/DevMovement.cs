@@ -83,7 +83,9 @@ public class DevMovement : MonoBehaviour {
 				transform.Translate (Vector3.forward * Time.deltaTime * 5f * myAnimator.GetFloat("VSpeed"));
 			else if(myAnimator.GetFloat("VSpeed") < -0.5f)
 				transform.Translate (Vector3.forward * Time.deltaTime * 2f * myAnimator.GetFloat("VSpeed"));
-		} else {
+		} 
+
+		if (Mathf.Approximately(myAnimator.GetFloat("VSpeed"), 0f) && Mathf.Approximately(myAnimator.GetFloat("HorizSpeed"), 0f)) {
 			stopFootstepSound ();
 		}
 
@@ -123,6 +125,22 @@ public class DevMovement : MonoBehaviour {
 	}
 
 	void runningSound(){
+		if (runCounter == 0)
+			footstep1.Play ();
+		else if (runCounter == 1)
+			footstep2.Play ();
+		else if (runCounter == 2)
+			footstep3.Play ();
+		else if (runCounter == 3)
+			footstep4.Play ();
+		++runCounter;
+		if (runCounter == 4)
+			runCounter = 0;
+	}
+
+	void horizRunningSound(){
+		if (myAnimator.GetFloat ("VSpeed") != 0f)
+			return;
 		if (runCounter == 0)
 			footstep1.Play ();
 		else if (runCounter == 1)
