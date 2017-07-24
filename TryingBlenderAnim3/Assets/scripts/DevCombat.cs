@@ -36,6 +36,7 @@ public class DevCombat : MonoBehaviour {
 			//otherwise, if clicked LMB, attack
 			if (Input.GetKeyDown (KeyCode.Mouse0)) {
 				myAnimator.SetBool ("doAttack", true);
+				Invoke ("switchAttack", 0.5f);
 			} else {
 				myAnimator.SetBool ("doAttack", false);
 			}
@@ -51,21 +52,24 @@ public class DevCombat : MonoBehaviour {
 		return info.IsName ("quick_1") || info.IsName ("quick_2") || info.IsName ("quick_3");
 	}
 
+	public void switchAttack(){
+		switch (myAnimator.GetInteger ("quickAttack")) {
+		case 1:
+			myAnimator.SetInteger ("quickAttack", 2);
+			break;
+		case 2:
+			myAnimator.SetInteger ("quickAttack", 3);
+			break;
+		case 3:
+			myAnimator.SetInteger ("quickAttack", 1);
+			break;
+		default:
+			Debug.LogAssertion ("quickAttack is not set to 1-3, look at DevCombat.cs script");
+			break;
+		}
+	}
+
 	public void stopAttack(){
 		myAnimator.SetBool ("doAttack", false);
-		switch (myAnimator.GetInteger ("quickAttack")) {
-			case 1:
-				myAnimator.SetInteger ("quickAttack", 2);
-				break;
-			case 2:
-				myAnimator.SetInteger ("quickAttack", 3);
-				break;
-			case 3:
-				myAnimator.SetInteger ("quickAttack", 1);
-				break;
-			default:
-				Debug.LogAssertion ("quickAttack is not set to 1-3, look at DevCombat.cs script");
-				break;
-		}
 	}
 }

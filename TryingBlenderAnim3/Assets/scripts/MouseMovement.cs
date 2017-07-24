@@ -10,6 +10,8 @@ public class MouseMovement : MonoBehaviour {
 	public float sensitivityY;
 	public GameObject player;
 
+	private Vector3 closePos;
+
 	[SerializeField][HideInInspector]
 	private Vector3 initialOffset;
 	private Vector3 currentOffset;
@@ -19,14 +21,30 @@ public class MouseMovement : MonoBehaviour {
 		initialOffset = transform.position - player.transform.position;
 	}
 
+//	private bool Approx(Vector3 a, Vector3 b){
+//		return Mathf.Approximately (a.x, b.x) && Mathf.Approximately (a.y, b.y) && Mathf.Approximately (a.z, b.z);
+//	}
+//
+//	public void ZoomIn() {
+////		Vector3 dir = transform.position - closePos;
+//		transform.position.Set (closePos.x, closePos.y, closePos.z);
+//		currentOffset = transform.position - player.transform.position;
+//	}
+//
+//	public void ZoomOut(Vector3 direction) {
+//		Vector3 current = transform.position - player.transform.position;
+//		if (!Approx (current, initialOffset)) {
+//			transform.Translate (direction);		
+//		}
+//	}
+		
 	private void Start () {
 		if(player == null) {
 			Debug.LogError ("Assign a player for the camera in Unity's inspector");
 		}
 		currentOffset = initialOffset;
 		firstTimeAdjust = false;
-//		deltaVert = 0f;
-//		deltaVert = 0f;
+		closePos = new Vector3 (0f, 1.54f, -1.425f);
 	}
 
 	private void VerticalRotation()  {
