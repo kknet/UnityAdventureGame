@@ -46,7 +46,7 @@ public class DevCombat : MonoBehaviour {
 		return !isAttacking() && !myAnimator.GetBool ("isBlocking");
 	}
 
-	bool isAttacking() {
+	public bool isAttacking() {
 		AnimatorStateInfo info = myAnimator.GetCurrentAnimatorStateInfo (0);
 		return info.IsName ("quick_1") || info.IsName ("quick_2") || info.IsName ("quick_3");
 	}

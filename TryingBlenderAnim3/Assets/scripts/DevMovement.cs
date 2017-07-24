@@ -61,7 +61,7 @@ public class DevMovement : MonoBehaviour {
 	// Update is called once per frame
 	void Update () {
 
-		Debug.Log (transform.eulerAngles.y);
+//		Debug.Log (transform.eulerAngles.y);
 
 		myAnimator.SetFloat ("VSpeed", Input.GetAxis ("Vertical"));
 		myAnimator.SetFloat ("HorizSpeed", Input.GetAxis("Horizontal"));
