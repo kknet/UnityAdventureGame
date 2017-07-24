@@ -1,103 +1,182 @@
 ﻿//using System.Collections;
 //using System.Collections.Generic;
 //using UnityEngine;
-//using System.Collections;
-//using System.Collections.Generic;
-//using UnityEngine;
 //
-//public class DevAnimScript : MonoBehaviour {
-//	public Transform CamTransform;
+//public class WeaponToggle : MonoBehaviour {
 //
 //	public Animator myAnimator;
-//	private float needToRot;
+//	public AudioSource Sheath;
+//	public AudioSource Unsheath;
+//
+//	private string weaponOut;
+//	private string newWeaponOut;
+//	GameObject[] allWeps;
+//	Dictionary <string, GameObject> weaponsTable;
+//	GameObject ShieldIn;
+//	GameObject ShieldOut;
+//	//	bool isShieldOut;
 //
 //	// Use this for initialization
 //	void Start () {
-//		myAnimator = GetComponent<Animator>();
-//		needToRot = 0;
-//		myAnimator.SetBool ("adjustingToCam", false);
+//		weaponsTable = new Dictionary<string, GameObject> ();
+//		allWeps = GameObject.FindGameObjectsWithTag ("Weapons");
+//		myAnimator = GameObject.Find ("DevDrake").GetComponent<Animator> ();
+//		ShieldIn = GameObject.Find ("ShieldIn");
+//		ShieldOut = GameObject.Find ("ShieldOut");
+//		ShieldIn.SetActive (true);
+//		ShieldOut.SetActive (false);
+//		weaponOut = "";
+//		initTable ();
+//		setOutInactive ();
+//		//		isShieldOut = false;
 //	}
 //
-//	public void adjustToCam(float dif, bool needToAdjust)
-//	{
-//		if (Mathf.Approximately (dif, 0f)) {
-//			myAnimator.SetBool ("adjustingToCam", false);
-//			needToAdjust = false;
-//			return;
+//	void initTable(){
+//		foreach (GameObject g in allWeps) {
+//			weaponsTable.Add (g.name, g);
 //		}
-//		if(myAnimator.GetBool ("adjustingToCam")){
-//			if (dif > 180f)
-//				dif = dif - 360f;
-//			else if (dif < -180f)
-//				dif = dif + 360f;
-//			needToRot = dif / 15.0f;
-//		}
-//		myAnimator.SetBool ("adjustingToCam", true);
-//		transform.Rotate (Vector3.up * needToRot);
-//		//		if (Mathf.Approximately(transform.rotation.eulerAngles.y, CamTransform.rotation.eulerAngles.y)) {
-//		//			myAnimator.SetBool ("adjustingToCam", false);
-//		//			needToAdjust = false;
-//		//		}
+//		//		if(weaponOut!="")
+//		//			weaponsTable[weaponOut + "In"].SetActive(false);
 //	}
 //
-//	public bool isIdle()
-//	{
-//		if (myAnimator.GetFloat ("VSpeed") == 0 && myAnimator.GetFloat ("HorizSpeed") == 0 && myAnimator.GetBool ("shouldFrontFlip") == false && myAnimator.GetBool ("Jumping") == false)
-//		{
-//			return true;
-//		}
-//		return false;
-//	}
 //
 //	// Update is called once per frame
 //	void Update () {
 //
-//		myAnimator.SetFloat("VSpeed", Input.GetAxis("Vertical"));
-//
-//		//		myAnimator.SetFloat("HorizSpeed", Input.GetAxis("Horizontal"));
-//
-//		//		if(Input.GetKey(KeyCode.A)||Input.GetKey(KeyCode.LeftArrow))
-//		//		{
-//		//			transform.Translate(Vector3.left * Time.deltaTime * 5);
-//		//		}
-//		//
-//		//		else if(Input.GetKey(KeyCode.D)||Input.GetKey(KeyCode.RightArrow))
-//		//		{
-//		//			transform.Translate(Vector3.right * Time.deltaTime * 5);
-//		//		}
-//
-//		if(Input.GetKey(KeyCode.W)||Input.GetKey(KeyCode.UpArrow))
-//		{
-//			transform.Translate(Vector3.forward * Time.deltaTime * 7);
+//		if (Input.GetKeyDown (KeyCode.C)) {
+//			if (weaponOut != "") {
+//				StartSheath ();
+//				Invoke ("StartShieldSheath", 0.5f);
+//			}
 //		}
-//		if(Input.GetButtonDown("Jump"))
-//		{
-//			myAnimator.SetBool("Jumping", true);
-//			Invoke("stopJumping", 0.5f);
+//		else if (Input.GetKeyDown(KeyCode.Alpha1)) {	
+//			if (weaponOut == "Scimitar"){
+//				return;
+//			}
+//
+//			//a weapon is already equipped (not a scimitar)
+//			if (weaponOut!="") {
+//				newWeaponOut = "Scimitar";
+//				StartSwitch ();
+//
+//				//no weapon is already equipped
+//			} else {
+//				StartShieldDraw ();
+//				weaponOut = "Scimitar";
+//				Invoke ("StartDraw", 0.5f);
+//			}
 //		}
-//		else if(Input.GetButtonDown("FrontFlip"))
-//		{
-//			myAnimator.SetBool ("shouldFrontFlip", true);
-//			Invoke ("stopFrontFlip", 0.5f);
-//		}
-//		if(!myAnimator.GetBool("adjustingToCam")) {
-//			if (!myAnimator.GetBool ("Jumping") && !myAnimator.GetBool ("shouldFrontFlip")) {
-//				if (Mathf.Abs (myAnimator.GetFloat ("VSpeed")) > 0.0f && Input.GetAxis ("Mouse X") > 0) {
-//					transform.Rotate (Vector3.up * Time.deltaTime * 100.0f);
-//				} else if (Mathf.Abs (myAnimator.GetFloat ("VSpeed")) > 0.0f && Input.GetAxis ("Mouse X") < 0) {
-//					transform.Rotate (Vector3.down * Time.deltaTime * 100.0f);
-//				}
+//		else if (Input.GetKeyDown(KeyCode.Alpha2)) {	
+//			if (weaponOut == "Spear"){
+//				return;
+//			}
+//
+//			//a weapon is already equipped (not a scimitar)
+//			if (weaponOut!="") {
+//				newWeaponOut = "Spear";
+//				StartSwitch ();
+//
+//				//no weapon is already equipped
+//			} else {
+//				StartShieldDraw ();
+//				weaponOut = "Spear";
+//				Invoke ("StartDraw", 0.5f);
 //			}
 //		}
 //	}
 //
-//	void stopJumping()
-//	{
-//		myAnimator.SetBool("Jumping", false);
+//	void StartSwitch(){
+//		myAnimator.SetBool ("SwitchingWeps", true);
+//		Sheath.PlayDelayed (0.2f);
+//		myAnimator.SetBool ("Drawing", true);
+//		Unsheath.PlayDelayed (0.3f);
+//		myAnimator.SetBool ("WeaponDrawn", true);
 //	}
 //
-//	void stopFrontFlip()
+//
+//	void StartShieldSheath(){
+//		if (weaponOut!="") {
+//			myAnimator.SetBool ("ShieldDraw", false);
+//			myAnimator.SetBool ("ShieldSheath", true);
+//		}
+//	}
+//
+//	void FinishShieldSheath(){
+//		ShieldIn.SetActive (true);
+//		ShieldOut.SetActive (false);
+//		//		isShieldOut = false;
+//	}
+//
+//	void StartShieldDraw(){
+//		if (weaponOut=="") {
+//			myAnimator.SetBool ("ShieldSheath", false);
+//			myAnimator.SetBool ("ShieldDraw", true);
+//		}
+//	}
+//
+//	void FinishShieldDraw(){
+//		ShieldIn.SetActive (false);
+//		ShieldOut.SetActive (true);
+//		//		isShieldOut = true;
+//	}
+//
+//	void StartSheath() {
+//		if (weaponOut!="") {
+//			myAnimator.SetBool ("Sheathing", true);
+//			Sheath.PlayDelayed (0.3f);
+//		}
+//	}
+//	public void FinishSheath(){
+//		weaponsTable[weaponOut + "Out"].SetActive(false);
+//		weaponsTable[weaponOut + "In"].SetActive(true);
+//
+//		//		ShieldIn.SetActive (true);
+//		//		ShieldOut.SetActive (false);
+//
+//		if (myAnimator.GetBool ("SwitchingWeps")) {
+//			weaponOut = newWeaponOut;
+//		} else {
+//			weaponOut = "";
+//		}
+//		newWeaponOut = "";
+//		myAnimator.SetBool ("Sheathing", false);
+//
+//		if (myAnimator.GetBool ("SwitchingWeps")) {
+//			myAnimator.SetBool ("WeaponDrawn", true);
+//		} else {
+//			myAnimator.SetBool ("WeaponDrawn", false);
+//		}
+//	}
+//
+//	//assumes that previous weapon (if any) has been sheathed
+//	void StartDraw(){
+//		if (weaponOut == "") {
+//			Debug.LogAssertion ("In StartDraw but weaponOut is blank");
+//			return;
+//		}
+//		Unsheath.PlayDelayed (0.3f);
+//		myAnimator.SetBool ("Drawing", true);
+//	}
+//
+//	public void FinishDrawing(){
+//		weaponsTable[weaponOut + "Out"].SetActive(true);
+//		weaponsTable[weaponOut + "In"].SetActive(false);
+//		//		ShieldIn.SetActive (false);
+//		//		ShieldOut.SetActive (true);
+//		myAnimator.SetBool ("Drawing", false);
+//		myAnimator.SetBool ("SwitchingWeps", false);
+//		myAnimator.SetBool("WeaponDrawn", true);
+//	}
+//
+//
+//
+//	void setOutInactive()
 //	{
-//		myAnimator.SetBool ("shouldFrontFlip", false);
+//		foreach (GameObject g in allWeps) {
+//			if (g.name.Contains ("Out"))
+//				g.SetActive (false);
+//			else
+//				g.SetActive (true);
+//		}		
 //	}
 //}

@@ -1,5 +1,8 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+//sheathing rot: -132, -701, -104, sheathing trans:
+//attacking rot: -113, -539, -271, attacking trans: -0.358, 0.108, 0.003
+
 using UnityEngine;
 
 public class WeaponToggle : MonoBehaviour {
@@ -21,9 +24,9 @@ public class WeaponToggle : MonoBehaviour {
 		weaponsTable = new Dictionary<string, GameObject> ();
 		allWeps = GameObject.FindGameObjectsWithTag ("Weapons");
 		myAnimator = GameObject.Find ("DevDrake").GetComponent<Animator> ();
-		ShieldIn = GameObject.Find ("ShieldIn");
+//		ShieldIn = GameObject.Find ("ShieldIn");
 		ShieldOut = GameObject.Find ("ShieldOut");
-		ShieldIn.SetActive (true);
+//		ShieldIn.SetActive (true);
 		ShieldOut.SetActive (false);
 		weaponOut = "";
 		initTable ();
@@ -102,7 +105,7 @@ public class WeaponToggle : MonoBehaviour {
 	}
 
 	void FinishShieldSheath(){
-		ShieldIn.SetActive (true);
+//		ShieldIn.SetActive (true);
 		ShieldOut.SetActive (false);
 //		isShieldOut = false;
 	}
@@ -115,7 +118,7 @@ public class WeaponToggle : MonoBehaviour {
 	}
 
 	void FinishShieldDraw(){
-		ShieldIn.SetActive (false);
+//		ShieldIn.SetActive (false);
 		ShieldOut.SetActive (true);
 //		isShieldOut = true;
 	}
