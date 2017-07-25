@@ -48,6 +48,7 @@
   <ItemGroup>
      <Compile Include="Assets\CameraZoom.cs" />
      <Compile Include="Assets\CombatHits.cs" />
+     <Compile Include="Assets\EnemyAI.cs" />
      <Compile Include="Assets\OBJExport\OBJExporter.cs" />
      <Compile Include="Assets\scripts\DevCombat.cs" />
      <Compile Include="Assets\scripts\DevMovement.cs" />
