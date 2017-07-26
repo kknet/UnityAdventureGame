@@ -7,36 +7,29 @@ public class EnemyAI : MonoBehaviour {
 	private Animator enemyAnim;
 	private GameObject Dev;
 	private int rotCounter;
-	private Vector3 needToRot;
+	private float needToRot;
+	private bool firstTimeAdjust;
+	private float rotSpeed;
 
 	// Use this for initialization
 	void Start () {
 		enemyAnim = GetComponent<Animator> ();
 		Dev = GameObject.Find ("DevDrake");
 		rotCounter = 0;
-		needToRot = Vector3.zero;
+		needToRot = 0f;
+		firstTimeAdjust = false;
+		rotSpeed = 5f;
 	}
 	
 	// Update is called once per frame
 	void Update () {
-		Vector3 orig = transform.position;
-		Vector3 devOrig = Dev.transform.position;
+		applyRotation ();
 
-		Vector3 dif = devOrig - orig;
-		dif = new Vector3 (dif.x, 0f, dif.z);//we don't care about the y difference
-
-		Vector3 dir = Vector3.Normalize (dif);
-		Vector3 target = devOrig - (5.0f * dir);
-
-		//if not facing the correct direction
-		if (!Approx (transform.forward, dir)) {
-			applyRotation (dif);
-		}
-		if (!Approx (dif, Vector3.zero)) {
-			applySpeed ();
-		} else {
-			reduceSpeed ();
-		}
+//		if (!Approx (dif, Vector3.zero)) {
+//			applySpeed ();
+//		} else {
+//			reduceSpeed ();
+//		}
 
 
 	}
@@ -45,19 +38,15 @@ public class EnemyAI : MonoBehaviour {
 		return Mathf.Approximately (a.x, b.x) && Mathf.Approximately (a.y, b.y) && Mathf.Approximately (a.z, b.z);
 	}
 
-	private void applyRotation(Vector3 dif){
-		if (rotCounter == 0 && !Approx (dif, Vector3.zero)) {
-			rotCounter = 20;
-			needToRot = dif / 20f;
-			transform.Rotate (needToRot);
-			--rotCounter;
-		} else if (rotCounter > 0) {
-			transform.Rotate (needToRot);
-			--rotCounter;
-		} else {
-			rotCounter = 0;
-			needToRot = Vector3.zero;
-		}
+	private void applyRotation() {
+
+		Vector3 dif = Dev.transform.position - transform.position;
+		dif = new Vector3 (dif.x, 0f, dif.z);
+
+		transform.forward = 
+		Vector3.RotateTowards (transform.forward, dif, rotSpeed * Time.deltaTime, 0.0f); 
+//		transform.Rotate (needToRot * Vector3.up);
+//		--rotCounter;
 	}
 
 	private void applySpeed(){
