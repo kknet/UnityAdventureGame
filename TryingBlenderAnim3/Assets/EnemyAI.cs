@@ -6,28 +6,27 @@ public class EnemyAI : MonoBehaviour {
 
 	private Animator enemyAnim;
 	private GameObject Dev;
-	private int rotCounter;
-	private float needToRot;
-	private bool firstTimeAdjust;
 	private float rotSpeed;
-
+	private float moveSpeed;
+	private Vector3 dif;
 	// Use this for initialization
 	void Start () {
 		enemyAnim = GetComponent<Animator> ();
 		Dev = GameObject.Find ("DevDrake");
-		rotCounter = 0;
-		needToRot = 0f;
-		firstTimeAdjust = false;
 		rotSpeed = 5f;
+		moveSpeed = 3f;
 	}
-	
+
 	// Update is called once per frame
 	void Update () {
+		Debug.Log (Dev.transform.position + " " + transform.position + " " + dif);
+
 		applyRotation ();
 
-//		if (!Approx (dif, Vector3.zero)) {
-//			applySpeed ();
-//		} else {
+		if (!Approx (dif, Vector3.zero)) {
+			applySpeed ();
+		} 
+//			else {
 //			reduceSpeed ();
 //		}
 
@@ -39,23 +38,24 @@ public class EnemyAI : MonoBehaviour {
 	}
 
 	private void applyRotation() {
-
-		Vector3 dif = Dev.transform.position - transform.position;
+		dif = Dev.transform.position - transform.position;
 		dif = new Vector3 (dif.x, 0f, dif.z);
 
-		transform.forward = 
-		Vector3.RotateTowards (transform.forward, dif, rotSpeed * Time.deltaTime, 0.0f); 
-//		transform.Rotate (needToRot * Vector3.up);
-//		--rotCounter;
+		transform.forward = Vector3.RotateTowards (transform.forward, dif, rotSpeed * Time.deltaTime, 0.0f); 
 	}
 
 	private void applySpeed(){
-		enemyAnim.SetFloat ("enemySpeed", Mathf.Min (1.0f, enemyAnim.GetFloat ("enemySpeed") + 0.03f));
+		if (Vector3.Magnitude (dif) < 2f) {
+			enemyAnim.SetFloat ("enemySpeed", Mathf.MoveTowards(enemyAnim.GetFloat ("enemySpeed"), 0f, 2f * Time.deltaTime));
+		} else {
+			enemyAnim.SetFloat ("enemySpeed", Mathf.MoveTowards(enemyAnim.GetFloat ("enemySpeed"), 1f, 2f * Time.deltaTime));
+		}
+		transform.Translate(Vector3.forward * enemyAnim.GetFloat("enemySpeed") * Time.deltaTime * moveSpeed);
 	}
 
-	private void reduceSpeed(){
-		enemyAnim.SetFloat ("enemySpeed", Mathf.Max (0f, enemyAnim.GetFloat ("enemySpeed") - 0.03f));
-	}
+//	private void reduceSpeed(){
+//		enemyAnim.SetFloat ("enemySpeed", Mathf.Max (0f, enemyAnim.GetFloat ("enemySpeed") - 0.03f));
+//	}
 
 
 }

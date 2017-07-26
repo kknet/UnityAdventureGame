@@ -2,181 +2,85 @@
 //using System.Collections.Generic;
 //using UnityEngine;
 //
-//public class WeaponToggle : MonoBehaviour {
+//public class EnemyAI : MonoBehaviour {
 //
-//	public Animator myAnimator;
-//	public AudioSource Sheath;
-//	public AudioSource Unsheath;
-//
-//	private string weaponOut;
-//	private string newWeaponOut;
-//	GameObject[] allWeps;
-//	Dictionary <string, GameObject> weaponsTable;
-//	GameObject ShieldIn;
-//	GameObject ShieldOut;
-//	//	bool isShieldOut;
+//	private Animator enemyAnim;
+//	private GameObject Dev;
+//	private float rotSpeed;
+//	private float moveSpeed;
+//	private int rotCounter;
+//	private Vector3 target;
+//	private Vector3 dif;
+//	private Vector3 oldDif;
+//	private Vector3 oldDev;
 //
 //	// Use this for initialization
 //	void Start () {
-//		weaponsTable = new Dictionary<string, GameObject> ();
-//		allWeps = GameObject.FindGameObjectsWithTag ("Weapons");
-//		myAnimator = GameObject.Find ("DevDrake").GetComponent<Animator> ();
-//		ShieldIn = GameObject.Find ("ShieldIn");
-//		ShieldOut = GameObject.Find ("ShieldOut");
-//		ShieldIn.SetActive (true);
-//		ShieldOut.SetActive (false);
-//		weaponOut = "";
-//		initTable ();
-//		setOutInactive ();
-//		//		isShieldOut = false;
+//		enemyAnim = GetComponent<Animator> ();
+//		Dev = GameObject.Find ("DevDrake");
+//		rotSpeed = 5f;
+//		moveSpeed = 3f;
+//		rotCounter = 0;
+//		oldDif = Vector3.zero;
+//		oldDev = Vector3.zero;
 //	}
-//
-//	void initTable(){
-//		foreach (GameObject g in allWeps) {
-//			weaponsTable.Add (g.name, g);
-//		}
-//		//		if(weaponOut!="")
-//		//			weaponsTable[weaponOut + "In"].SetActive(false);
-//	}
-//
 //
 //	// Update is called once per frame
 //	void Update () {
+//		Debug.Log (Dev.transform.position + " " + target);
 //
-//		if (Input.GetKeyDown (KeyCode.C)) {
-//			if (weaponOut != "") {
-//				StartSheath ();
-//				Invoke ("StartShieldSheath", 0.5f);
-//			}
+//		applyRotation ();
+//		applySpeed ();
+//
+//		//		else {
+//		//			reduceSpeed (dif);
+//		//		}
+//	}
+//
+//	private float rand(float a, float b){
+//		return UnityEngine.Random.Range (a, b);
+//	}
+//
+//	private bool Approx(Vector3 a, Vector3 b){
+//		return Mathf.Approximately (a.x, b.x) && Mathf.Approximately (a.y, b.y) && Mathf.Approximately (a.z, b.z);
+//	}
+//
+//	private void setRandomizedTarget(){
+//		//		oldDif = dif;
+//		dif = (Dev.transform.position - transform.position);
+//		Vector3 perpenDif = Vector3.Normalize (Vector3.Cross (dif, -1.0f * dif)) * rand (1f, -1f);
+//		target = Dev.transform.position + perpenDif;
+//		dif = target - transform.position;
+//	}
+//
+//	private void applyRotation() {
+//		if ((oldDev == Vector3.zero) || (Vector3.Magnitude (oldDev - Dev.transform.position) > 2f && Vector3.Magnitude(Dev.transform.position - transform.position) > 2f)) {
+//			setRandomizedTarget();
 //		}
-//		else if (Input.GetKeyDown(KeyCode.Alpha1)) {	
-//			if (weaponOut == "Scimitar"){
-//				return;
-//			}
 //
-//			//a weapon is already equipped (not a scimitar)
-//			if (weaponOut!="") {
-//				newWeaponOut = "Scimitar";
-//				StartSwitch ();
-//
-//				//no weapon is already equipped
-//			} else {
-//				StartShieldDraw ();
-//				weaponOut = "Scimitar";
-//				Invoke ("StartDraw", 0.5f);
-//			}
-//		}
-//		else if (Input.GetKeyDown(KeyCode.Alpha2)) {	
-//			if (weaponOut == "Spear"){
-//				return;
-//			}
-//
-//			//a weapon is already equipped (not a scimitar)
-//			if (weaponOut!="") {
-//				newWeaponOut = "Spear";
-//				StartSwitch ();
-//
-//				//no weapon is already equipped
-//			} else {
-//				StartShieldDraw ();
-//				weaponOut = "Spear";
-//				Invoke ("StartDraw", 0.5f);
-//			}
-//		}
+//		transform.forward = Vector3.RotateTowards (transform.forward, dif, rotSpeed * Time.deltaTime, 3.14f); 
 //	}
 //
-//	void StartSwitch(){
-//		myAnimator.SetBool ("SwitchingWeps", true);
-//		Sheath.PlayDelayed (0.2f);
-//		myAnimator.SetBool ("Drawing", true);
-//		Unsheath.PlayDelayed (0.3f);
-//		myAnimator.SetBool ("WeaponDrawn", true);
-//	}
-//
-//
-//	void StartShieldSheath(){
-//		if (weaponOut!="") {
-//			myAnimator.SetBool ("ShieldDraw", false);
-//			myAnimator.SetBool ("ShieldSheath", true);
-//		}
-//	}
-//
-//	void FinishShieldSheath(){
-//		ShieldIn.SetActive (true);
-//		ShieldOut.SetActive (false);
-//		//		isShieldOut = false;
-//	}
-//
-//	void StartShieldDraw(){
-//		if (weaponOut=="") {
-//			myAnimator.SetBool ("ShieldSheath", false);
-//			myAnimator.SetBool ("ShieldDraw", true);
-//		}
-//	}
-//
-//	void FinishShieldDraw(){
-//		ShieldIn.SetActive (false);
-//		ShieldOut.SetActive (true);
-//		//		isShieldOut = true;
-//	}
-//
-//	void StartSheath() {
-//		if (weaponOut!="") {
-//			myAnimator.SetBool ("Sheathing", true);
-//			Sheath.PlayDelayed (0.3f);
-//		}
-//	}
-//	public void FinishSheath(){
-//		weaponsTable[weaponOut + "Out"].SetActive(false);
-//		weaponsTable[weaponOut + "In"].SetActive(true);
-//
-//		//		ShieldIn.SetActive (true);
-//		//		ShieldOut.SetActive (false);
-//
-//		if (myAnimator.GetBool ("SwitchingWeps")) {
-//			weaponOut = newWeaponOut;
+//	private void applySpeed(){
+//		if (Vector3.Magnitude (dif) < 2f) {
+//			enemyAnim.SetFloat ("enemySpeed", Mathf.MoveTowards(enemyAnim.GetFloat ("enemySpeed"), 0f, 2f * Time.deltaTime));
 //		} else {
-//			weaponOut = "";
+//			enemyAnim.SetFloat ("enemySpeed", Mathf.MoveTowards(enemyAnim.GetFloat ("enemySpeed"), 1f, 2f * Time.deltaTime));
 //		}
-//		newWeaponOut = "";
-//		myAnimator.SetBool ("Sheathing", false);
-//
-//		if (myAnimator.GetBool ("SwitchingWeps")) {
-//			myAnimator.SetBool ("WeaponDrawn", true);
-//		} else {
-//			myAnimator.SetBool ("WeaponDrawn", false);
-//		}
-//	}
-//
-//	//assumes that previous weapon (if any) has been sheathed
-//	void StartDraw(){
-//		if (weaponOut == "") {
-//			Debug.LogAssertion ("In StartDraw but weaponOut is blank");
-//			return;
-//		}
-//		Unsheath.PlayDelayed (0.3f);
-//		myAnimator.SetBool ("Drawing", true);
-//	}
-//
-//	public void FinishDrawing(){
-//		weaponsTable[weaponOut + "Out"].SetActive(true);
-//		weaponsTable[weaponOut + "In"].SetActive(false);
-//		//		ShieldIn.SetActive (false);
-//		//		ShieldOut.SetActive (true);
-//		myAnimator.SetBool ("Drawing", false);
-//		myAnimator.SetBool ("SwitchingWeps", false);
-//		myAnimator.SetBool("WeaponDrawn", true);
+//		transform.Translate(Vector3.forward * enemyAnim.GetFloat("enemySpeed") * Time.deltaTime * moveSpeed);
+//		oldDev = Dev.transform.position;
 //	}
 //
 //
 //
-//	void setOutInactive()
-//	{
-//		foreach (GameObject g in allWeps) {
-//			if (g.name.Contains ("Out"))
-//				g.SetActive (false);
-//			else
-//				g.SetActive (true);
-//		}		
-//	}
+//	//	private void reduceSpeed(Vector3 dif){
+//	//		if (Vector3.Magnitude (dif) < 1f) {
+//	//			
+//	//			return;
+//	//		}
+//	//		enemyAnim.SetFloat ("enemySpeed", Mathf.Max (0f, enemyAnim.GetFloat ("enemySpeed") - 0.03f));
+//	//		transform.Translate(Vector3.forward * enemyAnim.GetFloat("enemySpeed") * Time.deltaTime * moveSpeed);
+//	//	}
+//
+//
 //}
