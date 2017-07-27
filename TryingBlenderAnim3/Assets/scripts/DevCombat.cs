@@ -4,8 +4,6 @@ using UnityEngine;
 
 public class DevCombat : MonoBehaviour {
 	public Animator myAnimator;
-
-
 	// Use this for initialization
 	void Start () {
 		myAnimator = GetComponent<Animator>();
@@ -72,4 +70,5 @@ public class DevCombat : MonoBehaviour {
 	public void stopAttack(){
 		myAnimator.SetBool ("doAttack", false);
 	}
+		
 }

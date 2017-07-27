@@ -1,9 +1,9 @@
 ﻿<Properties StartupItem="Assembly-CSharp.csproj">
   <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" PreferredExecutionTarget="Unity.Instance.Unity Editor" />
-  <MonoDevelop.Ide.Workbench ActiveDocument="Assets\scripts\EnemyAI.cs">
+  <MonoDevelop.Ide.Workbench ActiveDocument="Assets\scripts\PersonHit.cs">
     <Files>
-      <File FileName="Assets\scripts\EnemyAI.cs" Line="40" Column="97" />
-      <File FileName="Assets\scripts\DevCombat.cs" Line="54" Column="1" />
+      <File FileName="Assets\scripts\WeaponHitsStrong.cs" Line="12" Column="32" />
+      <File FileName="Assets\scripts\PersonHit.cs" Line="21" Column="71" />
     </Files>
   </MonoDevelop.Ide.Workbench>
   <MonoDevelop.Ide.DebuggingService.Breakpoints>
