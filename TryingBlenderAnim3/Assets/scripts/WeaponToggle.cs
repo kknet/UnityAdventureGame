@@ -204,8 +204,6 @@ public class WeaponToggle : MonoBehaviour {
 		myAnimator.SetBool ("SwitchingWeps", false);
 		myAnimator.SetBool("WeaponDrawn", true);
 	}
-		
-
 
 	void setOutInactive()
 	{

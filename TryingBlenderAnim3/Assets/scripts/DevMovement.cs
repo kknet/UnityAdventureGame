@@ -109,7 +109,7 @@ public class DevMovement : MonoBehaviour {
 			myAnimator.SetBool ("shouldFrontFlip", true);
 			Invoke ("stopFrontFlip", 2.1f);
 		}
-		if(adjustCounter == 0 && myAnimator.GetFloat("VSpeed") > 0) {
+		if(adjustCounter == 0 && (!Mathf.Approximately(myAnimator.GetFloat("VSpeed"), 0f) || !Mathf.Approximately(myAnimator.GetFloat("HorizSpeed"), 0f))) {
 			if (!myAnimator.GetBool ("Jumping") && !myAnimator.GetBool ("shouldFrontFlip") && player.GetComponent<DevCombat>().notInCombatMove()) {
 				transform.Rotate (Vector3.up * Input.GetAxis("Mouse X") * Time.deltaTime * Camera.main.GetComponent<MouseMovement>().sensitivityX);
 			}
