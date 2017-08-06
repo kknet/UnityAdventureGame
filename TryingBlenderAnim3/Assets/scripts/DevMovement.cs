@@ -68,6 +68,9 @@ public class DevMovement : MonoBehaviour {
 
 		AnimatorStateInfo anim = myAnimator.GetCurrentAnimatorStateInfo(0);
 
+		if (anim.IsTag ("impact"))
+			impactMoveBack ();
+
 		if (Input.GetKey (KeyCode.A) || Input.GetKey (KeyCode.LeftArrow) || Input.GetKey (KeyCode.D) || Input.GetKey (KeyCode.RightArrow)) {
 			if(myAnimator.GetFloat("VSpeed") < -0.5f) 
 				transform.Translate(Vector3.right * Time.deltaTime * 1 * myAnimator.GetFloat("HorizSpeed"));
@@ -114,6 +117,10 @@ public class DevMovement : MonoBehaviour {
 				transform.Rotate (Vector3.up * Input.GetAxis("Mouse X") * Time.deltaTime * Camera.main.GetComponent<MouseMovement>().sensitivityX);
 			}
 		}
+	}
+
+	public void impactMoveBack(){
+		transform.Translate (Vector3.back * 0.5f * Time.deltaTime);
 	}
 
 	void rotateRight(){

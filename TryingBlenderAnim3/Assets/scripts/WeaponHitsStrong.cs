@@ -18,7 +18,7 @@ public class WeaponHitsStrong : MonoBehaviour {
 		myAnimator = Character.GetComponent<Animator> ();
 		strongHit = findSound ("Strong Hit");
 	}
-	
+
 	// Update is called once per frame
 
 	public bool isAttacking() {
@@ -31,11 +31,16 @@ public class WeaponHitsStrong : MonoBehaviour {
 		return info.IsTag ("blocking");
 	}
 
+	public bool isInShock(){
+		AnimatorStateInfo info = myAnimator.GetCurrentAnimatorStateInfo (0);
+		return info.IsTag ("impact");
+	}
+
 	public bool isIdleRun() {
 		AnimatorStateInfo info = myAnimator.GetCurrentAnimatorStateInfo (0);
 		return info.IsTag ("idleRun");
 	}
-		
+
 	AudioSource findSound(string audioName){
 		return GameObject.Find (Character.name + "/Audio Sources/" + audioName).GetComponent<AudioSource>();
 	}
@@ -45,18 +50,19 @@ public class WeaponHitsStrong : MonoBehaviour {
 	}
 
 	void OnCollisionEnter(Collision col){
-		if (isAttacking ())
+		if (!isAttacking ())
 			return;
 
-		if (col.gameObject.CompareTag ("Strongs") && !strongHit.isPlaying) {
-			strongHit.Play ();
+		if (col.gameObject.CompareTag ("Strongs") && !strongHit.isPlaying && !isInShock()) {
 			myAnimator.SetBool ("hitStrong", true);
-			Invoke ("stopStrong", 1.0f);
+			strongHit.Play ();
+			Invoke ("stopStrong", 2.0f);
 		}
 	}
 
 	void stopStrong(){
 		myAnimator.SetBool ("hitStrong", false);
+		strongHit.Stop ();
 	}
 
 
