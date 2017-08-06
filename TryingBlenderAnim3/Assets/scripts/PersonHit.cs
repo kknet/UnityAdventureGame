@@ -14,7 +14,8 @@ public class PersonHit : MonoBehaviour {
 	}
 
 	AudioSource findSound(string audioName){
-		return GameObject.Find (this.name + "/AudioSources/" + audioName).GetComponent<AudioSource>();
+		string charName = transform.name;
+		return GameObject.Find (charName + "/Audio Sources/" + audioName).GetComponent<AudioSource>();
 	}
 
 	void onCollisionEnter (Collision col) {

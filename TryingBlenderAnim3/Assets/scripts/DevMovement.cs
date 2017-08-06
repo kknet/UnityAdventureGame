@@ -139,7 +139,7 @@ public class DevMovement : MonoBehaviour {
 	}
 
 	void horizRunningSound(){
-		if (myAnimator.GetFloat ("VSpeed") != 0f)
+		if (!Mathf.Approximately(myAnimator.GetFloat ("VSpeed"), 0f))
 			return;
 		if (runCounter == 0)
 			footstep1.Play ();

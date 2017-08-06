@@ -125,6 +125,10 @@ public class EnemyAI : MonoBehaviour {
 	}
 
 	private void applySpeed() {
+		if (isEnemyAttacking ()) {
+			enemyAnim.SetFloat ("enemySpeed", Mathf.MoveTowards(enemyAnim.GetFloat ("enemySpeed"), 0f, 5f * Time.deltaTime));
+			return;
+		}
 		if (Vector3.Magnitude (dif) < 1f) {
 			enemyAnim.SetFloat ("enemySpeed", Mathf.MoveTowards(enemyAnim.GetFloat ("enemySpeed"), 0f, 5f * Time.deltaTime));
 		} else {
