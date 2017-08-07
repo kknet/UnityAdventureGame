@@ -63,23 +63,40 @@ public class DevMovement : MonoBehaviour {
 
 //		Debug.Log (transform.eulerAngles.y);
 
-		myAnimator.SetFloat ("VSpeed", Input.GetAxis ("Vertical"));
-		myAnimator.SetFloat ("HorizSpeed", Input.GetAxis("Horizontal"));
+//		myAnimator.SetFloat ("HorizSpeed", Input.GetAxis("Horizontal"));
 
 		AnimatorStateInfo anim = myAnimator.GetCurrentAnimatorStateInfo(0);
 
 		if (anim.IsTag ("impact"))
 			impactMoveBack ();
 
-		if (Input.GetKey (KeyCode.A) || Input.GetKey (KeyCode.LeftArrow) || Input.GetKey (KeyCode.D) || Input.GetKey (KeyCode.RightArrow)) {
-			if(myAnimator.GetFloat("VSpeed") < -0.5f) 
-				transform.Translate(Vector3.right * Time.deltaTime * 1 * myAnimator.GetFloat("HorizSpeed"));
-			else if(myAnimator.GetFloat("VSpeed") > 0.5f) 
-				transform.Translate(Vector3.right * Time.deltaTime * 2 * myAnimator.GetFloat("HorizSpeed"));
-			else
-				transform.Translate(Vector3.right * Time.deltaTime * 4 * myAnimator.GetFloat("HorizSpeed"));
+//		if (Input.GetKey (KeyCode.A) || Input.GetKey (KeyCode.LeftArrow) || Input.GetKey (KeyCode.D) || Input.GetKey (KeyCode.RightArrow)) {
+//			if(myAnimator.GetFloat("VSpeed") < -0.5f) 
+//				transform.Translate(Vector3.right * Time.deltaTime * 1 * myAnimator.GetFloat("HorizSpeed"));
+//			else if(myAnimator.GetFloat("VSpeed") > 0.5f) 
+//				transform.Translate(Vector3.right * Time.deltaTime * 2 * myAnimator.GetFloat("HorizSpeed"));
+//			else
+//				transform.Translate(Vector3.right * Time.deltaTime * 4 * myAnimator.GetFloat("HorizSpeed"));
+//		}
+
+		if (Input.GetKey (KeyCode.A) || Input.GetKey (KeyCode.LeftArrow)) {
+			//cam.y - dev.y = 90 --> dev.y = cam.y - 90?
+//			Vector3 desiredRot = new Vector3(transform.eulerAngles.x, CamTransform.eulerAngles.y - 90f,transform.eulerAngles.z);
+//			transform.rotation =  Quaternion.Euler(Vector3.RotateTowards (transform.eulerAngles, desiredRot, Time.deltaTime * 2.0f, 0.0f));
+			Vector3 desiredRot = new Vector3 (transform.eulerAngles.x, transform.eulerAngles.x + 270f, transform.eulerAngles.z);
+			transform.rotation = Quaternion.Euler (Vector3.RotateTowards (transform.eulerAngles, desiredRot, Time.deltaTime * 5.0f, 3f));
+			myAnimator.SetFloat ("VSpeed", Mathf.MoveTowards(myAnimator.GetFloat ("VSpeed"), -1.0f * Input.GetAxis ("Horizontal"), 0.05f));
+		} else if (Input.GetKey (KeyCode.D) || Input.GetKey (KeyCode.RightArrow)) {
+			//cam.y - dev.y = 90 --> dev.y = cam.y - 90?
+//			Vector3 desiredRot = new Vector3(transform.eulerAngles.x, CamTransform.eulerAngles.y - 90f,transform.eulerAngles.z);
+//			transform.rotation =  Quaternion.Euler(Vector3.RotateTowards (transform.eulerAngles, desiredRot, Time.deltaTime * 2.0f, 0.0f));
+			Vector3 desiredRot = new Vector3 (transform.eulerAngles.x, transform.eulerAngles.x + 90f, transform.eulerAngles.z);
+			transform.rotation = Quaternion.Euler (Vector3.RotateTowards (transform.eulerAngles, desiredRot, Time.deltaTime * 5.0f, 3f));
+			myAnimator.SetFloat ("VSpeed", Mathf.MoveTowards(myAnimator.GetFloat ("VSpeed"), Input.GetAxis ("Horizontal"), 0.05f));
+		} else {
+//			myAnimator.SetFloat ("VSpeed", Input.GetAxis ("Vertical"));
+			myAnimator.SetFloat ("VSpeed", Mathf.MoveTowards (myAnimator.GetFloat ("VSpeed"), Input.GetAxis ("Vertical"), 0.05f)); 
 		}
-			
 
 		if (anim.IsTag("Running")) {
 			if(myAnimator.GetFloat("VSpeed") > 0.5f)
