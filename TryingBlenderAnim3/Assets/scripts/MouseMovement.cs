@@ -62,88 +62,25 @@ public class MouseMovement : MonoBehaviour {
 		}
 	}
 
-//	private void HorizontalRotation(){
-//		bool idle = player.GetComponent<DevMovement>().isIdle ();
-//		float movementX = Input.GetAxis ("Mouse X") * sensitivityX * Time.deltaTime;
-//		bool combating = !player.GetComponent<DevCombat> ().notInCombatMove ();
-////		bool turning = player.GetComponent<DevMovement> ().turning ();
-//		if (combating) {
-//			if (!Mathf.Approximately (movementX, 0f)) {
-//				transform.RotateAround (player.transform.position, Vector3.up, movementX);
-//				firstTimeAdjust = true;
-//			}
-//			return;
-//		}
-//		if (!Mathf.Approximately (movementX, 0f)) {
-//			if (idle) {
-////				deltaHoriz = movementX;
-//				transform.RotateAround (player.transform.position, Vector3.up, movementX);
-//				firstTimeAdjust = true;
-//			} else {
-//				if (player.GetComponent<DevMovement> ().adjustCounter == 0) {
-//						float speed = 0;
-//						bool vert = !Mathf.Approximately (Input.GetAxis ("Vertical"), 0f); 
-//						bool horiz = !Mathf.Approximately (Input.GetAxis ("Horizontal"), 0f); 
-//						if (vert && (Input.GetKey (KeyCode.W) || (Input.GetKey (KeyCode.UpArrow)))) {
-//							speed = (player.transform.rotation.eulerAngles.y - transform.rotation.eulerAngles.y);						
-//						}
-//						else if (vert && (Input.GetKey (KeyCode.S) || (Input.GetKey (KeyCode.DownArrow)))) {
-//							speed = (180f + player.transform.rotation.eulerAngles.y - transform.rotation.eulerAngles.y);						
-//						}
-//						else if (horiz && (Input.GetKey (KeyCode.A) || (Input.GetKey (KeyCode.LeftArrow)))) {
-//							speed = (90f + player.transform.rotation.eulerAngles.y - transform.rotation.eulerAngles.y);						
-//						}
-//						else if (horiz && (Input.GetKey (KeyCode.D) || (Input.GetKey (KeyCode.RightArrow)))) {
-//							speed = (270f + player.transform.rotation.eulerAngles.y - transform.rotation.eulerAngles.y);						
-//						}
-//						transform.RotateAround (player.transform.position, Vector3.up, speed);
-//				}
-//			}
-//		}
-//		else if(!idle && (firstTimeAdjust || player.GetComponent<DevMovement> ().adjustCounter > 0))
-//		{
-//			float dif = transform.rotation.eulerAngles.y - player.transform.rotation.eulerAngles.y;
-//			bool vert = !Mathf.Approximately (Input.GetAxis ("Vertical"), 0f); 
-//			bool horiz = !Mathf.Approximately (Input.GetAxis ("Horizontal"), 0f); 
-//			if (vert && (Input.GetKey (KeyCode.W) || (Input.GetKey (KeyCode.UpArrow)))) {
-//				dif = (transform.rotation.eulerAngles.y - player.transform.rotation.eulerAngles.y);						
-//			}
-//			else if (vert && (Input.GetKey (KeyCode.S) || (Input.GetKey (KeyCode.DownArrow)))) {
-//				dif = (transform.rotation.eulerAngles.y - player.transform.rotation.eulerAngles.y + 180f);						
-//			}
-//			else if (horiz && (Input.GetKey (KeyCode.A) || (Input.GetKey (KeyCode.LeftArrow)))) {
-//				dif = (transform.rotation.eulerAngles.y - player.transform.rotation.eulerAngles.y - 90f);						
-//			}
-//			else if (horiz && (Input.GetKey (KeyCode.D) || (Input.GetKey (KeyCode.RightArrow)))) {
-//				dif = (transform.rotation.eulerAngles.y - player.transform.rotation.eulerAngles.y + 90f);						
-//			}
-//
-//			if (!Mathf.Approximately(dif,0)) {
-//				player.GetComponent<DevMovement>().adjustToCam (dif, firstTimeAdjust);
-//				firstTimeAdjust = false;
-//			}
-//		}
-//	}
 
 	private void HorizontalRotation(){
-		Debug.Log (firstTimeAdjust);
-
 		bool idle = player.GetComponent<DevMovement>().isIdle ();
 		float movementX = Input.GetAxis ("Mouse X") * sensitivityX * Time.deltaTime;
 		bool combating = !player.GetComponent<DevCombat> ().notInCombatMove ();
-		//		bool turning = player.GetComponent<DevMovement> ().turning ();
-		if (combating) {
-			if (!Mathf.Approximately (movementX, 0f)) {
+		bool counterZero = (player.GetComponent<DevMovement> ().adjustCounter == 0);
+		bool camMoved = !Mathf.Approximately (movementX, 0f);
+		if ((counterZero) && combating) {
+			if (camMoved) {
 				transform.RotateAround (player.transform.position, Vector3.up, movementX);
 				firstTimeAdjust = true;
 			}
 			return;
 		}
-		if (!Mathf.Approximately (movementX, 0f)) {
-			if (idle) {
-				//				deltaHoriz = movementX;
+		if (camMoved) {
+			if (counterZero && idle) {
 				transform.RotateAround (player.transform.position, Vector3.up, movementX);
 				firstTimeAdjust = true;
+				return;
 			}
 		}
 		bool vert = !Mathf.Approximately (Input.GetAxis ("Vertical"), 0f); 
@@ -151,42 +88,25 @@ public class MouseMovement : MonoBehaviour {
 		float dif = 0f;
 		if (vert && (Input.GetKey (KeyCode.W) || (Input.GetKey (KeyCode.UpArrow)))) {
 			dif = (transform.rotation.eulerAngles.y - player.transform.rotation.eulerAngles.y);						
-			firstTimeAdjust = (!Mathf.Approximately (dif, 0f)) && (player.GetComponent<DevMovement> ().adjustCounter == 0);
+			firstTimeAdjust = (!Mathf.Approximately (dif, 0f)) && (counterZero);
 		}
 		else if (vert && (Input.GetKey (KeyCode.S) || (Input.GetKey (KeyCode.DownArrow)))) {
 			dif = (transform.rotation.eulerAngles.y - player.transform.rotation.eulerAngles.y + 180f);						
-			firstTimeAdjust = (!Mathf.Approximately (dif, 0f)) && (player.GetComponent<DevMovement> ().adjustCounter == 0);
+			firstTimeAdjust = (!Mathf.Approximately (dif, 0f)) && (counterZero);
 		}
 		else if (horiz && (Input.GetKey (KeyCode.A) || (Input.GetKey (KeyCode.LeftArrow)))) {
-			dif = (transform.rotation.eulerAngles.y - player.transform.rotation.eulerAngles.y - 90f);						
-			firstTimeAdjust = (!Mathf.Approximately (dif, 0f)) && (player.GetComponent<DevMovement> ().adjustCounter == 0);
+			dif = (transform.rotation.eulerAngles.y - player.transform.rotation.eulerAngles.y - 90f + 20f);						
+			firstTimeAdjust = (!Mathf.Approximately (dif, 0f)) && (counterZero);
 		}
 		else if (horiz && (Input.GetKey (KeyCode.D) || (Input.GetKey (KeyCode.RightArrow)))) {
-			dif = (transform.rotation.eulerAngles.y - player.transform.rotation.eulerAngles.y + 90f);						
-			firstTimeAdjust = (!Mathf.Approximately (dif, 0f)) && (player.GetComponent<DevMovement> ().adjustCounter == 0);
+			dif = (transform.rotation.eulerAngles.y - player.transform.rotation.eulerAngles.y + 90f + 20f);						
+			firstTimeAdjust = (!Mathf.Approximately (dif, 0f)) && (counterZero);
 		}
 		if (!Mathf.Approximately(dif,0)) {
 			player.GetComponent<DevMovement>().adjustToCam (dif, firstTimeAdjust);
 			firstTimeAdjust = false;
 		}
-
-//		if (player.GetComponent<DevMovement> ().adjustCounter == 0) {
-//			float speed = 0;
-//			if (vert && (Input.GetKey (KeyCode.W) || (Input.GetKey (KeyCode.UpArrow)))) {
-//				speed = (player.transform.rotation.eulerAngles.y - transform.rotation.eulerAngles.y);						
-//			}
-//			else if (vert && (Input.GetKey (KeyCode.S) || (Input.GetKey (KeyCode.DownArrow)))) {
-//				speed = (180f + player.transform.rotation.eulerAngles.y - transform.rotation.eulerAngles.y);						
-//			}
-//			else if (horiz && (Input.GetKey (KeyCode.A) || (Input.GetKey (KeyCode.LeftArrow)))) {
-//				speed = (90f + player.transform.rotation.eulerAngles.y - transform.rotation.eulerAngles.y);						
-//			}
-//			else if (horiz && (Input.GetKey (KeyCode.D) || (Input.GetKey (KeyCode.RightArrow)))) {
-//				speed = (270f + player.transform.rotation.eulerAngles.y - transform.rotation.eulerAngles.y);						
-//			}
-//			transform.RotateAround (player.transform.position, Vector3.up, speed);
-			transform.RotateAround (player.transform.position, Vector3.up, movementX);
-//		}
+		transform.RotateAround (player.transform.position, Vector3.up, movementX);
 	}
 
 

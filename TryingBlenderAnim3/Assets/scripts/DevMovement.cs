@@ -47,8 +47,8 @@ public class DevMovement : MonoBehaviour {
 				dif = dif - 360f;
 			else if (dif < -180f)
 				dif = dif + 360f;
-			needToRot = dif / 15.0f;
-			adjustCounter = 15;
+			needToRot = dif / 20.0f;
+			adjustCounter = 20;
 		}
 		transform.Rotate (Vector3.up * needToRot);
 		--adjustCounter;
@@ -85,58 +85,23 @@ public class DevMovement : MonoBehaviour {
 	}
 
 
-	// Update is called once per frame
 	void Update () {
-
-//		Debug.Log (transform.eulerAngles.y);
-
-//		myAnimator.SetFloat ("HorizSpeed", Input.GetAxis("Horizontal"));
-
 		AnimatorStateInfo anim = myAnimator.GetCurrentAnimatorStateInfo (0);
 
 		if (anim.IsTag ("impact"))
 			impactMoveBack ();
 
 		if (Input.GetKey (KeyCode.W) || Input.GetKey (KeyCode.UpArrow)) {
-//			if (camRotChanged ()) {
-//				turnCounter = 30;
-//				desiredRot = Camera.main.transform.eulerAngles.y;
-//				turn = (desiredRot - transform.eulerAngles.y) / 30;
-//			}
 			myAnimator.SetFloat ("VSpeed", Mathf.MoveTowards (myAnimator.GetFloat ("VSpeed"), Input.GetAxis ("Vertical"), 0.05f)); 
 		} else if (Input.GetKey (KeyCode.S) || Input.GetKey (KeyCode.DownArrow)) {
-//			if (camRotChanged ()) {
-//				turnCounter = 30;
-//				desiredRot = Camera.main.transform.eulerAngles.y + 180f;
-//				turn = (desiredRot - transform.eulerAngles.y) / 30;
-//			}
 			myAnimator.SetFloat ("VSpeed", Mathf.MoveTowards (myAnimator.GetFloat ("VSpeed"), -1.0f * Input.GetAxis ("Vertical"), 0.05f)); 
 		} else if (Input.GetKey (KeyCode.A) || Input.GetKey (KeyCode.LeftArrow)) {
-//			if (camRotChanged ()) {
-//				turnCounter = 30;
-//				desiredRot = Camera.main.transform.eulerAngles.y + 270f;
-//				turn = (desiredRot - transform.eulerAngles.y) / 30;
-//			}
 			myAnimator.SetFloat ("VSpeed", Mathf.MoveTowards (myAnimator.GetFloat ("VSpeed"), -1.0f * Input.GetAxis ("Horizontal"), 0.05f));
 		} else if (Input.GetKey (KeyCode.D) || Input.GetKey (KeyCode.RightArrow)) {
-//			if (camRotChanged ()) {
-//				turnCounter = 30;
-//				desiredRot = Camera.main.transform.eulerAngles.y + 90f;
-//				turn = (desiredRot - transform.eulerAngles.y) / 30;
-//			}
 			myAnimator.SetFloat ("VSpeed", Mathf.MoveTowards (myAnimator.GetFloat ("VSpeed"), Input.GetAxis ("Horizontal"), 0.05f));
 		} else {
 			myAnimator.SetFloat ("VSpeed", Mathf.MoveTowards (myAnimator.GetFloat ("VSpeed"), Input.GetAxis ("Vertical"), 0.05f)); 
 		}
-
-//		if (turning () || turnCounter > 0){
-//			transform.Rotate (Vector3.up * (turn));
-//			--turnCounter;
-//		}
-//		else {
-//			turnCounter = 0;
-//			turn = 0f;
-//		}
 
 		if (anim.IsTag("Running")) {
 			if(myAnimator.GetFloat("VSpeed") > 0.5f)

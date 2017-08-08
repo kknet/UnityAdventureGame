@@ -4,39 +4,63 @@ using UnityEngine;
 
 public class DevCombat : MonoBehaviour {
 	public Animator myAnimator;
+
+	private string savedAction;
 	// Use this for initialization
 	void Start () {
 		myAnimator = GetComponent<Animator>();
+		savedAction = "";
 	}
 
 	// Update is called once per frame
 	void Update () {
-//		int layerIndex = 0;
-//		Debug.Log (myAnimator.GetCurrentAnimatorStateInfo (0).fullPathHash);
-
-//		Debug.Log ("in combat: " + !notInCombatMove());
-
-		//if attack button is pressed while an attack is already ongoing, ignore the button press
-
-//		if(!myAnimator.GetBool("WeaponDrawn")){
-//			myAnimator.SetBool ("doAttack", false);
-//			myAnimator.SetBool ("isBlocking", false);
-//			return;	
-//		} 
-
 		//if holding RMB, block
-		if (Input.GetKey (KeyCode.Mouse1)) {
-			myAnimator.SetBool ("doAttack", false);
-			myAnimator.SetBool ("isBlocking", true);
-		} else {
-			myAnimator.SetBool ("isBlocking", false);		
 
-			//otherwise, if clicked LMB, attack
-			if (Input.GetKeyDown (KeyCode.Mouse0)) {
-				myAnimator.SetBool ("doAttack", true);
+		//action was tried earlier, but dev was rotating, now is no longer rotating, so do action
+		if (savedAction != "" && GetComponent<DevMovement> ().adjustCounter == 0) {
+			myAnimator.SetBool (savedAction, true);
+			if (savedAction == "doAttack") {
 				Invoke ("switchAttack", 0.5f);
-			} else {
+			}
+			savedAction = "";
+			return;
+		}
+
+
+		//still rotating character, so save action, and do action once rotation is over
+		if (savedAction == "" && GetComponent<DevMovement> ().adjustCounter != 0) {
+			if (Input.GetKey (KeyCode.Mouse1)) {
 				myAnimator.SetBool ("doAttack", false);
+				savedAction = "isBlocking";
+			} else {
+				myAnimator.SetBool ("isBlocking", false);		
+
+				//otherwise, if clicked LMB, attack
+				if (Input.GetKeyDown (KeyCode.Mouse0)) {
+					savedAction = "doAttack";
+				} else {
+					myAnimator.SetBool ("doAttack", false);
+				}
+			}
+			if(savedAction!="")
+				return;
+		}
+
+		//dev is not rotating, and there is no saved action, so do action right now (normal way)
+		if (savedAction == "") {
+			if (Input.GetKey (KeyCode.Mouse1)) {
+				myAnimator.SetBool ("doAttack", false);
+				myAnimator.SetBool ("isBlocking", true);
+			} else {
+				myAnimator.SetBool ("isBlocking", false);		
+
+				//otherwise, if clicked LMB, attack
+				if (Input.GetKeyDown (KeyCode.Mouse0)) {
+					myAnimator.SetBool ("doAttack", true);
+					Invoke ("switchAttack", 0.5f);
+				} else {
+					myAnimator.SetBool ("doAttack", false);
+				}
 			}
 		}
 	}
