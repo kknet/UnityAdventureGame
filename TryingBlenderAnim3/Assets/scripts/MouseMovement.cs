@@ -97,20 +97,35 @@ public class MouseMovement : MonoBehaviour {
 		bool vert = !Mathf.Approximately (Input.GetAxis ("Vertical"), 0f); 
 		bool horiz = !Mathf.Approximately (Input.GetAxis ("Horizontal"), 0f); 
 
-		if (vert && (Input.GetKeyDown (KeyCode.W) || (Input.GetKeyDown (KeyCode.UpArrow)))) {
+		bool W = (Input.GetKey (KeyCode.W) || Input.GetKey (KeyCode.UpArrow)) || (Input.GetKeyDown (KeyCode.W) || Input.GetKeyDown (KeyCode.UpArrow));
+		bool A = (Input.GetKey (KeyCode.A) || Input.GetKey (KeyCode.LeftArrow)) || (Input.GetKeyDown (KeyCode.A) || Input.GetKeyDown (KeyCode.LeftArrow));
+		bool S = (Input.GetKey (KeyCode.S) || Input.GetKey (KeyCode.DownArrow)) || (Input.GetKeyDown (KeyCode.S) || Input.GetKeyDown (KeyCode.DownArrow));
+		bool D = (Input.GetKey (KeyCode.D) || Input.GetKey (KeyCode.RightArrow)) || (Input.GetKeyDown (KeyCode.D) || Input.GetKeyDown (KeyCode.RightArrow));
+
+		if (vert && horiz && W && A) {
+			goal = transform.rotation.eulerAngles.y - 45f;
+		}
+		else if (vert && horiz && W && D) {
+			goal = transform.rotation.eulerAngles.y + 45f;
+		}
+		else if (vert && horiz && S && A) {
+			goal = transform.rotation.eulerAngles.y - 135f;
+		}
+		else if (vert && horiz && S && D) {
+			goal = transform.rotation.eulerAngles.y + 135f;
+		}
+		else if (vert && W && !S) {
 			goal = transform.rotation.eulerAngles.y;
 		}
-		else if (vert && (Input.GetKeyDown (KeyCode.S) || (Input.GetKeyDown (KeyCode.DownArrow)))) {
-			goal = transform.rotation.eulerAngles.y + 180f;
-		}
-		else if (horiz && (Input.GetKeyDown (KeyCode.A) || (Input.GetKeyDown (KeyCode.LeftArrow)))) {
+		else if (horiz && A && !D) {
 			goal = transform.rotation.eulerAngles.y - 90f;
 		}
-		else if (horiz && (Input.GetKeyDown (KeyCode.D) || (Input.GetKeyDown (KeyCode.RightArrow)))) {
+		else if (vert && S && !W) {
+			goal = transform.rotation.eulerAngles.y + 180f;
+		}
+		else if (horiz && D && !A) {
 			goal = transform.rotation.eulerAngles.y + 90f;
 		}
-
-		Debug.Log (dif);
 
 		dif = goal - player.transform.rotation.eulerAngles.y;
 		difClamp ();
@@ -122,7 +137,7 @@ public class MouseMovement : MonoBehaviour {
 			firstTimeAdjust = false;
 		} else {
 			if (!movementButtonPressed ())
-				myAnimator.SetFloat ("VSpeed", Mathf.MoveTowards (myAnimator.GetFloat ("VSpeed"), 0f, 0.05f));
+				myAnimator.SetFloat ("VSpeed", Mathf.MoveTowards (myAnimator.GetFloat ("VSpeed"), Input.GetAxis ("Vertical"), 0.05f));
 		}
 		transform.RotateAround (player.transform.position, Vector3.up, movementX);
 	}

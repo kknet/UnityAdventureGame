@@ -16,7 +16,12 @@ public class DevCombat : MonoBehaviour {
 		return Input.GetKeyDown (KeyCode.W) || Input.GetKeyDown (KeyCode.A) 
 			|| Input.GetKeyDown (KeyCode.S) || Input.GetKeyDown (KeyCode.D)
 			|| Input.GetKeyDown (KeyCode.UpArrow) || Input.GetKeyDown (KeyCode.LeftArrow) 
-			|| Input.GetKeyDown (KeyCode.RightArrow) || Input.GetKeyDown (KeyCode.DownArrow);
+			|| Input.GetKeyDown (KeyCode.RightArrow) || Input.GetKeyDown (KeyCode.DownArrow) 
+			|| Input.GetKey (KeyCode.W) || Input.GetKey (KeyCode.A) 
+			|| Input.GetKey (KeyCode.S) || Input.GetKey (KeyCode.D)
+			|| Input.GetKey (KeyCode.UpArrow) || Input.GetKey (KeyCode.LeftArrow) 
+			|| Input.GetKey (KeyCode.RightArrow) || Input.GetKey (KeyCode.DownArrow);
+		
 	}
 
 	// Update is called once per frame
