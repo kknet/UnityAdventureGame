@@ -47,6 +47,7 @@ public class DevMovement : MonoBehaviour {
 				dif = dif - 360f;
 			else if (dif < -180f)
 				dif = dif + 360f;
+
 			needToRot = dif / 20.0f;
 			adjustCounter = 20;
 		}

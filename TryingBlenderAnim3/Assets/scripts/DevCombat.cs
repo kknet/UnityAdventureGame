@@ -5,11 +5,18 @@ using UnityEngine;
 public class DevCombat : MonoBehaviour {
 	public Animator myAnimator;
 
-	private string savedAction;
+	public string savedAction;
 	// Use this for initialization
 	void Start () {
 		myAnimator = GetComponent<Animator>();
 		savedAction = "";
+	}
+
+	private bool movementButtonPressed(){
+		return Input.GetKeyDown (KeyCode.W) || Input.GetKeyDown (KeyCode.A) 
+			|| Input.GetKeyDown (KeyCode.S) || Input.GetKeyDown (KeyCode.D)
+			|| Input.GetKeyDown (KeyCode.UpArrow) || Input.GetKeyDown (KeyCode.LeftArrow) 
+			|| Input.GetKeyDown (KeyCode.RightArrow) || Input.GetKeyDown (KeyCode.DownArrow);
 	}
 
 	// Update is called once per frame
@@ -28,7 +35,7 @@ public class DevCombat : MonoBehaviour {
 
 
 		//still rotating character, so save action, and do action once rotation is over
-		if (savedAction == "" && GetComponent<DevMovement> ().adjustCounter != 0) {
+		if (savedAction == "" && (GetComponent<DevMovement> ().adjustCounter != 0 || movementButtonPressed())) {
 			if (Input.GetKey (KeyCode.Mouse1)) {
 				myAnimator.SetBool ("doAttack", false);
 				savedAction = "isBlocking";

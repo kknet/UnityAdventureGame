@@ -1,16 +1,17 @@
 using UnityEngine;
 
 public class MouseMovement : MonoBehaviour {
-	
-	private bool firstTimeAdjust;
-//	private float deltaVert;
-//	private float deltaHoriz;
 
+
+	public Animator myAnimator;
 	public float sensitivityX;
 	public float sensitivityY;
 	public GameObject player;
 
+	private bool firstTimeAdjust;
 	private Vector3 closePos;
+	private float dif;
+	private float goal;
 
 	[SerializeField][HideInInspector]
 	private Vector3 initialOffset;
@@ -21,23 +22,31 @@ public class MouseMovement : MonoBehaviour {
 		initialOffset = transform.position - player.transform.position;
 	}
 
-//	private bool Approx(Vector3 a, Vector3 b){
-//		return Mathf.Approximately (a.x, b.x) && Mathf.Approximately (a.y, b.y) && Mathf.Approximately (a.z, b.z);
-//	}
-//
-//	public void ZoomIn() {
-////		Vector3 dir = transform.position - closePos;
-//		transform.position.Set (closePos.x, closePos.y, closePos.z);
-//		currentOffset = transform.position - player.transform.position;
-//	}
-//
-//	public void ZoomOut(Vector3 direction) {
-//		Vector3 current = transform.position - player.transform.position;
-//		if (!Approx (current, initialOffset)) {
-//			transform.Translate (direction);		
-//		}
-//	}
-		
+	private bool movementButtonPressed(){
+		return Input.GetKeyDown (KeyCode.W) || Input.GetKeyDown (KeyCode.A) 
+			|| Input.GetKeyDown (KeyCode.S) || Input.GetKeyDown (KeyCode.D)
+			|| Input.GetKeyDown (KeyCode.UpArrow) || Input.GetKeyDown (KeyCode.LeftArrow) 
+			|| Input.GetKeyDown (KeyCode.RightArrow) || Input.GetKeyDown (KeyCode.DownArrow);
+	}
+
+
+	//	private bool Approx(Vector3 a, Vector3 b){
+	//		return Mathf.Approximately (a.x, b.x) && Mathf.Approximately (a.y, b.y) && Mathf.Approximately (a.z, b.z);
+	//	}
+	//
+	//	public void ZoomIn() {
+	////		Vector3 dir = transform.position - closePos;
+	//		transform.position.Set (closePos.x, closePos.y, closePos.z);
+	//		currentOffset = transform.position - player.transform.position;
+	//	}
+	//
+	//	public void ZoomOut(Vector3 direction) {
+	//		Vector3 current = transform.position - player.transform.position;
+	//		if (!Approx (current, initialOffset)) {
+	//			transform.Translate (direction);		
+	//		}
+	//	}
+
 	private void Start () {
 		if(player == null) {
 			Debug.LogError ("Assign a player for the camera in Unity's inspector");
@@ -45,6 +54,8 @@ public class MouseMovement : MonoBehaviour {
 		currentOffset = initialOffset;
 		firstTimeAdjust = false;
 		closePos = new Vector3 (0f, 1.54f, -1.425f);
+		dif = 0f;
+		goal = player.transform.rotation.eulerAngles.y;
 	}
 
 	private void VerticalRotation()  {
@@ -57,7 +68,7 @@ public class MouseMovement : MonoBehaviour {
 				movementY += 360f;
 			total = movementY + transform.rotation.eulerAngles.x;//recalculate total		
 			total = Mathf.Clamp (total, -30f, 50f);//clamp it with limits
-//			deltaVert = total;
+			//			deltaVert = total;
 			transform.rotation = Quaternion.Euler (total, 0f, 0f);//calculate resulting quaternion
 		}
 	}
@@ -85,45 +96,61 @@ public class MouseMovement : MonoBehaviour {
 		}
 		bool vert = !Mathf.Approximately (Input.GetAxis ("Vertical"), 0f); 
 		bool horiz = !Mathf.Approximately (Input.GetAxis ("Horizontal"), 0f); 
-		float dif = 0f;
-		if (vert && (Input.GetKey (KeyCode.W) || (Input.GetKey (KeyCode.UpArrow)))) {
-			dif = (transform.rotation.eulerAngles.y - player.transform.rotation.eulerAngles.y);						
-			firstTimeAdjust = (!Mathf.Approximately (dif, 0f)) && (counterZero);
+
+		if (vert && (Input.GetKeyDown (KeyCode.W) || (Input.GetKeyDown (KeyCode.UpArrow)))) {
+			goal = transform.rotation.eulerAngles.y;
 		}
-		else if (vert && (Input.GetKey (KeyCode.S) || (Input.GetKey (KeyCode.DownArrow)))) {
-			dif = (transform.rotation.eulerAngles.y - player.transform.rotation.eulerAngles.y + 180f);						
-			firstTimeAdjust = (!Mathf.Approximately (dif, 0f)) && (counterZero);
+		else if (vert && (Input.GetKeyDown (KeyCode.S) || (Input.GetKeyDown (KeyCode.DownArrow)))) {
+			goal = transform.rotation.eulerAngles.y + 180f;
 		}
-		else if (horiz && (Input.GetKey (KeyCode.A) || (Input.GetKey (KeyCode.LeftArrow)))) {
-			dif = (transform.rotation.eulerAngles.y - player.transform.rotation.eulerAngles.y - 90f + 20f);						
-			firstTimeAdjust = (!Mathf.Approximately (dif, 0f)) && (counterZero);
+		else if (horiz && (Input.GetKeyDown (KeyCode.A) || (Input.GetKeyDown (KeyCode.LeftArrow)))) {
+			goal = transform.rotation.eulerAngles.y - 90f;
 		}
-		else if (horiz && (Input.GetKey (KeyCode.D) || (Input.GetKey (KeyCode.RightArrow)))) {
-			dif = (transform.rotation.eulerAngles.y - player.transform.rotation.eulerAngles.y + 90f + 20f);						
-			firstTimeAdjust = (!Mathf.Approximately (dif, 0f)) && (counterZero);
+		else if (horiz && (Input.GetKeyDown (KeyCode.D) || (Input.GetKeyDown (KeyCode.RightArrow)))) {
+			goal = transform.rotation.eulerAngles.y + 90f;
 		}
-		if (!Mathf.Approximately(dif,0)) {
-			player.GetComponent<DevMovement>().adjustToCam (dif, firstTimeAdjust);
+
+		Debug.Log (dif);
+
+		dif = goal - player.transform.rotation.eulerAngles.y;
+		difClamp ();
+		firstTimeAdjust = (!Mathf.Approximately (dif, 0f)) && (counterZero);
+		if (difBig() && (firstTimeAdjust || !counterZero)) {
+			if (!movementButtonPressed ())
+				myAnimator.SetFloat ("VSpeed", Mathf.MoveTowards (myAnimator.GetFloat ("VSpeed"), 1f, 0.1f));
+			player.GetComponent<DevMovement> ().adjustToCam (dif, firstTimeAdjust);
 			firstTimeAdjust = false;
+		} else {
+			if (!movementButtonPressed ())
+				myAnimator.SetFloat ("VSpeed", Mathf.MoveTowards (myAnimator.GetFloat ("VSpeed"), 0f, 0.05f));
 		}
 		transform.RotateAround (player.transform.position, Vector3.up, movementX);
 	}
 
+	private void difClamp(){
+		if (dif > 180f)
+			dif = dif - 360f;
+		else if (dif < -180f)
+			dif = dif + 360f;
+	}
 
+	private bool difBig(){
+		return Mathf.Abs(dif) > 2f;
+	}
 
 
 
 	private void LateUpdate () {
 		transform.position = player.transform.position + currentOffset;
 
-//		VerticalRotation ();
+		//		VerticalRotation ();
 		HorizontalRotation ();
 
-//		transform.RotateAround (player.transform.position, Vector3.up, deltaHoriz);
-//		transform.RotateAround (transform.position, Vector3.right, deltaVert * 0.1f);
-//
-//		deltaVert = 0f;
-//		deltaHoriz = 0f;
+		//		transform.RotateAround (player.transform.position, Vector3.up, deltaHoriz);
+		//		transform.RotateAround (transform.position, Vector3.right, deltaVert * 0.1f);
+		//
+		//		deltaVert = 0f;
+		//		deltaHoriz = 0f;
 
 		currentOffset = transform.position - player.transform.position;
 	}
