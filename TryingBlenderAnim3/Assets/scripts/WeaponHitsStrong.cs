@@ -49,7 +49,7 @@ public class WeaponHitsStrong : MonoBehaviour {
 		return currentObj.transform.root.gameObject;
 	}
 
-	void OnCollisionEnter(Collision col){
+	void OnTriggerEnter(Collider col){
 		if (!isAttacking ())
 			return;
 

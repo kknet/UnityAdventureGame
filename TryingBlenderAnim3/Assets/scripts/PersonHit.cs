@@ -18,10 +18,13 @@ public class PersonHit : MonoBehaviour {
 		return GameObject.Find (charName + "/Audio Sources/" + audioName).GetComponent<AudioSource>();
 	}
 
-	void onCollisionEnter (Collision col) {
+	void OnTriggerEnter(Collider col){
+		Debug.Log ("got hit");
+
 		if (col.gameObject.CompareTag ("Weapons") && !strongHit.isPlaying) {
-			strongHit.Play ();
 			myAnim.SetBool ("hitStrong", true);
+			strongHit.Play ();
+			decreaseHealth (100f);
 			Invoke ("stopStrong", 1.0f);
 		}
 	}
@@ -34,6 +37,10 @@ public class PersonHit : MonoBehaviour {
 	// Update is called once per frame
 	void Update () {
 
+	}
+
+	void decreaseHealth(float decrease){
+		GetComponent<ManageHealth> ().decreaseHealth (decrease);
 	}
 
 }

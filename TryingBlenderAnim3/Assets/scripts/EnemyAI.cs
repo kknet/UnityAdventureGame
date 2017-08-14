@@ -25,7 +25,10 @@ public class EnemyAI : MonoBehaviour {
 
 	// Update is called once per frame
 	void Update () {
-		Debug.Log ("oldDev: "+ oldDev + " dev: "+ Dev.transform.position + " enemy: " + transform.position + " dif: " + dif);
+//		if (GetComponent<ManageHealth> ().isDead ())
+//			this.gameObject.SetActive (false);
+
+//		Debug.Log ("oldDev: "+ oldDev + " dev: "+ Dev.transform.position + " enemy: " + transform.position + " dif: " + dif);
 
 		applyRotation ();
 
@@ -129,7 +132,7 @@ public class EnemyAI : MonoBehaviour {
 			enemyAnim.SetFloat ("enemySpeed", Mathf.MoveTowards(enemyAnim.GetFloat ("enemySpeed"), 0f, 5f * Time.deltaTime));
 			return;
 		}
-		if (Vector3.Magnitude (dif) < 1f) {
+		if (Vector3.Magnitude (dif) < 2f) {
 			enemyAnim.SetFloat ("enemySpeed", Mathf.MoveTowards(enemyAnim.GetFloat ("enemySpeed"), 0f, 5f * Time.deltaTime));
 		} else {
 			enemyAnim.SetFloat ("enemySpeed", Mathf.MoveTowards(enemyAnim.GetFloat ("enemySpeed"), 1f, 2f * Time.deltaTime));

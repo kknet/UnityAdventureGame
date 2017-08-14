@@ -112,9 +112,8 @@ public class DevMovement : MonoBehaviour {
 				transform.Translate (Vector3.forward * Time.deltaTime * 5f * myAnimator.GetFloat("VSpeed"));
 			else if(myAnimator.GetBool("WeaponDrawn") && myAnimator.GetFloat("VSpeed") > 0.5f)
 				transform.Translate (Vector3.forward * Time.deltaTime * 5f * myAnimator.GetFloat("VSpeed"));
-
-//			else if(myAnimator.GetFloat("VSpeed") < -0.5f)
-//				transform.Translate (Vector3.forward * Time.deltaTime * 5f * myAnimator.GetFloat("VSpeed"));
+			//			else if(myAnimator.GetFloat("VSpeed") < -0.5f)
+			//				transform.Translate (Vector3.forward * Time.deltaTime * 5f * myAnimator.GetFloat("VSpeed"));
 		} 
 
 		if (Mathf.Approximately(myAnimator.GetFloat("VSpeed"), 0f) && Mathf.Approximately(myAnimator.GetFloat("HorizSpeed"), 0f)) {
