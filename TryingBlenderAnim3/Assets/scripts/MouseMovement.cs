@@ -7,6 +7,7 @@ public class MouseMovement : MonoBehaviour {
 	public float sensitivityX;
 	public float sensitivityY;
 	public GameObject player;
+	public GameObject devHair;
 
 	private bool firstTimeAdjust;
 	private Vector3 closePos;
@@ -58,25 +59,33 @@ public class MouseMovement : MonoBehaviour {
 		goal = player.transform.rotation.eulerAngles.y;
 	}
 
-	private void VerticalRotation()  {
-		float movementY = Input.GetAxis ("Mouse Y") * sensitivityY * Time.deltaTime;
-		if (!Mathf.Approximately (movementY, 0f)) {
+	private bool VerticalRotation()  {
+		float movementY = Input.GetAxisRaw ("Mouse Y") * sensitivityY * Time.deltaTime;
+		if (movementY > 180f)
+			movementY -= 360f;
+		else if (movementY < -180f)
+			movementY += 360f;
+//		if (Mathf.Abs(movementY) > 0.2f) {
 			float total = movementY + transform.rotation.eulerAngles.x;
-			if (total > 180f)
-				movementY -= 360f;
-			else if (total < -180f)
-				movementY += 360f;
-			total = movementY + transform.rotation.eulerAngles.x;//recalculate total		
-			total = Mathf.Clamp (total, -30f, 50f);//clamp it with limits
-			//			deltaVert = total;
-			transform.rotation = Quaternion.Euler (total, 0f, 0f);//calculate resulting quaternion
-		}
+			if (total > 50f)
+				movementY = 50f - transform.rotation.eulerAngles.x;
+			else if (total < 0f)
+				movementY = 0f - transform.rotation.eulerAngles.x;
+
+			//transform.Rotate (Vector3.right * movementY);
+
+			Vector3 axis = Vector3.Cross (transform.position - devHair.transform.position, Vector3.up);
+			transform.RotateAround (devHair.transform.position, axis, movementY);
+
+			return true;
+//		}
+//		return false;
 	}
 
 
 	private void HorizontalRotation(){
 		bool idle = player.GetComponent<DevMovement>().isIdle ();
-		float movementX = Input.GetAxis ("Mouse X") * sensitivityX * Time.deltaTime;
+		float movementX = Input.GetAxisRaw ("Mouse X") * sensitivityX * Time.deltaTime;
 		bool combating = !player.GetComponent<DevCombat> ().notInCombatMove ();
 		bool counterZero = (player.GetComponent<DevMovement> ().adjustCounter == 0);
 		bool camMoved = !Mathf.Approximately (movementX, 0f);
@@ -94,8 +103,8 @@ public class MouseMovement : MonoBehaviour {
 				return;
 			}
 		}
-		bool vert = !Mathf.Approximately (Input.GetAxis ("Vertical"), 0f); 
-		bool horiz = !Mathf.Approximately (Input.GetAxis ("Horizontal"), 0f); 
+		bool vert = !Mathf.Approximately (Input.GetAxisRaw ("Vertical"), 0f); 
+		bool horiz = !Mathf.Approximately (Input.GetAxisRaw ("Horizontal"), 0f); 
 
 		bool W = (Input.GetKey (KeyCode.W) || Input.GetKey (KeyCode.UpArrow)) || (Input.GetKeyDown (KeyCode.W) || Input.GetKeyDown (KeyCode.UpArrow));
 		bool A = (Input.GetKey (KeyCode.A) || Input.GetKey (KeyCode.LeftArrow)) || (Input.GetKeyDown (KeyCode.A) || Input.GetKeyDown (KeyCode.LeftArrow));
@@ -130,16 +139,22 @@ public class MouseMovement : MonoBehaviour {
 		dif = goal - player.transform.rotation.eulerAngles.y;
 		difClamp ();
 		firstTimeAdjust = (!Mathf.Approximately (dif, 0f)) && (counterZero);
-		if (difBig() && (firstTimeAdjust || !counterZero)) {
-			if (!movementButtonPressed ())
+		if (difBig () && (firstTimeAdjust || !counterZero)) {
+			if (!movementButtonPressed ()) {
 				myAnimator.SetFloat ("VSpeed", Mathf.MoveTowards (myAnimator.GetFloat ("VSpeed"), 1f, 0.1f));
+				player.GetComponent<DevMovement> ().horizRot = true;
+			} else {
+				player.GetComponent<DevMovement> ().horizRot = false;
+			}
+
 			player.GetComponent<DevMovement> ().adjustToCam (dif, firstTimeAdjust);
 			firstTimeAdjust = false;
 		} else {
-			if (!movementButtonPressed ())
-				myAnimator.SetFloat ("VSpeed", Mathf.MoveTowards (myAnimator.GetFloat ("VSpeed"), Input.GetAxis ("Vertical"), 0.05f));
+			player.GetComponent<DevMovement> ().horizRot = false;
 		}
-		transform.RotateAround (player.transform.position, Vector3.up, movementX);
+
+
+		transform.RotateAround (player.transform.position + new Vector3(0.0f, 3.0f, 0.0f), Vector3.up, movementX);
 	}
 
 	private void difClamp(){
@@ -158,8 +173,9 @@ public class MouseMovement : MonoBehaviour {
 	private void LateUpdate () {
 		transform.position = player.transform.position + currentOffset;
 
-		//		VerticalRotation ();
-		HorizontalRotation ();
+		bool vert = VerticalRotation ();
+//		if(!vert)
+			HorizontalRotation ();
 
 		//		transform.RotateAround (player.transform.position, Vector3.up, deltaHoriz);
 		//		transform.RotateAround (transform.position, Vector3.right, deltaVert * 0.1f);

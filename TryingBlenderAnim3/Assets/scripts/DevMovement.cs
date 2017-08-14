@@ -14,6 +14,7 @@ public class DevMovement : MonoBehaviour {
 	public AudioSource footstep4;
 	public AudioSource land;
 	public AudioSource flipJump;
+	public bool horizRot;
 
 	private int turnCounter;
 	private float turn;
@@ -32,6 +33,7 @@ public class DevMovement : MonoBehaviour {
 		applyJumpTrans = false;
 		turn = 0f;
 		desiredRot = Camera.main.transform.eulerAngles.y;
+		horizRot = false;
 	}
 
 	public void adjustToCam(float dif, bool firstTimeAdjust)
@@ -93,15 +95,16 @@ public class DevMovement : MonoBehaviour {
 			impactMoveBack ();
 
 		if (Input.GetKey (KeyCode.W) || Input.GetKey (KeyCode.UpArrow)) {
-			myAnimator.SetFloat ("VSpeed", Mathf.MoveTowards (myAnimator.GetFloat ("VSpeed"), Input.GetAxis ("Vertical"), 0.05f)); 
+			myAnimator.SetFloat ("VSpeed", Mathf.MoveTowards (myAnimator.GetFloat ("VSpeed"), Input.GetAxisRaw ("Vertical"), 0.05f)); 
 		} else if (Input.GetKey (KeyCode.S) || Input.GetKey (KeyCode.DownArrow)) {
-			myAnimator.SetFloat ("VSpeed", Mathf.MoveTowards (myAnimator.GetFloat ("VSpeed"), -1.0f * Input.GetAxis ("Vertical"), 0.05f)); 
+			myAnimator.SetFloat ("VSpeed", Mathf.MoveTowards (myAnimator.GetFloat ("VSpeed"), -1.0f * Input.GetAxisRaw ("Vertical"), 0.05f)); 
 		} else if (Input.GetKey (KeyCode.A) || Input.GetKey (KeyCode.LeftArrow)) {
-			myAnimator.SetFloat ("VSpeed", Mathf.MoveTowards (myAnimator.GetFloat ("VSpeed"), -1.0f * Input.GetAxis ("Horizontal"), 0.05f));
+			myAnimator.SetFloat ("VSpeed", Mathf.MoveTowards (myAnimator.GetFloat ("VSpeed"), -1.0f * Input.GetAxisRaw ("Horizontal"), 0.05f));
 		} else if (Input.GetKey (KeyCode.D) || Input.GetKey (KeyCode.RightArrow)) {
-			myAnimator.SetFloat ("VSpeed", Mathf.MoveTowards (myAnimator.GetFloat ("VSpeed"), Input.GetAxis ("Horizontal"), 0.05f));
+			myAnimator.SetFloat ("VSpeed", Mathf.MoveTowards (myAnimator.GetFloat ("VSpeed"), Input.GetAxisRaw ("Horizontal"), 0.05f));
 		} else {
-			myAnimator.SetFloat ("VSpeed", Mathf.MoveTowards (myAnimator.GetFloat ("VSpeed"), Input.GetAxis ("Vertical"), 0.05f)); 
+			if(!horizRot)
+				myAnimator.SetFloat ("VSpeed", Mathf.MoveTowards (myAnimator.GetFloat ("VSpeed"), Input.GetAxisRaw ("Vertical"), 0.05f)); 
 		}
 
 		if (anim.IsTag("Running")) {
@@ -137,7 +140,7 @@ public class DevMovement : MonoBehaviour {
 		}
 		if(adjustCounter == 0 && (!Mathf.Approximately(myAnimator.GetFloat("VSpeed"), 0f) || !Mathf.Approximately(myAnimator.GetFloat("HorizSpeed"), 0f))) {
 			if (!myAnimator.GetBool ("Jumping") && !myAnimator.GetBool ("shouldFrontFlip") && player.GetComponent<DevCombat>().notInCombatMove()) {
-				transform.Rotate (Vector3.up * Input.GetAxis("Mouse X") * Time.deltaTime * Camera.main.GetComponent<MouseMovement>().sensitivityX);
+				transform.Rotate (Vector3.up * Input.GetAxisRaw("Mouse X") * Time.deltaTime * Camera.main.GetComponent<MouseMovement>().sensitivityX);
 			}
 		}
 	}
