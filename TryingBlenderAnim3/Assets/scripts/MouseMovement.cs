@@ -13,6 +13,7 @@ public class MouseMovement : MonoBehaviour {
 	private Vector3 closePos;
 	private float dif;
 	private float goal;
+	private float distance;
 
 	[SerializeField][HideInInspector]
 	private Vector3 initialOffset;
@@ -57,29 +58,28 @@ public class MouseMovement : MonoBehaviour {
 		closePos = new Vector3 (0f, 1.54f, -1.425f);
 		dif = 0f;
 		goal = player.transform.rotation.eulerAngles.y;
+		distance = initialOffset.magnitude;
 	}
 
-	private bool VerticalRotation()  {
+	private void VerticalRotation()  {
 		float movementY = Input.GetAxisRaw ("Mouse Y") * sensitivityY * Time.deltaTime;
 		if (movementY > 180f)
 			movementY -= 360f;
 		else if (movementY < -180f)
 			movementY += 360f;
-//		if (Mathf.Abs(movementY) > 0.2f) {
-			float total = movementY + transform.rotation.eulerAngles.x;
-			if (total > 50f)
-				movementY = 50f - transform.rotation.eulerAngles.x;
-			else if (total < 0f)
-				movementY = 0f - transform.rotation.eulerAngles.x;
 
-			//transform.Rotate (Vector3.right * movementY);
-
-			Vector3 axis = Vector3.Cross (transform.position - devHair.transform.position, Vector3.up);
-			transform.RotateAround (devHair.transform.position, axis, movementY);
-
-			return true;
-//		}
-//		return false;
+		float total = movementY + transform.rotation.eulerAngles.x;
+		if (total > 50f) {
+			movementY = 50f - transform.rotation.eulerAngles.x;
+			total = movementY + transform.rotation.eulerAngles.x;
+		} else if (total < 0f) {
+			movementY = 0f - transform.rotation.eulerAngles.x;
+			total = movementY + transform.rotation.eulerAngles.x;
+		}
+		Vector3 axis = Vector3.Cross (transform.position - devHair.transform.position, Vector3.up);
+		transform.RotateAround (devHair.transform.position, axis, movementY);
+	
+		distance = initialOffset.magnitude * (35f + total) / 60f;
 	}
 
 
@@ -172,17 +172,8 @@ public class MouseMovement : MonoBehaviour {
 
 	private void LateUpdate () {
 		transform.position = player.transform.position + currentOffset;
-
-		bool vert = VerticalRotation ();
-//		if(!vert)
-			HorizontalRotation ();
-
-		//		transform.RotateAround (player.transform.position, Vector3.up, deltaHoriz);
-		//		transform.RotateAround (transform.position, Vector3.right, deltaVert * 0.1f);
-		//
-		//		deltaVert = 0f;
-		//		deltaHoriz = 0f;
-
-		currentOffset = transform.position - player.transform.position;
+		VerticalRotation ();
+		HorizontalRotation ();
+		currentOffset = (transform.position - player.transform.position).normalized * distance;
 	}
 }
