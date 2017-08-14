@@ -151,6 +151,7 @@ public class MouseMovement : MonoBehaviour {
 			firstTimeAdjust = false;
 		} else {
 			player.GetComponent<DevMovement> ().horizRot = false;
+			player.GetComponent<DevMovement> ().adjustCounter = 0;
 		}
 
 

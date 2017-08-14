@@ -40,10 +40,6 @@ public class DevMovement : MonoBehaviour {
 	{
 		if (!firstTimeAdjust && adjustCounter == 0)
 			return;
-		if (Mathf.Approximately (dif, 0f)) {
-			adjustCounter = 0;
-			return;
-		}
 		if(firstTimeAdjust)  {
 			if (dif > 180f)
 				dif = dif - 360f;
@@ -126,13 +122,13 @@ public class DevMovement : MonoBehaviour {
 			}
 		}
 
-		if(Input.GetButtonDown("Jump") && myAnimator.GetFloat("VSpeed") > 0 && adjustCounter == 0 
+		if(Input.GetButtonDown("Jump") && myAnimator.GetFloat("VSpeed") > 0f && adjustCounter == 0 
 			&& player.GetComponent<DevCombat>().notInCombatMove())
 		{
 			myAnimator.SetBool("Jumping", true);
 			Invoke ("stopJumping", 0.8f);
 		}
-		else if(Input.GetButtonDown("FrontFlip") && myAnimator.GetFloat("VSpeed") > 0 && adjustCounter == 0
+		else if(Input.GetButtonDown("FrontFlip") && myAnimator.GetFloat("VSpeed") > 0f && adjustCounter == 0
 			&& player.GetComponent<DevCombat>().notInCombatMove())
 		{
 			myAnimator.SetBool ("shouldFrontFlip", true);
