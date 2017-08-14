@@ -69,17 +69,17 @@ public class MouseMovement : MonoBehaviour {
 			movementY += 360f;
 
 		float total = movementY + transform.rotation.eulerAngles.x;
-		if (total > 50f) {
-			movementY = 50f - transform.rotation.eulerAngles.x;
+		if (total > 30f) {
+			movementY = 30f - transform.rotation.eulerAngles.x;
 			total = movementY + transform.rotation.eulerAngles.x;
-		} else if (total < 0f) {
-			movementY = 0f - transform.rotation.eulerAngles.x;
+		} else if (total < 10f) {
+			movementY = 10f - transform.rotation.eulerAngles.x;
 			total = movementY + transform.rotation.eulerAngles.x;
 		}
 		Vector3 axis = Vector3.Cross (transform.position - devHair.transform.position, Vector3.up);
 		transform.RotateAround (devHair.transform.position, axis, movementY);
 	
-		distance = initialOffset.magnitude * (35f + total) / 60f;
+		distance = initialOffset.magnitude * (25f + total) / 75f;
 	}
 
 
@@ -89,20 +89,30 @@ public class MouseMovement : MonoBehaviour {
 		bool combating = !player.GetComponent<DevCombat> ().notInCombatMove ();
 		bool counterZero = (player.GetComponent<DevMovement> ().adjustCounter == 0);
 		bool camMoved = !Mathf.Approximately (movementX, 0f);
-		if ((counterZero) && combating) {
-			if (camMoved) {
-				transform.RotateAround (player.transform.position, Vector3.up, movementX);
-				firstTimeAdjust = true;
-			}
-			return;
-		}
-		if (camMoved) {
-			if (counterZero && idle) {
+		AnimatorStateInfo anim = myAnimator.GetCurrentAnimatorStateInfo (0);
+		bool jumping = anim.IsTag("Jumps");
+
+		if (counterZero && camMoved) {
+			if (combating || idle) {
 				transform.RotateAround (player.transform.position, Vector3.up, movementX);
 				firstTimeAdjust = true;
 				return;
 			}
 		}
+
+//		if ((counterZero) && combating) {
+//			if (camMoved) {
+//
+//			}
+//			return;
+//		}
+//		if (camMoved) {
+//			if (counterZero && idle) {
+//				transform.RotateAround (player.transform.position, Vector3.up, movementX);
+//				firstTimeAdjust = true;
+//				return;
+//			}
+//		}
 		bool vert = !Mathf.Approximately (Input.GetAxisRaw ("Vertical"), 0f); 
 		bool horiz = !Mathf.Approximately (Input.GetAxisRaw ("Horizontal"), 0f); 
 
@@ -153,7 +163,6 @@ public class MouseMovement : MonoBehaviour {
 			player.GetComponent<DevMovement> ().horizRot = false;
 			player.GetComponent<DevMovement> ().adjustCounter = 0;
 		}
-
 
 		transform.RotateAround (player.transform.position + new Vector3(0.0f, 3.0f, 0.0f), Vector3.up, movementX);
 	}

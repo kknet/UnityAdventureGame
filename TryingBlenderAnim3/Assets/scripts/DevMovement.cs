@@ -68,7 +68,9 @@ public class DevMovement : MonoBehaviour {
 
 	public bool isIdle()
 	{
-		if (myAnimator.GetFloat ("VSpeed") == 0 && myAnimator.GetFloat ("HorizSpeed") == 0 && myAnimator.GetBool ("shouldFrontFlip") == false && myAnimator.GetBool ("Jumping") == false)
+		AnimatorStateInfo anim = myAnimator.GetCurrentAnimatorStateInfo (0);
+
+		if (!anim.IsTag("Jumps") && myAnimator.GetFloat ("VSpeed") == 0 && myAnimator.GetFloat ("HorizSpeed") == 0 && myAnimator.GetBool ("shouldFrontFlip") == false && myAnimator.GetBool ("Jumping") == false)
 		{
 			return true;
 		}
@@ -91,23 +93,28 @@ public class DevMovement : MonoBehaviour {
 			impactMoveBack ();
 
 		if (Input.GetKey (KeyCode.W) || Input.GetKey (KeyCode.UpArrow)) {
-			myAnimator.SetFloat ("VSpeed", Mathf.MoveTowards (myAnimator.GetFloat ("VSpeed"), Input.GetAxisRaw ("Vertical"), 0.05f)); 
+			myAnimator.SetFloat ("VSpeed", Mathf.MoveTowards (myAnimator.GetFloat ("VSpeed"), Input.GetAxisRaw ("Vertical"), 0.1f)); 
 		} else if (Input.GetKey (KeyCode.S) || Input.GetKey (KeyCode.DownArrow)) {
-			myAnimator.SetFloat ("VSpeed", Mathf.MoveTowards (myAnimator.GetFloat ("VSpeed"), -1.0f * Input.GetAxisRaw ("Vertical"), 0.05f)); 
+			myAnimator.SetFloat ("VSpeed", Mathf.MoveTowards (myAnimator.GetFloat ("VSpeed"), -1.0f * Input.GetAxisRaw ("Vertical"), 0.1f)); 
 		} else if (Input.GetKey (KeyCode.A) || Input.GetKey (KeyCode.LeftArrow)) {
-			myAnimator.SetFloat ("VSpeed", Mathf.MoveTowards (myAnimator.GetFloat ("VSpeed"), -1.0f * Input.GetAxisRaw ("Horizontal"), 0.05f));
+			myAnimator.SetFloat ("VSpeed", Mathf.MoveTowards (myAnimator.GetFloat ("VSpeed"), -1.0f * Input.GetAxisRaw ("Horizontal"), 0.1f));
 		} else if (Input.GetKey (KeyCode.D) || Input.GetKey (KeyCode.RightArrow)) {
-			myAnimator.SetFloat ("VSpeed", Mathf.MoveTowards (myAnimator.GetFloat ("VSpeed"), Input.GetAxisRaw ("Horizontal"), 0.05f));
+			myAnimator.SetFloat ("VSpeed", Mathf.MoveTowards (myAnimator.GetFloat ("VSpeed"), Input.GetAxisRaw ("Horizontal"), 0.1f));
 		} else {
 			if(!horizRot)
-				myAnimator.SetFloat ("VSpeed", Mathf.MoveTowards (myAnimator.GetFloat ("VSpeed"), Input.GetAxisRaw ("Vertical"), 0.05f)); 
+				myAnimator.SetFloat ("VSpeed", Mathf.MoveTowards (myAnimator.GetFloat ("VSpeed"), Input.GetAxisRaw ("Vertical"), 0.1f)); 
 		}
 
 		if (anim.IsTag("Running")) {
-			if(myAnimator.GetFloat("VSpeed") > 0.5f)
+
+
+			if(!myAnimator.GetBool("WeaponDrawn") && myAnimator.GetFloat("VSpeed") > 0.5f)
 				transform.Translate (Vector3.forward * Time.deltaTime * 5f * myAnimator.GetFloat("VSpeed"));
-			else if(myAnimator.GetFloat("VSpeed") < -0.5f)
+			else if(myAnimator.GetBool("WeaponDrawn") && myAnimator.GetFloat("VSpeed") > 0.5f)
 				transform.Translate (Vector3.forward * Time.deltaTime * 5f * myAnimator.GetFloat("VSpeed"));
+
+//			else if(myAnimator.GetFloat("VSpeed") < -0.5f)
+//				transform.Translate (Vector3.forward * Time.deltaTime * 5f * myAnimator.GetFloat("VSpeed"));
 		} 
 
 		if (Mathf.Approximately(myAnimator.GetFloat("VSpeed"), 0f) && Mathf.Approximately(myAnimator.GetFloat("HorizSpeed"), 0f)) {
@@ -120,6 +127,15 @@ public class DevMovement : MonoBehaviour {
 			} else {
 				transform.Translate (Vector3.forward * Time.deltaTime * 12f);
 			}
+		}
+
+		if (myAnimator.GetBool ("WeaponDrawn") && Input.GetButtonDown("Jump")) {
+			myAnimator.SetBool ("roll", true);
+			Invoke ("stopRolling", 1.0f);
+		}
+
+		if (anim.IsName ("quick_roll_to_run")) {
+			transform.Translate (Vector3.forward * Time.deltaTime * 2f);
 		}
 
 		if(Input.GetButtonDown("Jump") && myAnimator.GetFloat("VSpeed") > 0f && adjustCounter == 0 
@@ -135,7 +151,7 @@ public class DevMovement : MonoBehaviour {
 			Invoke ("stopFrontFlip", 2.1f);
 		}
 		if(adjustCounter == 0 && (!Mathf.Approximately(myAnimator.GetFloat("VSpeed"), 0f) || !Mathf.Approximately(myAnimator.GetFloat("HorizSpeed"), 0f))) {
-			if (!myAnimator.GetBool ("Jumping") && !myAnimator.GetBool ("shouldFrontFlip") && player.GetComponent<DevCombat>().notInCombatMove()) {
+			if (!anim.IsTag("Jumps") && !myAnimator.GetBool ("Jumping") && !myAnimator.GetBool ("shouldFrontFlip") && player.GetComponent<DevCombat>().notInCombatMove()) {
 				transform.Rotate (Vector3.up * Input.GetAxisRaw("Mouse X") * Time.deltaTime * Camera.main.GetComponent<MouseMovement>().sensitivityX);
 			}
 		}
@@ -199,6 +215,10 @@ public class DevMovement : MonoBehaviour {
 
 	void landingSound(){
 		land.Play ();
+	}
+
+	void stopRolling(){
+		myAnimator.SetBool ("roll", false);
 	}
 
 	void stopJumping()

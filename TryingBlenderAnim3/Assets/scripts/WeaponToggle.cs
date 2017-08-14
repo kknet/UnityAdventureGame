@@ -103,23 +103,23 @@ public class WeaponToggle : MonoBehaviour {
 				Invoke ("StartDraw", 0.5f);
 			}
 		}
-		else if (Input.GetKeyDown(KeyCode.Alpha2)) {	
-			if (weaponOut == "Spear"){
-				return;
-			}
-
-			//a weapon is already equipped (not a scimitar)
-			if (weaponOut!="") {
-				newWeaponOut = "Spear";
-				StartSwitch ();
-
-			//no weapon is already equipped
-			} else {
-				StartShieldDraw ();
-				weaponOut = "Spear";
-				Invoke ("StartDraw", 0.5f);
-			}
-		}
+//		else if (Input.GetKeyDown(KeyCode.Alpha2)) {	
+//			if (weaponOut == "Spear"){
+//				return;
+//			}
+//
+//			//a weapon is already equipped (not a scimitar)
+//			if (weaponOut!="") {
+//				newWeaponOut = "Spear";
+//				StartSwitch ();
+//
+//			//no weapon is already equipped
+//			} else {
+//				StartShieldDraw ();
+//				weaponOut = "Spear";
+//				Invoke ("StartDraw", 0.5f);
+//			}
+//		}
 	}
 
 	void StartSwitch(){
