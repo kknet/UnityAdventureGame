@@ -16,6 +16,7 @@ public class MouseMovement : MonoBehaviour {
 	private float distance;
 	private Vector3 oldEnemy;
 	private Vector3 displacement;
+	private Vector3 rollAngle;
 
 	[SerializeField][HideInInspector]
 	private Vector3 initialOffset;
@@ -45,6 +46,7 @@ public class MouseMovement : MonoBehaviour {
 		oldEnemy = Vector3.zero;
 		displacement = Vector3.zero;
 		inCombat = false;
+		rollAngle = Vector3.zero;
 	}
 
 	private void VerticalRotation()  {
@@ -94,12 +96,54 @@ public class MouseMovement : MonoBehaviour {
 			displacement = new Vector3 (displacement.x, 0f, displacement.z);
 		}
 
-		//rotate character towards closest enemy
-		player.transform.forward = Vector3.RotateTowards (player.transform.forward, displacement, 5f * Time.deltaTime, 0.0f); 
 
+		if (player.gameObject.GetComponent<DevMovement> ().rolling ()) {
+			bool W = (Input.GetKey (KeyCode.W) || Input.GetKey (KeyCode.UpArrow)) || (Input.GetKeyDown (KeyCode.W) || Input.GetKeyDown (KeyCode.UpArrow));
+			bool A = (Input.GetKey (KeyCode.A) || Input.GetKey (KeyCode.LeftArrow)) || (Input.GetKeyDown (KeyCode.A) || Input.GetKeyDown (KeyCode.LeftArrow));
+			bool S = (Input.GetKey (KeyCode.S) || Input.GetKey (KeyCode.DownArrow)) || (Input.GetKeyDown (KeyCode.S) || Input.GetKeyDown (KeyCode.DownArrow));
+			bool D = (Input.GetKey (KeyCode.D) || Input.GetKey (KeyCode.RightArrow)) || (Input.GetKeyDown (KeyCode.D) || Input.GetKeyDown (KeyCode.RightArrow));
+
+			W = W && !S;
+			S = S && !W;
+			A = A && !D;
+			D = D && !A;
+
+			if (W)
+				rollAngle += Vector3.forward;
+			else if (S)
+				rollAngle -= Vector3.forward;
+			if (D)
+				rollAngle += Vector3.right;
+			else if (A)
+				rollAngle -= Vector3.right;
+
+			if (rollAngle == Vector3.zero)
+				rollAngle = Vector3.forward;
+
+			player.transform.forward = Vector3.RotateTowards (player.transform.forward, rollAngle - player.transform.forward, 15f * Time.deltaTime, 0.0f); 
+		}
+		else {
+			rollAngle = Vector3.zero;
+			//rotate character towards closest enemy
+			Invoke("adjustToEnemy", 1f);
+		}
 		//rotate camera around character according to mouse input
 		float movementX = Input.GetAxisRaw ("Mouse X") * sensitivityX * Time.deltaTime;
 		transform.RotateAround (player.transform.position, Vector3.up, movementX);
+	}
+
+	private void adjustToEnemy(){
+		if (player.gameObject.GetComponent<DevMovement> ().rolling ())
+			return;
+		Vector3 oldForward = player.transform.forward;
+		player.transform.forward = Vector3.RotateTowards (player.transform.forward, displacement, 10f * Time.deltaTime, 0.0f); 
+		if ((oldForward-player.transform.forward).magnitude > 0.1f) {
+			myAnimator.SetFloat ("VSpeed", Mathf.MoveTowards (myAnimator.GetFloat ("VSpeed"), 1f, Time.deltaTime*2f));
+			player.transform.Translate (player.transform.forward * Time.deltaTime * 2f);
+			player.GetComponent<DevMovement> ().horizRot = true;
+		} else {
+			player.GetComponent<DevMovement> ().horizRot = false;
+		}
 	}
 
 	private void HorizontalRotation(){

@@ -77,6 +77,11 @@ public class DevMovement : MonoBehaviour {
 		return false;
 	}
 
+	public bool rolling(){
+		AnimatorStateInfo anim = myAnimator.GetCurrentAnimatorStateInfo (0);
+		return anim.IsTag ("roll");
+	}
+
 	public bool turning(){
 		return !Mathf.Approximately(desiredRot, transform.eulerAngles.y);
 	}
@@ -92,9 +97,15 @@ public class DevMovement : MonoBehaviour {
 		if (anim.IsTag ("impact"))
 			impactMoveBack ();
 
-		if (Camera.main.GetComponent<MouseMovement> ().inCombat && anim.IsTag("Running")) {
-			myAnimator.SetFloat ("VSpeed", Input.GetAxisRaw ("Vertical"));
-			myAnimator.SetFloat ("HorizSpeed", Input.GetAxisRaw ("Horizontal"));
+		bool inCombat = Camera.main.GetComponent<MouseMovement> ().inCombat;
+
+		if (rolling ()) {
+			transform.Translate (Vector3.forward * Time.deltaTime * 4f);
+		}
+
+		if (inCombat && anim.IsTag("Running")) {
+			myAnimator.SetFloat ("VSpeed", Mathf.MoveTowards(myAnimator.GetFloat ("VSpeed"), Input.GetAxisRaw ("Vertical"), 4f*Time.deltaTime));
+			myAnimator.SetFloat ("HorizSpeed", Mathf.MoveTowards(myAnimator.GetFloat ("HorizSpeed"), Input.GetAxisRaw ("Horizontal"), 4f*Time.deltaTime));
 
 			bool W = (Input.GetKey (KeyCode.W) || Input.GetKey (KeyCode.UpArrow));
 			bool A = (Input.GetKey (KeyCode.A) || Input.GetKey (KeyCode.LeftArrow));
@@ -116,7 +127,9 @@ public class DevMovement : MonoBehaviour {
 			else if (A)
 				angle -= Vector3.right;
 
-			transform.Translate (angle.normalized * Time.deltaTime * 5f);
+
+
+			transform.Translate (angle.normalized * Time.deltaTime * 2.5f);
 
 		} else {
 			if (anim.IsTag ("Running")) {
@@ -169,7 +182,7 @@ public class DevMovement : MonoBehaviour {
 			myAnimator.SetBool ("shouldFrontFlip", true);
 			Invoke ("stopFrontFlip", 2.1f);
 		}
-		if(adjustCounter == 0 && (!Mathf.Approximately(myAnimator.GetFloat("VSpeed"), 0f) || !Mathf.Approximately(myAnimator.GetFloat("HorizSpeed"), 0f))) {
+		if(!inCombat && adjustCounter == 0 && (!Mathf.Approximately(myAnimator.GetFloat("VSpeed"), 0f) || !Mathf.Approximately(myAnimator.GetFloat("HorizSpeed"), 0f))) {
 			if (!anim.IsTag("Jumps") && !myAnimator.GetBool ("Jumping") && !myAnimator.GetBool ("shouldFrontFlip") && player.GetComponent<DevCombat>().notInCombatMove()) {
 				transform.Rotate (Vector3.up * Input.GetAxisRaw("Mouse X") * Time.deltaTime * Camera.main.GetComponent<MouseMovement>().sensitivityX);
 			}
