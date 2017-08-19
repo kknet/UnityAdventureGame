@@ -8,12 +8,14 @@ public class MouseMovement : MonoBehaviour {
 	public float sensitivityY;
 	public GameObject player;
 	public GameObject devHair;
+	public bool inCombat;
 
 	private bool firstTimeAdjust;
-	private Vector3 closePos;
 	private float dif;
 	private float goal;
 	private float distance;
+	private Vector3 oldEnemy;
+	private Vector3 displacement;
 
 	[SerializeField][HideInInspector]
 	private Vector3 initialOffset;
@@ -30,35 +32,19 @@ public class MouseMovement : MonoBehaviour {
 			|| Input.GetKeyDown (KeyCode.UpArrow) || Input.GetKeyDown (KeyCode.LeftArrow) 
 			|| Input.GetKeyDown (KeyCode.RightArrow) || Input.GetKeyDown (KeyCode.DownArrow);
 	}
-
-
-	//	private bool Approx(Vector3 a, Vector3 b){
-	//		return Mathf.Approximately (a.x, b.x) && Mathf.Approximately (a.y, b.y) && Mathf.Approximately (a.z, b.z);
-	//	}
-	//
-	//	public void ZoomIn() {
-	////		Vector3 dir = transform.position - closePos;
-	//		transform.position.Set (closePos.x, closePos.y, closePos.z);
-	//		currentOffset = transform.position - player.transform.position;
-	//	}
-	//
-	//	public void ZoomOut(Vector3 direction) {
-	//		Vector3 current = transform.position - player.transform.position;
-	//		if (!Approx (current, initialOffset)) {
-	//			transform.Translate (direction);		
-	//		}
-	//	}
-
+				
 	private void Start () {
 		if(player == null) {
 			Debug.LogError ("Assign a player for the camera in Unity's inspector");
 		}
 		currentOffset = initialOffset;
 		firstTimeAdjust = false;
-		closePos = new Vector3 (0f, 1.54f, -1.425f);
 		dif = 0f;
 		goal = player.transform.rotation.eulerAngles.y;
 		distance = initialOffset.magnitude;
+		oldEnemy = Vector3.zero;
+		displacement = Vector3.zero;
+		inCombat = false;
 	}
 
 	private void VerticalRotation()  {
@@ -82,6 +68,39 @@ public class MouseMovement : MonoBehaviour {
 		distance = initialOffset.magnitude * (25f + total) / 75f;
 	}
 
+	private float rand(float a, float b){
+		return UnityEngine.Random.Range (a, b);
+	}
+
+	private bool Approx(Vector3 a, Vector3 b){
+		return Mathf.Approximately (a.x, b.x) && Mathf.Approximately (a.z, b.z);
+	}
+
+
+	private void HorizontalCombatRotation(Vector3 closestEnemy)
+	{
+
+		//if the position of the closest enemy changed
+		if (!Approx(closestEnemy, oldEnemy))
+		{
+			//choose a random position that is near the enemy
+			//and using this random position, and the player's position
+			//calculate the desired rotation of the player
+			displacement = closestEnemy - player.transform.position;
+			displacement = new Vector3 (displacement.x, 0f, displacement.z);
+			Vector3 perpenDif = Vector3.Normalize (Vector3.Cross (displacement, -1.0f * displacement)) * rand (1f, -1f);
+			Vector3 target = closestEnemy + perpenDif;
+			displacement = target - player.transform.position;
+			displacement = new Vector3 (displacement.x, 0f, displacement.z);
+		}
+
+		//rotate character towards closest enemy
+		player.transform.forward = Vector3.RotateTowards (player.transform.forward, displacement, 5f * Time.deltaTime, 0.0f); 
+
+		//rotate camera around character according to mouse input
+		float movementX = Input.GetAxisRaw ("Mouse X") * sensitivityX * Time.deltaTime;
+		transform.RotateAround (player.transform.position, Vector3.up, movementX);
+	}
 
 	private void HorizontalRotation(){
 		bool idle = player.GetComponent<DevMovement>().isIdle ();
@@ -94,7 +113,7 @@ public class MouseMovement : MonoBehaviour {
 
 		if (counterZero && camMoved) {
 			if (combating || idle) {
-				transform.RotateAround (player.transform.position, Vector3.up, movementX);
+				transform.RotateAround (player.transform.position + new Vector3(0.0f, 3.0f, 0.0f), Vector3.up, movementX);
 				firstTimeAdjust = true;
 				return;
 			}
@@ -178,12 +197,68 @@ public class MouseMovement : MonoBehaviour {
 		return Mathf.Abs(dif) > 2f;
 	}
 
+	//return position of nearest enemy
+	public Vector3 nearestEnemy(){
+		Vector3 pos = player.transform.position;
+		Vector3 center = new Vector3 (pos.x, 0f, pos.z);
+		Vector3 halfExtents = new Vector3 (20f, 5f, 20f);
+		Collider[] hits = Physics.OverlapBox (center, halfExtents);
+		if (hits.Length == 0)
+			return Vector3.zero;
 
+		Vector3 closestEnemy = Vector3.zero;
+		float dist = 0f;
+		foreach(Collider col in hits)
+		{
+			if (col.gameObject.CompareTag ("Enemy")) {
+				if (closestEnemy == Vector3.zero) {
+					closestEnemy = col.gameObject.transform.position;
+					dist = (closestEnemy - player.transform.position).magnitude;
+				} else {
+					tuple t = closer (dist, closestEnemy, col.gameObject.transform.position);
+					dist = t.second ();
+					closestEnemy = t.first ();
+				}					
+			}
+		}
+		return closestEnemy;
+	}
 
-	private void LateUpdate () {
+	class tuple {
+		Vector3 a;
+		float b;
+		public tuple(Vector3 A, float B) {
+			a = A;
+			b = B;
+		}
+		public Vector3 first() { return a; }
+		public float second() { return b; }
+	}
+
+	private tuple closer(float dist, Vector3 oldGuy, Vector3 newGuy){
+		float difference = (newGuy - player.transform.position).magnitude;
+		if (difference < dist)
+			return new tuple (newGuy, difference);
+		return new tuple (oldGuy, dist);
+	}
+
+	private void Update(){
 		transform.position = player.transform.position + currentOffset;
-		VerticalRotation ();
-		HorizontalRotation ();
+		Vector3 enemy = nearestEnemy (); 
+		inCombat = (enemy != Vector3.zero);
+		if (inCombat) {
+			HorizontalCombatRotation (enemy);				
+		} else {
+			VerticalRotation ();
+			HorizontalRotation ();		
+		}
 		currentOffset = (transform.position - player.transform.position).normalized * distance;
 	}
+
+//	private void LateUpdate () {
+//		transform.position = player.transform.position + currentOffset;
+//		VerticalRotation ();
+//		HorizontalRotation ();
+//		currentOffset = (transform.position - player.transform.position).normalized * distance;
+//	}
 }

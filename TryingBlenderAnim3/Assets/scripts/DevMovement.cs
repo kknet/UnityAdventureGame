@@ -16,8 +16,8 @@ public class DevMovement : MonoBehaviour {
 	public AudioSource flipJump;
 	public bool horizRot;
 
-	private int turnCounter;
-	private float turn;
+//	private int turnCounter;
+//	private float turn;
 	private float desiredRot;
 	private bool applyJumpTrans;
 	private float needToRot;
@@ -28,10 +28,10 @@ public class DevMovement : MonoBehaviour {
 		myAnimator = GetComponent<Animator>();
 		needToRot = 0;
 		adjustCounter = 0;
-		turnCounter = 0;
+//		turnCounter = 0;
 		runCounter = 0;
 		applyJumpTrans = false;
-		turn = 0f;
+//		turn = 0f;
 		desiredRot = Camera.main.transform.eulerAngles.y;
 		horizRot = false;
 	}
@@ -92,30 +92,50 @@ public class DevMovement : MonoBehaviour {
 		if (anim.IsTag ("impact"))
 			impactMoveBack ();
 
-		if (Input.GetKey (KeyCode.W) || Input.GetKey (KeyCode.UpArrow)) {
-			myAnimator.SetFloat ("VSpeed", Mathf.MoveTowards (myAnimator.GetFloat ("VSpeed"), Input.GetAxisRaw ("Vertical"), 0.1f)); 
-		} else if (Input.GetKey (KeyCode.S) || Input.GetKey (KeyCode.DownArrow)) {
-			myAnimator.SetFloat ("VSpeed", Mathf.MoveTowards (myAnimator.GetFloat ("VSpeed"), -1.0f * Input.GetAxisRaw ("Vertical"), 0.1f)); 
-		} else if (Input.GetKey (KeyCode.A) || Input.GetKey (KeyCode.LeftArrow)) {
-			myAnimator.SetFloat ("VSpeed", Mathf.MoveTowards (myAnimator.GetFloat ("VSpeed"), -1.0f * Input.GetAxisRaw ("Horizontal"), 0.1f));
-		} else if (Input.GetKey (KeyCode.D) || Input.GetKey (KeyCode.RightArrow)) {
-			myAnimator.SetFloat ("VSpeed", Mathf.MoveTowards (myAnimator.GetFloat ("VSpeed"), Input.GetAxisRaw ("Horizontal"), 0.1f));
+		if (Camera.main.GetComponent<MouseMovement> ().inCombat && anim.IsTag("Running")) {
+			myAnimator.SetFloat ("VSpeed", Input.GetAxisRaw ("Vertical"));
+			myAnimator.SetFloat ("HorizSpeed", Input.GetAxisRaw ("Horizontal"));
+
+			bool W = (Input.GetKey (KeyCode.W) || Input.GetKey (KeyCode.UpArrow));
+			bool A = (Input.GetKey (KeyCode.A) || Input.GetKey (KeyCode.LeftArrow));
+			bool S = (Input.GetKey (KeyCode.S) || Input.GetKey (KeyCode.DownArrow));
+			bool D = (Input.GetKey (KeyCode.D) || Input.GetKey (KeyCode.RightArrow));
+
+			W = W && !S;
+			S = S && !W;
+			A = A && !D;
+			D = D && !A;
+
+			Vector3 angle = Vector3.zero;
+			if (W)
+				angle += Vector3.forward;
+			else if (S)
+				angle -= Vector3.forward;
+			if (D)
+				angle += Vector3.right;
+			else if (A)
+				angle -= Vector3.right;
+
+			transform.Translate (angle.normalized * Time.deltaTime * 5f);
+
 		} else {
-			if(!horizRot)
-				myAnimator.SetFloat ("VSpeed", Mathf.MoveTowards (myAnimator.GetFloat ("VSpeed"), Input.GetAxisRaw ("Vertical"), 0.1f)); 
+			if (anim.IsTag ("Running")) {
+				if (Input.GetKey (KeyCode.W) || Input.GetKey (KeyCode.UpArrow)) {
+					myAnimator.SetFloat ("VSpeed", Mathf.MoveTowards (myAnimator.GetFloat ("VSpeed"), Input.GetAxisRaw ("Vertical"), 0.1f)); 
+				} else if (Input.GetKey (KeyCode.S) || Input.GetKey (KeyCode.DownArrow)) {
+					myAnimator.SetFloat ("VSpeed", Mathf.MoveTowards (myAnimator.GetFloat ("VSpeed"), -1.0f * Input.GetAxisRaw ("Vertical"), 0.1f)); 
+				} else if (Input.GetKey (KeyCode.A) || Input.GetKey (KeyCode.LeftArrow)) {
+					myAnimator.SetFloat ("VSpeed", Mathf.MoveTowards (myAnimator.GetFloat ("VSpeed"), -1.0f * Input.GetAxisRaw ("Horizontal"), 0.1f));
+				} else if (Input.GetKey (KeyCode.D) || Input.GetKey (KeyCode.RightArrow)) {
+					myAnimator.SetFloat ("VSpeed", Mathf.MoveTowards (myAnimator.GetFloat ("VSpeed"), Input.GetAxisRaw ("Horizontal"), 0.1f));
+				} else {
+					if(!horizRot)
+						myAnimator.SetFloat ("VSpeed", Mathf.MoveTowards (myAnimator.GetFloat ("VSpeed"), Input.GetAxisRaw ("Vertical"), 0.1f)); 
+				}
+					transform.Translate (Vector3.forward * Time.deltaTime * 5f * myAnimator.GetFloat ("VSpeed"));
+			}
 		}
-
-		if (anim.IsTag("Running")) {
-
-
-			if(!myAnimator.GetBool("WeaponDrawn") && myAnimator.GetFloat("VSpeed") > 0.5f)
-				transform.Translate (Vector3.forward * Time.deltaTime * 5f * myAnimator.GetFloat("VSpeed"));
-			else if(myAnimator.GetBool("WeaponDrawn") && myAnimator.GetFloat("VSpeed") > 0.5f)
-				transform.Translate (Vector3.forward * Time.deltaTime * 5f * myAnimator.GetFloat("VSpeed"));
-			//			else if(myAnimator.GetFloat("VSpeed") < -0.5f)
-			//				transform.Translate (Vector3.forward * Time.deltaTime * 5f * myAnimator.GetFloat("VSpeed"));
-		} 
-
+			
 		if (Mathf.Approximately(myAnimator.GetFloat("VSpeed"), 0f) && Mathf.Approximately(myAnimator.GetFloat("HorizSpeed"), 0f)) {
 			stopFootstepSound ();
 		}

@@ -18,11 +18,11 @@ public class WeaponToggle : MonoBehaviour {
 	GameObject ShieldIn;
 	GameObject ShieldOut;
 
-	private Vector3 scimInRot = new Vector3(230.35f, -97.044f, -144.8f);
-	private Vector3 scimInTrans = new Vector3(0.288f, -0.174f, -0.405f);
-		
-	private Vector3 scimOutTrans = new Vector3(-1.0f, - 0.045f, -0.24f); 
-	private Vector3 scimOutRot = new Vector3(78.8f, - 236.2f, 48.31f); 
+//	private Vector3 scimInRot = new Vector3(230.35f, -97.044f, -144.8f);
+//	private Vector3 scimInTrans = new Vector3(0.288f, -0.174f, -0.405f);
+//		
+//	private Vector3 scimOutTrans = new Vector3(-1.0f, - 0.045f, -0.24f); 
+//	private Vector3 scimOutRot = new Vector3(78.8f, - 236.2f, 48.31f); 
 
 	//scimOut:
 	// transform: -1 -0.045 -0.24
@@ -33,7 +33,7 @@ public class WeaponToggle : MonoBehaviour {
 	// Use this for initialization
 	void Start () {
 		weaponsTable = new Dictionary<string, GameObject> ();
-		allWeps = GameObject.FindGameObjectsWithTag ("Weapons");
+		allWeps = GameObject.FindGameObjectsWithTag ("OurWeapons");
 		myAnimator = GameObject.Find ("DevDrake").GetComponent<Animator> ();
 //		ShieldIn = GameObject.Find ("ShieldIn");
 		ShieldOut = GameObject.Find ("ShieldOut");

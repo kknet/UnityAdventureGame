@@ -18,10 +18,19 @@ public class PersonHit : MonoBehaviour {
 		return GameObject.Find (charName + "/Audio Sources/" + audioName).GetComponent<AudioSource>();
 	}
 
-	void OnTriggerEnter(Collider col){
-		Debug.Log ("got hit");
+	void OnCollisionEnter(Collision col){
 
-		if (col.gameObject.CompareTag ("Weapons") && !strongHit.isPlaying) {
+		bool isThisAnEnemy = gameObject.CompareTag ("Enemy");
+		bool gotHitByOther = false;
+		if (isThisAnEnemy)
+			gotHitByOther = col.gameObject.CompareTag ("OurWeapons");
+		else
+			gotHitByOther = col.gameObject.CompareTag ("EnemyWeapons");
+
+		bool notHitAlready = !strongHit.isPlaying;
+
+		if (gotHitByOther && notHitAlready) {
+			Debug.Log ("got hit");
 			myAnim.SetBool ("hitStrong", true);
 			strongHit.Play ();
 			decreaseHealth (100f);
