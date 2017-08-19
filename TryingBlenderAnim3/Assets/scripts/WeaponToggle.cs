@@ -63,6 +63,24 @@ public class WeaponToggle : MonoBehaviour {
 	// transform: -1 -0.045 -0.24
 	// rotation: 78.8 -236.2 48.31
 
+	public void drawScim(){
+		if (weaponOut == "Scimitar"){
+			return;
+		}
+
+		//a weapon is already equipped (not a scimitar)
+		if (weaponOut!="") {
+			newWeaponOut = "Scimitar";
+			StartSwitch ();
+
+			//no weapon is already equipped
+		} else {
+			StartShieldDraw ();
+			weaponOut = "Scimitar";
+			Invoke ("StartDraw", 0.5f);
+		}	
+	}
+
 	void Update () {
 //		if (myAnimator.GetBool ("Sheathing") && weaponsTable["ScimitarOut"].activeSelf) {
 //			GameObject scimOut = weaponsTable ["ScimitarOut"];
@@ -87,21 +105,7 @@ public class WeaponToggle : MonoBehaviour {
 			}
 		}
 		else if (Input.GetKeyDown(KeyCode.Alpha1)) {	
-			if (weaponOut == "Scimitar"){
-				return;
-			}
-
-			//a weapon is already equipped (not a scimitar)
-			if (weaponOut!="") {
-				newWeaponOut = "Scimitar";
-				StartSwitch ();
-
-			//no weapon is already equipped
-			} else {
-				StartShieldDraw ();
-				weaponOut = "Scimitar";
-				Invoke ("StartDraw", 0.5f);
-			}
+			drawScim ();
 		}
 //		else if (Input.GetKeyDown(KeyCode.Alpha2)) {	
 //			if (weaponOut == "Spear"){

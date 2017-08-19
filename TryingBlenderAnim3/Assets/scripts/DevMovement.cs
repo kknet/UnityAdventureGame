@@ -97,7 +97,7 @@ public class DevMovement : MonoBehaviour {
 		if (anim.IsTag ("impact"))
 			impactMoveBack ();
 
-		bool inCombat = Camera.main.GetComponent<MouseMovement> ().inCombat;
+		bool inCombat = Camera.main.GetComponent<MouseMovement> ().inCombatZone;
 
 		if (rolling ()) {
 			transform.Translate (Vector3.forward * Time.deltaTime * 4f);
@@ -127,9 +127,7 @@ public class DevMovement : MonoBehaviour {
 			else if (A)
 				angle -= Vector3.right;
 
-
-
-			transform.Translate (angle.normalized * Time.deltaTime * 2.5f);
+			transform.Translate (angle.normalized * Time.deltaTime * 1.5f);
 
 		} else {
 			if (anim.IsTag ("Running")) {

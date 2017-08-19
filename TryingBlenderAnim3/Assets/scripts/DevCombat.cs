@@ -28,35 +28,35 @@ public class DevCombat : MonoBehaviour {
 	void Update () {
 		//if holding RMB, block
 
-		//action was tried earlier, but dev was rotating, now is no longer rotating, so do action
-		if (savedAction != "" && GetComponent<DevMovement> ().adjustCounter == 0) {
-			myAnimator.SetBool (savedAction, true);
-			if (savedAction == "doAttack") {
-				Invoke ("switchAttack", 0.5f);
-			}
-			savedAction = "";
-			return;
-		}
-
-
-		//still rotating character, so save action, and do action once rotation is over
-		if (savedAction == "" && (GetComponent<DevMovement> ().adjustCounter != 0 || movementButtonPressed())) {
-			if (Input.GetKey (KeyCode.Mouse1)) {
-				myAnimator.SetBool ("doAttack", false);
-				savedAction = "isBlocking";
-			} else {
-				myAnimator.SetBool ("isBlocking", false);		
-
-				//otherwise, if clicked LMB, attack
-				if (Input.GetKeyDown (KeyCode.Mouse0)) {
-					savedAction = "doAttack";
-				} else {
-					myAnimator.SetBool ("doAttack", false);
-				}
-			}
-			if(savedAction!="")
-				return;
-		}
+//		//action was tried earlier, but dev was rotating, now is no longer rotating, so do action
+//		if (savedAction != "" && GetComponent<DevMovement> ().adjustCounter == 0) {
+//			myAnimator.SetBool (savedAction, true);
+//			if (savedAction == "doAttack") {
+//				Invoke ("switchAttack", 0.5f);
+//			}
+//			savedAction = "";
+//			return;
+//		}
+//
+//
+//		//still rotating character, so save action, and do action once rotation is over
+//		if (savedAction == "" && (GetComponent<DevMovement> ().adjustCounter != 0 || movementButtonPressed())) {
+//			if (Input.GetKey (KeyCode.Mouse1)) {
+//				myAnimator.SetBool ("doAttack", false);
+//				savedAction = "isBlocking";
+//			} else {
+//				myAnimator.SetBool ("isBlocking", false);		
+//
+//				//otherwise, if clicked LMB, attack
+//				if (Input.GetKeyDown (KeyCode.Mouse0)) {
+//					savedAction = "doAttack";
+//				} else {
+//					myAnimator.SetBool ("doAttack", false);
+//				}
+//			}
+//			if(savedAction!="")
+//				return;
+//		}
 
 		//dev is not rotating, and there is no saved action, so do action right now (normal way)
 		if (savedAction == "") {

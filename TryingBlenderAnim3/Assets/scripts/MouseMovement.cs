@@ -8,7 +8,7 @@ public class MouseMovement : MonoBehaviour {
 	public float sensitivityY;
 	public GameObject player;
 	public GameObject devHair;
-	public bool inCombat;
+	public bool inCombatZone;
 
 	private bool firstTimeAdjust;
 	private float dif;
@@ -17,6 +17,9 @@ public class MouseMovement : MonoBehaviour {
 	private Vector3 oldEnemy;
 	private Vector3 displacement;
 	private Vector3 rollAngle;
+	private bool triggeredDraw;
+	private bool wepIsOut;
+	private float enemyLockOnStart;
 
 	[SerializeField][HideInInspector]
 	private Vector3 initialOffset;
@@ -45,8 +48,30 @@ public class MouseMovement : MonoBehaviour {
 		distance = initialOffset.magnitude;
 		oldEnemy = Vector3.zero;
 		displacement = Vector3.zero;
-		inCombat = false;
+		inCombatZone = false;
 		rollAngle = Vector3.zero;
+		wepIsOut = false;
+		triggeredDraw = false;
+		enemyLockOnStart = 0f;
+	}
+
+	private void VerticalCombatRotation(){
+
+		if (Mathf.Approximately (transform.rotation.eulerAngles.x, 30f))
+			return;
+		
+		float movementY = 0.2f;
+		float total = movementY + transform.rotation.eulerAngles.x;
+		if (total > 30f) {
+			movementY = 30f - transform.rotation.eulerAngles.x;
+			total = movementY + transform.rotation.eulerAngles.x;
+		} else if (total < 2f) {
+			movementY = 2f - transform.rotation.eulerAngles.x;
+			total = movementY + transform.rotation.eulerAngles.x;
+		}
+		Vector3 axis = Vector3.Cross (transform.position - devHair.transform.position, Vector3.up);
+		transform.RotateAround (devHair.transform.position, axis, movementY);
+		distance = initialOffset.magnitude * (25f + total) / 55f;
 	}
 
 	private void VerticalRotation()  {
@@ -60,14 +85,14 @@ public class MouseMovement : MonoBehaviour {
 		if (total > 30f) {
 			movementY = 30f - transform.rotation.eulerAngles.x;
 			total = movementY + transform.rotation.eulerAngles.x;
-		} else if (total < 10f) {
-			movementY = 10f - transform.rotation.eulerAngles.x;
+		} else if (total < 2f) {
+			movementY = 2f - transform.rotation.eulerAngles.x;
 			total = movementY + transform.rotation.eulerAngles.x;
 		}
 		Vector3 axis = Vector3.Cross (transform.position - devHair.transform.position, Vector3.up);
 		transform.RotateAround (devHair.transform.position, axis, movementY);
 	
-		distance = initialOffset.magnitude * (25f + total) / 75f;
+		distance = initialOffset.magnitude * (25f + total) / 55f;
 	}
 
 	private float rand(float a, float b){
@@ -83,8 +108,7 @@ public class MouseMovement : MonoBehaviour {
 	{
 
 		//if the position of the closest enemy changed
-		if (!Approx(closestEnemy, oldEnemy))
-		{
+		if (!Approx (closestEnemy, oldEnemy)) {
 			//choose a random position that is near the enemy
 			//and using this random position, and the player's position
 			//calculate the desired rotation of the player
@@ -94,8 +118,8 @@ public class MouseMovement : MonoBehaviour {
 			Vector3 target = closestEnemy + perpenDif;
 			displacement = target - player.transform.position;
 			displacement = new Vector3 (displacement.x, 0f, displacement.z);
+			oldEnemy = closestEnemy;
 		}
-
 
 		if (player.gameObject.GetComponent<DevMovement> ().rolling ()) {
 			bool W = (Input.GetKey (KeyCode.W) || Input.GetKey (KeyCode.UpArrow)) || (Input.GetKeyDown (KeyCode.W) || Input.GetKeyDown (KeyCode.UpArrow));
@@ -125,7 +149,7 @@ public class MouseMovement : MonoBehaviour {
 		else {
 			rollAngle = Vector3.zero;
 			//rotate character towards closest enemy
-			Invoke("adjustToEnemy", 1f);
+			Invoke("adjustToEnemy", 0.5f);
 		}
 		//rotate camera around character according to mouse input
 		float movementX = Input.GetAxisRaw ("Mouse X") * sensitivityX * Time.deltaTime;
@@ -243,13 +267,17 @@ public class MouseMovement : MonoBehaviour {
 
 	//return position of nearest enemy
 	public Vector3 nearestEnemy(){
+		if (oldEnemy != Vector3.zero && (Time.time-enemyLockOnStart) < 1f)
+			return oldEnemy;
+
 		Vector3 pos = player.transform.position;
 		Vector3 center = new Vector3 (pos.x, 0f, pos.z);
-		Vector3 halfExtents = new Vector3 (20f, 5f, 20f);
+		Vector3 halfExtents = new Vector3 (10f, 5f, 10f);
 		Collider[] hits = Physics.OverlapBox (center, halfExtents);
 		if (hits.Length == 0)
 			return Vector3.zero;
 
+		bool enemyChanged = false;
 		Vector3 closestEnemy = Vector3.zero;
 		float dist = 0f;
 		foreach(Collider col in hits)
@@ -260,39 +288,50 @@ public class MouseMovement : MonoBehaviour {
 					dist = (closestEnemy - player.transform.position).magnitude;
 				} else {
 					tuple t = closer (dist, closestEnemy, col.gameObject.transform.position);
+					enemyChanged = t.third ();
 					dist = t.second ();
 					closestEnemy = t.first ();
 				}					
 			}
 		}
+		if (enemyChanged)
+			enemyLockOnStart = Time.time;
 		return closestEnemy;
 	}
 
 	class tuple {
 		Vector3 a;
 		float b;
-		public tuple(Vector3 A, float B) {
+		bool c;
+		public tuple(Vector3 A, float B, bool C) {
 			a = A;
 			b = B;
+			c = C;
 		}
 		public Vector3 first() { return a; }
 		public float second() { return b; }
+		public bool third() { return c; }
 	}
 
 	private tuple closer(float dist, Vector3 oldGuy, Vector3 newGuy){
 		float difference = (newGuy - player.transform.position).magnitude;
-		if (difference < dist)
-			return new tuple (newGuy, difference);
-		return new tuple (oldGuy, dist);
+		if (difference + 2f <= dist)
+			return new tuple (newGuy, difference, true);
+		return new tuple (oldGuy, dist, false);
 	}
 
 	private void Update(){
 		transform.position = player.transform.position + currentOffset;
 		Vector3 enemy = nearestEnemy (); 
-		inCombat = (enemy != Vector3.zero);
-		if (inCombat) {
-			HorizontalCombatRotation (enemy);				
+		inCombatZone = (enemy != Vector3.zero);
+		wepIsOut = (triggeredDraw && myAnimator.GetBool ("WeaponDrawn")) || (!triggeredDraw);
+		if (inCombatZone && wepIsOut) {
+			triggeredDraw = true;
+			player.GetComponent<WeaponToggle> ().drawScim ();
+			HorizontalCombatRotation (enemy);
+			VerticalCombatRotation ();
 		} else {
+			triggeredDraw = false;
 			VerticalRotation ();
 			HorizontalRotation ();		
 		}
