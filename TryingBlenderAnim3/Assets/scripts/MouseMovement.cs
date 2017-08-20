@@ -112,8 +112,8 @@ public class MouseMovement : MonoBehaviour {
 			//choose a random position that is near the enemy
 			//and using this random position, and the player's position
 			//calculate the desired rotation of the player
-//		if(player.GetComponent<DevMovement>().isIdle() || rand(0, 1) > 0.3)
-//		{
+		if(player.GetComponent<DevCombat>().notInCombatMove())
+		{
 			displacement = closestEnemy - player.transform.position;
 			displacement = new Vector3 (displacement.x, 0f, displacement.z);
 			Vector3 perpenDif = Vector3.Normalize (Vector3.Cross (displacement, -1.0f * displacement)) * rand (1f, 0f);
@@ -121,7 +121,7 @@ public class MouseMovement : MonoBehaviour {
 			displacement = target - player.transform.position;
 			displacement = new Vector3 (displacement.x, 0f, displacement.z);
 			oldEnemy = closestEnemy;
-//		}
+		}
 
 		if (player.gameObject.GetComponent<DevMovement> ().rolling ()) {
 			bool W = (Input.GetKey (KeyCode.W) || Input.GetKey (KeyCode.UpArrow)) || (Input.GetKeyDown (KeyCode.W) || Input.GetKeyDown (KeyCode.UpArrow));

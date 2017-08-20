@@ -109,7 +109,7 @@ public class DevMovement : MonoBehaviour {
 			transform.Translate (Vector3.forward * Time.deltaTime * 4f);
 		}
 
-		if (inCombat && wepIsOut && !jumping()) {
+		if (inCombat && wepIsOut && !jumping() && GetComponent<DevCombat>().notInCombatMove()) {
 
 			int dif = (int)(CamTransform.eulerAngles.y - transform.eulerAngles.y);
 			if (dif < 0)
