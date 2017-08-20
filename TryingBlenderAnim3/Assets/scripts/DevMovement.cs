@@ -110,8 +110,6 @@ public class DevMovement : MonoBehaviour {
 		}
 
 		if (inCombat && wepIsOut && !jumping()) {
-			myAnimator.SetFloat ("VSpeed", Mathf.MoveTowards(myAnimator.GetFloat ("VSpeed"), Input.GetAxisRaw ("Vertical"), 4f*Time.deltaTime));
-			myAnimator.SetFloat ("HorizSpeed", Mathf.MoveTowards(myAnimator.GetFloat ("HorizSpeed"), Input.GetAxisRaw ("Horizontal"), 4f*Time.deltaTime));
 
 			bool W = (Input.GetKey (KeyCode.W) || Input.GetKey (KeyCode.UpArrow));
 			bool A = (Input.GetKey (KeyCode.A) || Input.GetKey (KeyCode.LeftArrow));
@@ -123,18 +121,111 @@ public class DevMovement : MonoBehaviour {
 			A = A && !D;
 			D = D && !A;
 
-			Vector3 angle = Vector3.zero;
-			if (W)
-				angle += Vector3.forward;
+			float angle = 0f;
+
+			if (W && A)
+				angle = -45f;
+			else if (W && D)
+				angle = 45f;
+			else if (S && A)
+				angle = -135f;
+			else if (S && D)
+				angle = 135f;
+			else if (W)
+				angle = 0f;
 			else if (S)
-				angle -= Vector3.forward;
-			if (D)
-				angle += Vector3.right;
+				angle = 180f;
 			else if (A)
-				angle -= Vector3.right;
+				angle = -90f;
+			else if (D)
+				angle = 90f;
 
-			transform.Translate (angle.normalized * Time.deltaTime * 1.5f);
+			if (W || A || S || D) {
+				angle += CamTransform.eulerAngles.y;
 
+				while (angle > 180f)
+					angle -= 360f;
+				while (angle < -180f)
+					angle += 360f;
+
+				int div = ((int)angle / 45);
+				int rem = ((int)angle) % 45;
+
+				if (rem >= 23)
+					++div;
+
+				angle = div * 45f;
+
+				int intAngle = div * 45;
+				int X = 0;
+				int Y = 0;
+
+
+				switch (intAngle) {
+				case 0:
+					{
+						X = 1;
+						Y = 0;
+						break;
+					}
+				case 45:
+					{
+						X = 1;
+						Y = 1;
+						break;
+					}
+				case 90:
+					{
+						X = 0;
+						Y = 1;
+						break;
+					}
+				case 135:
+					{
+						X = -1;
+						Y = 1;
+						break;
+					}
+				case 180:
+					{
+						X = -1;
+						Y = 0;
+						break;
+					}
+				case -180:
+					{
+						X = -1;
+						Y = 0;
+						break;
+					}
+
+				case -135:
+					{
+						X = -1;
+						Y = -1;
+						break;
+					}
+				case -90:
+					{
+						X = 0;
+						Y = -1;
+						break;
+					}
+				case -45:
+					{
+						X = 1;
+						Y = -1;
+						break;
+					}
+				}
+
+				myAnimator.SetFloat ("VSpeed", Mathf.MoveTowards (myAnimator.GetFloat ("VSpeed"), X * 1f, 4f * Time.deltaTime));
+				myAnimator.SetFloat ("HorizSpeed", Mathf.MoveTowards (myAnimator.GetFloat ("HorizSpeed"), Y * 1f, 4f * Time.deltaTime));
+				transform.Translate (((Vector3.forward * X) + (Vector3.right * Y)) * Time.deltaTime * 1.5f);
+			} else {
+				myAnimator.SetFloat ("VSpeed", Mathf.MoveTowards (myAnimator.GetFloat ("VSpeed"), 0f, 4f * Time.deltaTime));
+				myAnimator.SetFloat ("HorizSpeed", Mathf.MoveTowards (myAnimator.GetFloat ("HorizSpeed"), 0f, 4f * Time.deltaTime));
+			}
 		} else {
 			if (anim.IsTag ("Running")) {
 				if (Input.GetKey (KeyCode.W) || Input.GetKey (KeyCode.UpArrow)) {

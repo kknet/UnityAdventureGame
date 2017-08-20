@@ -332,10 +332,8 @@ public class MouseMovement : MonoBehaviour {
 			triggeredDraw = false;
 
 		jumping = player.gameObject.GetComponent<DevMovement> ().jumping ();
-
-		Debug.Log (inCombatZone && jumping);
-
 		wepIsOut = (triggeredDraw && myAnimator.GetBool ("WeaponDrawn")) || (!oldInCombatZone && inCombatZone);
+
 		if (inCombatZone && wepIsOut) {
 			if(((!oldInCombatZone && inCombatZone) || (inCombatZone && !jumping)) && !myAnimator.GetBool ("WeaponDrawn"))
 				player.GetComponent<WeaponToggle> ().drawScim ();

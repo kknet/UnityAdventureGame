@@ -79,7 +79,7 @@ public class WeaponToggle : MonoBehaviour {
 		else {
 			StartShieldDraw ();
 			weaponOut = "Scimitar";
-			Invoke ("StartDraw", 2.0f);
+			Invoke ("StartDraw", 1.0f);
 		}	
 	}
 
