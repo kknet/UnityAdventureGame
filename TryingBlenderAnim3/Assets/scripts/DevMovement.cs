@@ -77,6 +77,11 @@ public class DevMovement : MonoBehaviour {
 		return false;
 	}
 
+	public bool jumping(){
+		AnimatorStateInfo anim = myAnimator.GetCurrentAnimatorStateInfo (0);
+		return anim.IsTag ("Jumps");
+	}
+
 	public bool rolling(){
 		AnimatorStateInfo anim = myAnimator.GetCurrentAnimatorStateInfo (0);
 		return anim.IsTag ("roll");
@@ -98,12 +103,13 @@ public class DevMovement : MonoBehaviour {
 			impactMoveBack ();
 
 		bool inCombat = Camera.main.GetComponent<MouseMovement> ().inCombatZone;
+		bool wepIsOut = Camera.main.GetComponent<MouseMovement> ().wepIsOut;
 
 		if (rolling ()) {
 			transform.Translate (Vector3.forward * Time.deltaTime * 4f);
 		}
 
-		if (inCombat && anim.IsTag("Running")) {
+		if (inCombat && wepIsOut && !jumping()) {
 			myAnimator.SetFloat ("VSpeed", Mathf.MoveTowards(myAnimator.GetFloat ("VSpeed"), Input.GetAxisRaw ("Vertical"), 4f*Time.deltaTime));
 			myAnimator.SetFloat ("HorizSpeed", Mathf.MoveTowards(myAnimator.GetFloat ("HorizSpeed"), Input.GetAxisRaw ("Horizontal"), 4f*Time.deltaTime));
 

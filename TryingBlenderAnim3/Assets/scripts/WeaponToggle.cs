@@ -74,34 +74,20 @@ public class WeaponToggle : MonoBehaviour {
 			StartSwitch ();
 
 			//no weapon is already equipped
-		} else {
+		} 
+
+		else {
 			StartShieldDraw ();
 			weaponOut = "Scimitar";
-			Invoke ("StartDraw", 0.5f);
+			Invoke ("StartDraw", 2.0f);
 		}	
 	}
 
 	void Update () {
-//		if (myAnimator.GetBool ("Sheathing") && weaponsTable["ScimitarOut"].activeSelf) {
-//			GameObject scimOut = weaponsTable ["ScimitarOut"];
-//			GameObject scimIn = weaponsTable ["ScimitarIn"];
-//			scimOut.transform.rotation = Quaternion.Euler(Vector3.RotateTowards (scimOut.transform.eulerAngles, scimInRot, Time.deltaTime * 0.1f, 0f));
-////			scimOut.transform.position = Vector3.RotateTowards (scimOut.transform.position, scimInTrans, Time.deltaTime * 0.1f, 0f);
-//		}
-//
-//		else if (myAnimator.GetBool ("Drawing") && weaponsTable["ScimitarOut"].activeSelf) {
-//			GameObject scimOut = weaponsTable ["ScimitarOut"];
-//			GameObject scimIn = weaponsTable ["ScimitarIn"];
-//			scimOut.transform.rotation = Quaternion.Euler(Vector3.RotateTowards (scimOut.transform.eulerAngles, scimOutRot, Time.deltaTime * 0.1f, 0f));
-////			scimOut.transform.position = Vector3.RotateTowards (scimOut.transform.position, scimOutTrans, Time.deltaTime * 0.1f, 0f);
-//		}
-
-
-
 		if (Input.GetKeyDown (KeyCode.C)) {
 			if (weaponOut != "") {
 				StartSheath ();
-				Invoke ("StartShieldSheath", 0.5f);
+//				Invoke ("StartShieldSheath", 0.5f);
 			}
 		}
 		else if (Input.GetKeyDown(KeyCode.Alpha1)) {	
@@ -170,7 +156,7 @@ public class WeaponToggle : MonoBehaviour {
 	public void FinishSheath(){
 		weaponsTable[weaponOut + "Out"].SetActive(false);
 		weaponsTable[weaponOut + "In"].SetActive(true);
-
+		StartShieldSheath ();
 //		ShieldIn.SetActive (true);
 //		ShieldOut.SetActive (false);
 

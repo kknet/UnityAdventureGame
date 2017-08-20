@@ -9,6 +9,7 @@ public class MouseMovement : MonoBehaviour {
 	public GameObject player;
 	public GameObject devHair;
 	public bool inCombatZone;
+	public bool wepIsOut;
 
 	private bool firstTimeAdjust;
 	private float dif;
@@ -18,8 +19,8 @@ public class MouseMovement : MonoBehaviour {
 	private Vector3 displacement;
 	private Vector3 rollAngle;
 	private bool triggeredDraw;
-	private bool wepIsOut;
 	private float enemyLockOnStart;
+	private bool jumping;
 
 	[SerializeField][HideInInspector]
 	private Vector3 initialOffset;
@@ -106,20 +107,19 @@ public class MouseMovement : MonoBehaviour {
 
 	private void HorizontalCombatRotation(Vector3 closestEnemy)
 	{
-
 		//if the position of the closest enemy changed
-		if (!Approx (closestEnemy, oldEnemy)) {
+//		if (!Approx (closestEnemy, oldEnemy)) {
 			//choose a random position that is near the enemy
 			//and using this random position, and the player's position
 			//calculate the desired rotation of the player
-			displacement = closestEnemy - player.transform.position;
-			displacement = new Vector3 (displacement.x, 0f, displacement.z);
-			Vector3 perpenDif = Vector3.Normalize (Vector3.Cross (displacement, -1.0f * displacement)) * rand (1f, -1f);
-			Vector3 target = closestEnemy + perpenDif;
-			displacement = target - player.transform.position;
-			displacement = new Vector3 (displacement.x, 0f, displacement.z);
-			oldEnemy = closestEnemy;
-		}
+		displacement = closestEnemy - player.transform.position;
+		displacement = new Vector3 (displacement.x, 0f, displacement.z);
+		Vector3 perpenDif = Vector3.Normalize (Vector3.Cross (displacement, -1.0f * displacement)) * rand (1f, 0f);
+		Vector3 target = closestEnemy + perpenDif;
+		displacement = target - player.transform.position;
+		displacement = new Vector3 (displacement.x, 0f, displacement.z);
+		oldEnemy = closestEnemy;
+//		}
 
 		if (player.gameObject.GetComponent<DevMovement> ().rolling ()) {
 			bool W = (Input.GetKey (KeyCode.W) || Input.GetKey (KeyCode.UpArrow)) || (Input.GetKeyDown (KeyCode.W) || Input.GetKeyDown (KeyCode.UpArrow));
@@ -144,7 +144,7 @@ public class MouseMovement : MonoBehaviour {
 			if (rollAngle == Vector3.zero)
 				rollAngle = Vector3.forward;
 
-			player.transform.forward = Vector3.RotateTowards (player.transform.forward, rollAngle - player.transform.forward, 15f * Time.deltaTime, 0.0f); 
+			player.transform.forward = Vector3.RotateTowards (player.transform.forward, rollAngle - player.transform.forward, 10f * Time.deltaTime, 0.0f); 
 		}
 		else {
 			rollAngle = Vector3.zero;
@@ -160,14 +160,14 @@ public class MouseMovement : MonoBehaviour {
 		if (player.gameObject.GetComponent<DevMovement> ().rolling ())
 			return;
 		Vector3 oldForward = player.transform.forward;
-		player.transform.forward = Vector3.RotateTowards (player.transform.forward, displacement, 10f * Time.deltaTime, 0.0f); 
-		if ((oldForward-player.transform.forward).magnitude > 0.1f) {
-			myAnimator.SetFloat ("VSpeed", Mathf.MoveTowards (myAnimator.GetFloat ("VSpeed"), 1f, Time.deltaTime*2f));
-			player.transform.Translate (player.transform.forward * Time.deltaTime * 2f);
-			player.GetComponent<DevMovement> ().horizRot = true;
-		} else {
-			player.GetComponent<DevMovement> ().horizRot = false;
-		}
+		player.transform.forward = Vector3.RotateTowards (player.transform.forward, displacement + Vector3.right, 5f * Time.deltaTime, 0.0f); 
+//		if ((oldForward-player.transform.forward).magnitude > 0.05f) {
+//			myAnimator.SetFloat ("VSpeed", Mathf.MoveTowards (myAnimator.GetFloat ("VSpeed"), 1f, Time.deltaTime*2f));
+//			player.transform.Translate (player.transform.forward * Time.deltaTime * 2f);
+//			player.GetComponent<DevMovement> ().horizRot = true;
+//		} else {
+//			player.GetComponent<DevMovement> ().horizRot = false;
+//		}
 	}
 
 	private void HorizontalRotation(){
@@ -323,15 +323,25 @@ public class MouseMovement : MonoBehaviour {
 	private void Update(){
 		transform.position = player.transform.position + currentOffset;
 		Vector3 enemy = nearestEnemy (); 
+
+		bool oldInCombatZone = inCombatZone;
 		inCombatZone = (enemy != Vector3.zero);
-		wepIsOut = (triggeredDraw && myAnimator.GetBool ("WeaponDrawn")) || (!triggeredDraw);
-		if (inCombatZone && wepIsOut) {
+		if (!oldInCombatZone && inCombatZone)
 			triggeredDraw = true;
-			player.GetComponent<WeaponToggle> ().drawScim ();
+		if (!inCombatZone)
+			triggeredDraw = false;
+
+		jumping = player.gameObject.GetComponent<DevMovement> ().jumping ();
+
+		Debug.Log (inCombatZone && jumping);
+
+		wepIsOut = (triggeredDraw && myAnimator.GetBool ("WeaponDrawn")) || (!oldInCombatZone && inCombatZone);
+		if (inCombatZone && wepIsOut) {
+			if(((!oldInCombatZone && inCombatZone) || (inCombatZone && !jumping)) && !myAnimator.GetBool ("WeaponDrawn"))
+				player.GetComponent<WeaponToggle> ().drawScim ();
 			HorizontalCombatRotation (enemy);
 			VerticalCombatRotation ();
 		} else {
-			triggeredDraw = false;
 			VerticalRotation ();
 			HorizontalRotation ();		
 		}
