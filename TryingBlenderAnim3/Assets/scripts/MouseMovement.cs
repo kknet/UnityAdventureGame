@@ -112,13 +112,15 @@ public class MouseMovement : MonoBehaviour {
 			//choose a random position that is near the enemy
 			//and using this random position, and the player's position
 			//calculate the desired rotation of the player
-		displacement = closestEnemy - player.transform.position;
-		displacement = new Vector3 (displacement.x, 0f, displacement.z);
-		Vector3 perpenDif = Vector3.Normalize (Vector3.Cross (displacement, -1.0f * displacement)) * rand (1f, 0f);
-		Vector3 target = closestEnemy + perpenDif;
-		displacement = target - player.transform.position;
-		displacement = new Vector3 (displacement.x, 0f, displacement.z);
-		oldEnemy = closestEnemy;
+//		if(player.GetComponent<DevMovement>().isIdle() || rand(0, 1) > 0.3)
+//		{
+			displacement = closestEnemy - player.transform.position;
+			displacement = new Vector3 (displacement.x, 0f, displacement.z);
+			Vector3 perpenDif = Vector3.Normalize (Vector3.Cross (displacement, -1.0f * displacement)) * rand (1f, 0f);
+			Vector3 target = closestEnemy + perpenDif;
+			displacement = target - player.transform.position;
+			displacement = new Vector3 (displacement.x, 0f, displacement.z);
+			oldEnemy = closestEnemy;
 //		}
 
 		if (player.gameObject.GetComponent<DevMovement> ().rolling ()) {
@@ -133,18 +135,20 @@ public class MouseMovement : MonoBehaviour {
 			D = D && !A;
 
 			if (W)
-				rollAngle += Vector3.forward;
+				rollAngle += transform.forward;
 			else if (S)
-				rollAngle -= Vector3.forward;
+				rollAngle -= transform.forward;
 			if (D)
-				rollAngle += Vector3.right;
+				rollAngle += transform.right;
 			else if (A)
-				rollAngle -= Vector3.right;
+				rollAngle -= transform.right;
 
 			if (rollAngle == Vector3.zero)
-				rollAngle = Vector3.forward;
+				rollAngle = transform.forward;
 
-			player.transform.forward = Vector3.RotateTowards (player.transform.forward, rollAngle - player.transform.forward, 10f * Time.deltaTime, 0.0f); 
+			rollAngle = new Vector3 (rollAngle.x, 0f, rollAngle.z);
+
+			player.transform.forward = Vector3.RotateTowards (player.transform.forward, rollAngle - player.transform.forward, 15f * Time.deltaTime, 0.0f); 
 		}
 		else {
 			rollAngle = Vector3.zero;
@@ -160,7 +164,7 @@ public class MouseMovement : MonoBehaviour {
 		if (player.gameObject.GetComponent<DevMovement> ().rolling ())
 			return;
 		Vector3 oldForward = player.transform.forward;
-		player.transform.forward = Vector3.RotateTowards (player.transform.forward, displacement + Vector3.right, 5f * Time.deltaTime, 0.0f); 
+		player.transform.forward = Vector3.RotateTowards (player.transform.forward, displacement, 15f * Time.deltaTime, 0.0f); 
 //		if ((oldForward-player.transform.forward).magnitude > 0.05f) {
 //			myAnimator.SetFloat ("VSpeed", Mathf.MoveTowards (myAnimator.GetFloat ("VSpeed"), 1f, Time.deltaTime*2f));
 //			player.transform.Translate (player.transform.forward * Time.deltaTime * 2f);
@@ -187,19 +191,6 @@ public class MouseMovement : MonoBehaviour {
 			}
 		}
 
-//		if ((counterZero) && combating) {
-//			if (camMoved) {
-//
-//			}
-//			return;
-//		}
-//		if (camMoved) {
-//			if (counterZero && idle) {
-//				transform.RotateAround (player.transform.position, Vector3.up, movementX);
-//				firstTimeAdjust = true;
-//				return;
-//			}
-//		}
 		bool vert = !Mathf.Approximately (Input.GetAxisRaw ("Vertical"), 0f); 
 		bool horiz = !Mathf.Approximately (Input.GetAxisRaw ("Horizontal"), 0f); 
 
@@ -340,8 +331,12 @@ public class MouseMovement : MonoBehaviour {
 			HorizontalCombatRotation (enemy);
 			VerticalCombatRotation ();
 		} else {
-			VerticalRotation ();
-			HorizontalRotation ();		
+			if (myAnimator.GetBool ("WeaponDrawn"))
+				player.GetComponent<WeaponToggle> ().StartSheath ();
+			else {
+				VerticalRotation ();
+				HorizontalRotation ();		
+			}
 		}
 		currentOffset = (transform.position - player.transform.position).normalized * distance;
 	}

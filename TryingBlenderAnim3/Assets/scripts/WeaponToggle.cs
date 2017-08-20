@@ -147,7 +147,7 @@ public class WeaponToggle : MonoBehaviour {
 //		isShieldOut = true;
 	}
 		
-	void StartSheath() {
+	public void StartSheath() {
 		if (weaponOut!="") {
 			myAnimator.SetBool ("Sheathing", true);
 			Sheath.PlayDelayed (0.3f);

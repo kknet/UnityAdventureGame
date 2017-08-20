@@ -111,121 +111,69 @@ public class DevMovement : MonoBehaviour {
 
 		if (inCombat && wepIsOut && !jumping()) {
 
+			int dif = (int)(CamTransform.eulerAngles.y - transform.eulerAngles.y);
+			if (dif < 0)
+				dif += 360;
+			
 			bool W = (Input.GetKey (KeyCode.W) || Input.GetKey (KeyCode.UpArrow));
 			bool A = (Input.GetKey (KeyCode.A) || Input.GetKey (KeyCode.LeftArrow));
 			bool S = (Input.GetKey (KeyCode.S) || Input.GetKey (KeyCode.DownArrow));
 			bool D = (Input.GetKey (KeyCode.D) || Input.GetKey (KeyCode.RightArrow));
-
 			W = W && !S;
 			S = S && !W;
 			A = A && !D;
 			D = D && !A;
 
-			float angle = 0f;
+			int X = 0;
+			int Y = 0;
 
-			if (W && A)
-				angle = -45f;
-			else if (W && D)
-				angle = 45f;
-			else if (S && A)
-				angle = -135f;
-			else if (S && D)
-				angle = 135f;
-			else if (W)
-				angle = 0f;
-			else if (S)
-				angle = 180f;
-			else if (A)
-				angle = -90f;
-			else if (D)
-				angle = 90f;
+			//round to the nearest 90 degrees
+			int div = dif / 90;
+			int rem = dif % 90;
+			if (rem >= 45 || rem <= -45) {
+				if (div < 0) {
+					--div;
+				} else {
+					++div;
+				}
+			}
+			dif = div * 90;
+			Debug.Log (dif);
 
 			if (W || A || S || D) {
-				angle += CamTransform.eulerAngles.y;
-
-				while (angle > 180f)
-					angle -= 360f;
-				while (angle < -180f)
-					angle += 360f;
-
-				int div = ((int)angle / 45);
-				int rem = ((int)angle) % 45;
-
-				if (rem >= 23)
-					++div;
-
-				angle = div * 45f;
-
-				int intAngle = div * 45;
-				int X = 0;
-				int Y = 0;
-
-
-				switch (intAngle) {
-				case 0:
-					{
-						X = 1;
-						Y = 0;
-						break;
-					}
-				case 45:
-					{
-						X = 1;
-						Y = 1;
-						break;
-					}
-				case 90:
-					{
-						X = 0;
-						Y = 1;
-						break;
-					}
-				case 135:
-					{
-						X = -1;
-						Y = 1;
-						break;
-					}
-				case 180:
-					{
-						X = -1;
-						Y = 0;
-						break;
-					}
-				case -180:
-					{
-						X = -1;
-						Y = 0;
-						break;
-					}
-
-				case -135:
-					{
-						X = -1;
-						Y = -1;
-						break;
-					}
-				case -90:
-					{
-						X = 0;
-						Y = -1;
-						break;
-					}
-				case -45:
-					{
-						X = 1;
-						Y = -1;
-						break;
-					}
+				bool angle0 = dif == 0 || dif == 360 || dif == -360;
+				bool angle90 = dif == 90 || dif == -270;
+				bool angleN90 = dif == -90 || dif == 270;
+				bool angle180 = dif == 180 || dif == -180;
+				if(angle0) {
+					if (W)	X=1;
+					else if (S) X=-1;
+					if (D) Y=1;
+					else if (A) Y=-1;
 				}
-
-				myAnimator.SetFloat ("VSpeed", Mathf.MoveTowards (myAnimator.GetFloat ("VSpeed"), X * 1f, 4f * Time.deltaTime));
-				myAnimator.SetFloat ("HorizSpeed", Mathf.MoveTowards (myAnimator.GetFloat ("HorizSpeed"), Y * 1f, 4f * Time.deltaTime));
-				transform.Translate (((Vector3.forward * X) + (Vector3.right * Y)) * Time.deltaTime * 1.5f);
-			} else {
-				myAnimator.SetFloat ("VSpeed", Mathf.MoveTowards (myAnimator.GetFloat ("VSpeed"), 0f, 4f * Time.deltaTime));
-				myAnimator.SetFloat ("HorizSpeed", Mathf.MoveTowards (myAnimator.GetFloat ("HorizSpeed"), 0f, 4f * Time.deltaTime));
+				else if (angle90) {
+					if (W) Y=1;
+					else if (S) Y=-1;
+					if (D) X=-1;
+					else if (A) X=1;
+				}
+				else if(angle180) {
+					if (W) X=-1;
+					else if (S) X=1;
+					if (D) Y=-1;
+					else if (A) Y=1;
+				}
+				else if(angleN90) {
+					if (W) Y=-1;
+					else if (S) Y=1;
+					if (D) X=1;
+					else if (A) X=-1;
+				}
 			}
+			myAnimator.SetFloat ("VSpeed", Mathf.MoveTowards (myAnimator.GetFloat ("VSpeed"), X * 1f, 4f * Time.deltaTime));
+			myAnimator.SetFloat ("HorizSpeed", Mathf.MoveTowards (myAnimator.GetFloat ("HorizSpeed"), Y * 1f, 4f * Time.deltaTime));
+			transform.Translate (((Vector3.forward * X) + (Vector3.right * Y)) * Time.deltaTime * 3f);
+
 		} else {
 			if (anim.IsTag ("Running")) {
 				if (Input.GetKey (KeyCode.W) || Input.GetKey (KeyCode.UpArrow)) {
@@ -240,7 +188,7 @@ public class DevMovement : MonoBehaviour {
 					if(!horizRot)
 						myAnimator.SetFloat ("VSpeed", Mathf.MoveTowards (myAnimator.GetFloat ("VSpeed"), Input.GetAxisRaw ("Vertical"), 0.1f)); 
 				}
-					transform.Translate (Vector3.forward * Time.deltaTime * 5f * myAnimator.GetFloat ("VSpeed"));
+				transform.Translate (Vector3.forward * Time.deltaTime * 5f * myAnimator.GetFloat ("VSpeed"));
 			}
 		}
 			
