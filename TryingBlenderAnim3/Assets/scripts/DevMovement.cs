@@ -175,7 +175,11 @@ public class DevMovement : MonoBehaviour {
 			transform.Translate (((Vector3.forward * X) + (Vector3.right * Y)) * Time.deltaTime * 3f);
 
 		} else {
-			if (anim.IsTag ("Running")) {
+			if ((Time.time - Camera.main.GetComponent<MouseMovement> ().combatExitTime) < 1f) {
+				myAnimator.SetFloat ("VSpeed", 0f);
+				myAnimator.SetFloat ("HorizSpeed", 0f);
+			}
+			else if(anim.IsTag("Running")) {
 				if (Input.GetKey (KeyCode.W) || Input.GetKey (KeyCode.UpArrow)) {
 					myAnimator.SetFloat ("VSpeed", Mathf.MoveTowards (myAnimator.GetFloat ("VSpeed"), Input.GetAxisRaw ("Vertical"), 0.1f)); 
 				} else if (Input.GetKey (KeyCode.S) || Input.GetKey (KeyCode.DownArrow)) {

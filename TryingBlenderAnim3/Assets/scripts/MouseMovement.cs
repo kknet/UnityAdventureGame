@@ -10,6 +10,8 @@ public class MouseMovement : MonoBehaviour {
 	public GameObject devHair;
 	public bool inCombatZone;
 	public bool wepIsOut;
+	public bool oldInCombatZone;
+	public float combatExitTime;
 
 	private bool firstTimeAdjust;
 	private float dif;
@@ -54,6 +56,7 @@ public class MouseMovement : MonoBehaviour {
 		wepIsOut = false;
 		triggeredDraw = false;
 		enemyLockOnStart = 0f;
+		combatExitTime = 0f;
 	}
 
 	private void VerticalCombatRotation(){
@@ -315,7 +318,7 @@ public class MouseMovement : MonoBehaviour {
 		transform.position = player.transform.position + currentOffset;
 		Vector3 enemy = nearestEnemy (); 
 
-		bool oldInCombatZone = inCombatZone;
+		oldInCombatZone = inCombatZone;
 		inCombatZone = (enemy != Vector3.zero);
 		if (!oldInCombatZone && inCombatZone)
 			triggeredDraw = true;
@@ -331,8 +334,10 @@ public class MouseMovement : MonoBehaviour {
 			HorizontalCombatRotation (enemy);
 			VerticalCombatRotation ();
 		} else {
-			if (myAnimator.GetBool ("WeaponDrawn"))
+			if (myAnimator.GetBool ("WeaponDrawn")) {
 				player.GetComponent<WeaponToggle> ().StartSheath ();
+				combatExitTime = Time.time;
+			}
 			else {
 				VerticalRotation ();
 				HorizontalRotation ();		
