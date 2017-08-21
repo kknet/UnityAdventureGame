@@ -138,7 +138,7 @@ public class DevMovement : MonoBehaviour {
 				}
 			}
 			dif = div * 90;
-			Debug.Log (dif);
+//			Debug.Log (dif);
 
 			if (W || A || S || D) {
 				bool angle0 = dif == 0 || dif == 360 || dif == -360;
