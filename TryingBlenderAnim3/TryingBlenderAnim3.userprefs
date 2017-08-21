@@ -2,14 +2,14 @@
   <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" PreferredExecutionTarget="Unity.Instance.Unity Editor" />
   <MonoDevelop.Ide.Workbench ActiveDocument="Assets\scripts\MouseMovement.cs">
     <Files>
-      <File FileName="Assets\scripts\DevMovement.cs" Line="132" Column="23" />
-      <File FileName="Assets\scripts\MouseMovement.cs" Line="158" Column="71" />
+      <File FileName="Assets\scripts\DevMovement.cs" Line="106" Column="11" />
+      <File FileName="Assets\scripts\MouseMovement.cs" Line="322" Column="24" />
       <File FileName="Assets\scripts\WeaponToggle.cs" Line="1" Column="1" />
       <File FileName="Assets\scripts\DevCombat.cs" Line="1" Column="1" />
       <File FileName="Assets\scripts\WeaponHitsStrong.cs" Line="1" Column="1" />
       <File FileName="Assets\scripts\PersonHit.cs" Line="1" Column="1" />
       <File FileName="Assets\scripts\ManageHealth.cs" Line="1" Column="1" />
-      <File FileName="Assets\scripts\EnemyAI.cs" Line="1" Column="1" />
+      <File FileName="Assets\scripts\EnemyAI.cs" Line="27" Column="18" />
     </Files>
   </MonoDevelop.Ide.Workbench>
   <MonoDevelop.Ide.DebuggingService.Breakpoints>

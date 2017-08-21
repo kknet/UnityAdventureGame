@@ -25,6 +25,11 @@ public class EnemyAI : MonoBehaviour {
 
 	// Update is called once per frame
 	void Update () {
+		if (!Camera.main.GetComponent<MouseMovement> ().inCombatZone) {
+			enemyAnim.SetFloat ("enemySpeed", Mathf.MoveTowards(enemyAnim.GetFloat ("enemySpeed"), 0f, 5f * Time.deltaTime));
+			return;
+		}
+
 //		if (GetComponent<ManageHealth> ().isDead ())
 //			this.gameObject.SetActive (false);
 

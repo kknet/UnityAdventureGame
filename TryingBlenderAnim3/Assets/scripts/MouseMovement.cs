@@ -23,6 +23,7 @@ public class MouseMovement : MonoBehaviour {
 	private bool triggeredDraw;
 	private float enemyLockOnStart;
 	private bool jumping;
+	private float lastCombatTime;
 
 	[SerializeField][HideInInspector]
 	private Vector3 initialOffset;
@@ -57,7 +58,9 @@ public class MouseMovement : MonoBehaviour {
 		triggeredDraw = false;
 		enemyLockOnStart = 0f;
 		combatExitTime = 0f;
+		lastCombatTime = 0f;
 	}
+
 
 	private void VerticalCombatRotation(){
 
@@ -118,7 +121,7 @@ public class MouseMovement : MonoBehaviour {
 		bool moving = !Mathf.Approximately(myAnimator.GetFloat("VSpeed"), 0f) || !Mathf.Approximately(myAnimator.GetFloat("HorizSpeed"), 0f);
 		Vector3 coolio = (displacement.normalized - player.transform.forward.normalized);
 
-		Debug.Log (coolio.magnitude);
+//		Debug.Log (coolio.magnitude);
 
 		displacement = closestEnemy - player.transform.position;
 		displacement = new Vector3 (displacement.x, 0f, displacement.z);
@@ -328,16 +331,17 @@ public class MouseMovement : MonoBehaviour {
 //			triggeredDraw = false;
 
 		jumping = player.gameObject.GetComponent<DevMovement> ().jumping ();
-		wepIsOut = (myAnimator.GetBool ("WeaponDrawn")) || (!oldInCombatZone && inCombatZone);
+		wepIsOut = (myAnimator.GetBool ("WeaponDrawn")) || (!oldInCombatZone && inCombatZone && (Time.time - combatExitTime) >= 10f);
 
-		if (inCombatZone && wepIsOut && (Time.time - combatExitTime >= 5f)) {
-			if(!oldInCombatZone && !myAnimator.GetBool("WeaponDrawn"))
+		if (inCombatZone && wepIsOut) {
+			if(!oldInCombatZone && !myAnimator.GetBool("WeaponDrawn") && (Time.time - combatExitTime) >= 10f)
 				player.GetComponent<WeaponToggle> ().drawScim ();
 			
 			HorizontalCombatRotation (enemy);
 			VerticalCombatRotation ();
+			lastCombatTime = Time.time;
 		} else {
-			if (myAnimator.GetBool ("WeaponDrawn")) {
+			if ((Time.time - lastCombatTime)< 2f && myAnimator.GetBool ("WeaponDrawn")) {
 				player.GetComponent<WeaponToggle> ().StartSheath ();
 				combatExitTime = Time.time;
 			}

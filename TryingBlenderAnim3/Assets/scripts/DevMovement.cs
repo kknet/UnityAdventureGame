@@ -102,12 +102,17 @@ public class DevMovement : MonoBehaviour {
 		if (anim.IsTag ("impact"))
 			impactMoveBack ();
 
+		if (anim.IsTag ("equip"))
+			return;
+
 		bool inCombat = Camera.main.GetComponent<MouseMovement> ().inCombatZone;
 		bool wepIsOut = Camera.main.GetComponent<MouseMovement> ().wepIsOut;
 
 		if (rolling ()) {
 			transform.Translate (Vector3.forward * Time.deltaTime * 4f);
 		}
+
+
 
 		if (inCombat && wepIsOut && !jumping() && GetComponent<DevCombat>().notInCombatMove()) {
 
