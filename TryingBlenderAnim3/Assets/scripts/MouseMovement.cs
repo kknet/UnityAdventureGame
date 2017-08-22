@@ -158,10 +158,10 @@ public class MouseMovement : MonoBehaviour {
 
 			player.transform.forward = Vector3.RotateTowards (player.transform.forward, rollAngle - player.transform.forward, 15f * Time.deltaTime, 0.0f); 
 		}
-		else if(player.GetComponent<DevCombat>().notInCombatMove() && moving){
+		else if(player.GetComponent<DevCombat>().notInCombatMove()){
 			rollAngle = Vector3.zero;
 			//rotate character towards closest enemy
-			Invoke("adjustToEnemy", 0.5f);
+			Invoke("adjustToEnemy", 0.1f);
 		}
 		//rotate camera around character according to mouse input
 		float movementX = Input.GetAxisRaw ("Mouse X") * sensitivityX * Time.deltaTime;
