@@ -10,6 +10,7 @@ public class MapPathfind : MonoBehaviour {
 	private float wid;
 	private Terrain ter;
 	private int numNodes;
+	private int sideLength;
 	public Vector3 min;
 	public Vector3 max;
 
@@ -20,15 +21,28 @@ public class MapPathfind : MonoBehaviour {
 		len = dimensions [2];
 		wid = dimensions [0];
 		numNodes = ((int)(len * wid)) / 4;
+		sideLength = (int) Mathf.Sqrt (numNodes);
 		min = new Vector3 (transform.position.x - (wid / 2f), transform.position.y, transform.position.z- (len / 2f));
 		max = new Vector3 (transform.position.x + (wid / 2f), transform.position.y, transform.position.z + (len / 2f));
 		buildGridGraph ();
 	}
 
-	void buildGridGraph(){
+	//return the mapNode cell in the grid that contains the given pt, or NULL if out of bounds
+	public mapNode containingCell(Vector3 givenPt) {
+		int zIndex = (int)((givenPt.z - min.z) / 2f);
+		int xIndex = (int)((givenPt.x - min.x) / 2f);
 
+		if (zIndex < 0 || zIndex >= sideLength || xIndex < 0 || xIndex >= sideLength) {
+			Debug.LogAssertion ("the givenPt is outside of the terrain");
+			return null;
+		}
+
+		return grid [zIndex] [xIndex];
+	}
+
+	void buildGridGraph(){
 		//set up the dimensions of the 2d array
-		int sideLength = (int) Mathf.Sqrt (numNodes);
+		
 		grid = new mapNode[sideLength][];
 		for (int z = 0; z < sideLength; ++z) {
 			grid [z] = new mapNode[sideLength];
@@ -71,6 +85,7 @@ public class MapPathfind : MonoBehaviour {
 		neighbors = new mapNode[5];
 		for (int x = 1; x < sideLength - 1; ++x) {
 
+			//bottom row
 			neighbors [0] = grid [1] [x];
 			neighbors [1] = grid [0] [x + 1];
 			neighbors [2] = grid [0] [x - 1];
@@ -78,7 +93,7 @@ public class MapPathfind : MonoBehaviour {
 			neighbors [4] = grid [1] [x - 1];
 			grid [0] [x].setNeighbors (neighbors);
 
-
+			//top row
 			neighbors [0] = grid [sideLength - 2] [x];
 			neighbors [1] = grid [sideLength - 1] [x + 1];
 			neighbors [2] = grid [sideLength - 1] [x - 1];
@@ -88,6 +103,7 @@ public class MapPathfind : MonoBehaviour {
 		}
 
 		for(int z = 1; z < sideLength-1; ++z) {
+			//leftmost column
 			neighbors [0] = grid [z]   [1];
 			neighbors [1] = grid [z+1] [0];
 			neighbors [2] = grid [z-1] [0];
@@ -95,6 +111,7 @@ public class MapPathfind : MonoBehaviour {
 			neighbors [4] = grid [z-1] [1];
 			grid [z] [0].setNeighbors(neighbors);
 
+			//rightmost column
 			neighbors [0] = grid [z]   [sideLength-2];
 			neighbors [1] = grid [z+1] [sideLength-1];
 			neighbors [2] = grid [z-1] [sideLength-1];
@@ -103,6 +120,7 @@ public class MapPathfind : MonoBehaviour {
 			grid [z] [sideLength-1].setNeighbors(neighbors);
 		}
 
+		//all middle cells
 		neighbors = new mapNode[8];
 		for (int z = 1; z < sideLength-1; ++z) {
 			for (int x = 1; x < sideLength-1; ++x) {
