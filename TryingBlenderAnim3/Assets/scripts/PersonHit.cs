@@ -18,7 +18,8 @@ public class PersonHit : MonoBehaviour {
 		return GameObject.Find (charName + "/Audio Sources/" + audioName).GetComponent<AudioSource>();
 	}
 
-	void OnCollisionEnter(Collision col){
+	void OnTriggerEnter(Collider col){
+		AnimatorStateInfo anim = myAnim.GetCurrentAnimatorStateInfo (0);
 
 		bool isThisAnEnemy = gameObject.CompareTag ("Enemy");
 		bool gotHitByOther = false;
@@ -27,20 +28,37 @@ public class PersonHit : MonoBehaviour {
 		else
 			gotHitByOther = col.gameObject.CompareTag ("EnemyWeapons");
 
-		bool notHitAlready = !strongHit.isPlaying;
+		bool notHitAlready = !strongHit.isPlaying && !anim.IsTag("impact");
 
 		if (gotHitByOther && notHitAlready) {
-			Debug.Log ("got hit");
 			myAnim.SetBool ("hitStrong", true);
+			Debug.Log ("got hit");
 			strongHit.Play ();
 			decreaseHealth (100f);
-			Invoke ("stopStrong", 1.0f);
+			Invoke ("stopStrong", 0.3f);
+//			col.gameObject.transform.root.gameObject.GetComponent<PersonHit> ().pauseAnim ();
+//			while (!anim.IsTag ("impact")) {
+//			}
+//			col.gameObject.transform.root.gameObject.GetComponent<PersonHit> ().playAnim ();
 		}
 	}
 
 	void stopStrong(){
 		myAnim.SetBool ("hitStrong", false);
 	}
+
+//	public void pauseAnim(){
+//		AnimatorStateInfo anim = myAnim.GetCurrentAnimatorStateInfo (0);
+//		myAnim.
+////		myAnim.enabled = false;
+//	}
+//
+//	public void playAnim(){
+//		myAnim.speed = 1;
+//		AnimatorStateInfo anim = myAnim.GetCurrentAnimatorStateInfo (0);
+//		anim.speed = 1;
+////		myAnim.enabled = true;
+//	}
 
 
 	// Update is called once per frame

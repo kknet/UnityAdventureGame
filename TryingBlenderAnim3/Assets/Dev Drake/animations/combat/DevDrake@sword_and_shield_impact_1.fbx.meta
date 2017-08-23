@@ -137,8 +137,8 @@ ModelImporter:
     - serializedVersion: 16
       name: sword_and_shield_impact_1
       takeName: mixamo.com
-      firstFrame: 0
-      lastFrame: 21
+      firstFrame: 1.4
+      lastFrame: 17.6
       wrapMode: 0
       orientationOffsetY: 0
       level: 0
