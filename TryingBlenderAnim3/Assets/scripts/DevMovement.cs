@@ -97,6 +97,11 @@ public class DevMovement : MonoBehaviour {
 
 
 	void Update () {
+		mapNode ourCell = GameObject.Find ("Terrain").GetComponent<MapPathfind> ().containingCell (transform.position);
+		if (ourCell!=null) {
+			KeyValuePair<int, int> coords = ourCell.getIndices ();
+			Debug.Log (coords.Key + ", " + coords.Value);
+		}
 		AnimatorStateInfo anim = myAnimator.GetCurrentAnimatorStateInfo (0);
 
 		if (anim.IsTag ("impact"))
