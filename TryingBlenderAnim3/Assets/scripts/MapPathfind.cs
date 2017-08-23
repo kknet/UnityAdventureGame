@@ -22,39 +22,101 @@ public class MapPathfind : MonoBehaviour {
 		numNodes = ((int)(len * wid)) / 4;
 		min = new Vector3 (transform.position.x - (wid / 2f), transform.position.y, transform.position.z- (len / 2f));
 		max = new Vector3 (transform.position.x + (wid / 2f), transform.position.y, transform.position.z + (len / 2f));
+		buildGridGraph ();
 	}
 
 	void buildGridGraph(){
 
-		//build each node
-		int sideLength = Mathf.Sqrt (numNodes);
-		grid = numNodes [sideLength] [sideLength];
+		//set up the dimensions of the 2d array
+		int sideLength = (int) Mathf.Sqrt (numNodes);
+		grid = new mapNode[sideLength][];
+		for (int z = 0; z < sideLength; ++z) {
+			grid [z] = new mapNode[sideLength];
+		}
 
-		for (int x = 0; x < sideLength; ++x) {
-			for (int y = 0; y < sideLength; ++y) {
-				grid [x] [y] = new mapNode (Vector3.zero);
+		//build each node, starting with the one at (0, 0)
+		Vector3 terrainOrigin = new Vector3 (transform.position.x - 15f, transform.position.y, transform.position.z - 15f);
+		Vector3 originCenter = new Vector3 (terrainOrigin.x + 1f, terrainOrigin.y, terrainOrigin.z + 1f);
+
+		for (int z = 0; z < sideLength; ++z) {
+			for (int x = 0; x < sideLength; ++x) {
+				grid [z] [x] = new mapNode (new Vector3(originCenter.x + (x*2f), originCenter.y, originCenter.z + (z*2f)));
 			}
 		}
 
 		//connect the nodes via setNeighbors, forming a grid graph
-		grid [0] [0].setNeighbors();
-		grid [0] [sideLength-1].setNeighbors();
-		grid [sideLength-1] [sideLength-1].setNeighbors();
-		grid [sideLength-1] [0].setNeighbors();
+		mapNode[] neighbors = new mapNode[3];
+		neighbors [0] = grid [0] [1];
+		neighbors [1] = grid [1] [0];
+		neighbors [2] = grid [1] [1];
+		grid [0] [0].setNeighbors(neighbors);
 
+		neighbors [0] = grid [0] [sideLength-2];
+		neighbors [1] = grid [1] [sideLength-1];
+		neighbors [2] = grid [1] [sideLength-2];
+		grid [0] [sideLength-1].setNeighbors(neighbors);
+
+		neighbors [0] = grid [sideLength-2] [sideLength-1];
+		neighbors [1] = grid [sideLength-1] [sideLength-2];
+		neighbors [2] = grid [sideLength-2] [sideLength-2];
+		grid [sideLength-1] [sideLength-1].setNeighbors(neighbors);
+
+
+		neighbors [0] = grid [sideLength-2] [0];
+		neighbors [1] = grid [sideLength-1] [1];
+		neighbors [2] = grid [sideLength-2] [1];
+		grid [sideLength-1] [0].setNeighbors(neighbors);
+
+
+		neighbors = new mapNode[5];
 		for (int x = 1; x < sideLength - 1; ++x) {
-			grid [0] [x].setNeighbors();
-			grid [sideLength-1] [x].setNeighbors();
-			grid [x] [0].setNeighbors();
-			grid [x] [sideLength-1].setNeighbors();
+
+			neighbors [0] = grid [1] [x];
+			neighbors [1] = grid [0] [x + 1];
+			neighbors [2] = grid [0] [x - 1];
+			neighbors [3] = grid [1] [x + 1];
+			neighbors [4] = grid [1] [x - 1];
+			grid [0] [x].setNeighbors (neighbors);
+
+
+			neighbors [0] = grid [sideLength - 2] [x];
+			neighbors [1] = grid [sideLength - 1] [x + 1];
+			neighbors [2] = grid [sideLength - 1] [x - 1];
+			neighbors [3] = grid [sideLength - 2] [x + 1];
+			neighbors [4] = grid [sideLength - 1] [x - 1];
+			grid [sideLength - 1] [x].setNeighbors (neighbors);
 		}
 
-		for (int x = 1; x < sideLength-1; ++x) {
-			for (int y = 1; y < sideLength-1; ++y) {
-				grid [x] [y].setNeighbors();
+		for(int z = 1; z < sideLength-1; ++z) {
+			neighbors [0] = grid [z]   [1];
+			neighbors [1] = grid [z+1] [0];
+			neighbors [2] = grid [z-1] [0];
+			neighbors [3] = grid [z+1] [1];
+			neighbors [4] = grid [z-1] [1];
+			grid [z] [0].setNeighbors(neighbors);
+
+			neighbors [0] = grid [z]   [sideLength-2];
+			neighbors [1] = grid [z+1] [sideLength-1];
+			neighbors [2] = grid [z-1] [sideLength-1];
+			neighbors [3] = grid [z+1] [sideLength-2];
+			neighbors [4] = grid [z-1] [sideLength-2];
+			grid [z] [sideLength-1].setNeighbors(neighbors);
+		}
+
+		neighbors = new mapNode[8];
+		for (int z = 1; z < sideLength-1; ++z) {
+			for (int x = 1; x < sideLength-1; ++x) {
+				neighbors [0] = grid [z+1] [x];
+				neighbors [1] = grid [z-1] [x];
+				neighbors [2] = grid [z] [x+1];
+				neighbors [3] = grid [z] [x-1];
+				neighbors [4] = grid [z+1] [x+1];
+				neighbors [5] = grid [z+1] [x-1];
+				neighbors [6] = grid [z-1] [x+1];
+				neighbors [7] = grid [z-1] [x-1];
+				grid [z] [x].setNeighbors(neighbors);
 			}
 		}
-
 	}
 	
 	// Update is called once per frame
