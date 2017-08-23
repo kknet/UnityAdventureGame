@@ -40,6 +40,116 @@ public class MapPathfind : MonoBehaviour {
 		return grid [zIndex] [xIndex];
 	}
 
+	public Queue<mapNode> findPath(mapNode start, mapNode dest)
+	{
+		Queue<mapNode> path = new Queue<mapNode>();
+		KeyValuePair<int,int> startCoords = start.getIndices ();
+		KeyValuePair<int,int> destCoords = dest.getIndices ();
+		if (startCoords.Key == destCoords.Key && startCoords.Value == destCoords.Value) {
+//			Debug.LogAssertion ("Start and Dest are the same!");
+			return path;
+		}
+
+		bool goRight = startCoords.Value < destCoords.Value;
+		bool goUp = startCoords.Key < destCoords.Key;
+
+		//z coords match
+		if (startCoords.Key == destCoords.Key) {
+
+			//go to the right
+			if (goRight) {
+				path.Enqueue (grid [startCoords.Key] [startCoords.Value + 1]);
+				Queue<mapNode> continuation = findPath (grid [startCoords.Key] [startCoords.Value + 1], dest);
+				while (continuation.Count != 0) {
+					path.Enqueue (continuation.Dequeue());
+				}
+				return path;
+			}
+
+			//go to the left
+			else {
+				path.Enqueue (grid [startCoords.Key] [startCoords.Value - 1]);
+				Queue<mapNode> continuation = findPath (grid [startCoords.Key] [startCoords.Value - 1], dest);
+				while (continuation.Count != 0) {
+					path.Enqueue (continuation.Dequeue());
+				}
+				return path;
+			}
+		} 
+
+		//x coords match
+		else if (startCoords.Value == destCoords.Value) {
+
+			//go up
+			if (goUp) {
+				path.Enqueue (grid [startCoords.Key + 1] [startCoords.Value]);
+				Queue<mapNode> continuation = findPath (grid [startCoords.Key + 1] [startCoords.Value], dest);
+				while (continuation.Count != 0) {
+					path.Enqueue (continuation.Dequeue());
+				}
+				return path;
+			}
+
+			//go down
+			else {
+				path.Enqueue (grid [startCoords.Key - 1] [startCoords.Value]);
+				Queue<mapNode> continuation = findPath (grid [startCoords.Key - 1] [startCoords.Value], dest);
+				while (continuation.Count != 0) {
+					path.Enqueue (continuation.Dequeue ());
+				}
+				return path;
+			}
+
+		} else {
+			if (goUp) {
+
+				//go diagonal up and right
+				if (goRight) {
+					path.Enqueue (grid [startCoords.Key + 1] [startCoords.Value + 1]);
+					Queue<mapNode> continuation = findPath (grid [startCoords.Key + 1] [startCoords.Value + 1], dest);
+					while (continuation.Count != 0) {
+						path.Enqueue (continuation.Dequeue ());
+					}
+					return path;
+				} 
+
+				//go diagonal up and left
+				else {
+					path.Enqueue (grid [startCoords.Key + 1] [startCoords.Value - 1]);
+					Queue<mapNode> continuation = findPath (grid [startCoords.Key + 1] [startCoords.Value - 1], dest);
+					while (continuation.Count != 0) {
+						path.Enqueue (continuation.Dequeue ());
+					}
+					return path;
+				}
+			} else {
+
+				//go diagonal down and right
+				if (goRight) {
+					path.Enqueue (grid [startCoords.Key - 1] [startCoords.Value + 1]);
+					Queue<mapNode> continuation = findPath (grid [startCoords.Key - 1] [startCoords.Value + 1], dest);
+					while (continuation.Count != 0) {
+						path.Enqueue (continuation.Dequeue ());
+					}
+					return path;
+				} 
+
+				//go diagonal down and left
+				else {
+					path.Enqueue (grid [startCoords.Key - 1] [startCoords.Value - 1]);
+					Queue<mapNode> continuation = findPath (grid [startCoords.Key - 1] [startCoords.Value - 1], dest);
+					while (continuation.Count != 0) {
+						path.Enqueue (continuation.Dequeue ());
+					}
+					return path;
+				}
+			}
+		
+		}
+
+
+	}
+
 	void buildGridGraph(){
 		//set up the dimensions of the 2d array
 		
@@ -49,7 +159,7 @@ public class MapPathfind : MonoBehaviour {
 		}
 
 		//build each node, starting with the one at (0, 0)
-		Vector3 terrainOrigin = new Vector3 (transform.position.x - 15f, transform.position.y, transform.position.z - 15f);
+		Vector3 terrainOrigin = transform.position;
 		Vector3 originCenter = new Vector3 (terrainOrigin.x + 1f, terrainOrigin.y, terrainOrigin.z + 1f);
 
 		for (int z = 0; z < nodesPerSide; ++z) {
@@ -59,71 +169,86 @@ public class MapPathfind : MonoBehaviour {
 		}
 
 		//connect the nodes via setNeighbors, forming a grid graph
-		mapNode[] neighbors = new mapNode[3];
-		neighbors [0] = grid [0] [1];
-		neighbors [1] = grid [1] [0];
-		neighbors [2] = grid [1] [1];
-		grid [0] [0].setNeighbors(neighbors);
+		{
+			mapNode[] neighbors = new mapNode[3];
+			neighbors [0] = grid [0] [1];
+			neighbors [1] = grid [1] [0];
+			neighbors [2] = grid [1] [1];
+			grid [0] [0].setNeighbors (neighbors);
+		}
 
-		neighbors [0] = grid [0] [nodesPerSide-2];
-		neighbors [1] = grid [1] [nodesPerSide-1];
-		neighbors [2] = grid [1] [nodesPerSide-2];
-		grid [0] [nodesPerSide-1].setNeighbors(neighbors);
+		{
+			mapNode[] neighbors = new mapNode[3];
+			neighbors [0] = grid [0] [nodesPerSide - 2];
+			neighbors [1] = grid [1] [nodesPerSide - 1];
+			neighbors [2] = grid [1] [nodesPerSide - 2];
+			grid [0] [nodesPerSide - 1].setNeighbors (neighbors);
+		}
+		{
+			mapNode[] neighbors = new mapNode[3];
+			neighbors [0] = grid [nodesPerSide - 2] [nodesPerSide - 1];
+			neighbors [1] = grid [nodesPerSide - 1] [nodesPerSide - 2];
+			neighbors [2] = grid [nodesPerSide - 2] [nodesPerSide - 2];
+			grid [nodesPerSide - 1] [nodesPerSide - 1].setNeighbors (neighbors);
+		}
+		{
+			mapNode[] neighbors = new mapNode[3];
+			neighbors [0] = grid [nodesPerSide - 2] [0];
+			neighbors [1] = grid [nodesPerSide - 1] [1];
+			neighbors [2] = grid [nodesPerSide - 2] [1];
+			grid [nodesPerSide - 1] [0].setNeighbors (neighbors);
+		}
 
-		neighbors [0] = grid [nodesPerSide-2] [nodesPerSide-1];
-		neighbors [1] = grid [nodesPerSide-1] [nodesPerSide-2];
-		neighbors [2] = grid [nodesPerSide-2] [nodesPerSide-2];
-		grid [nodesPerSide-1] [nodesPerSide-1].setNeighbors(neighbors);
-
-
-		neighbors [0] = grid [nodesPerSide-2] [0];
-		neighbors [1] = grid [nodesPerSide-1] [1];
-		neighbors [2] = grid [nodesPerSide-2] [1];
-		grid [nodesPerSide-1] [0].setNeighbors(neighbors);
-
-
-		neighbors = new mapNode[5];
 		for (int x = 1; x < nodesPerSide - 1; ++x) {
-
-			//bottom row
-			neighbors [0] = grid [1] [x];
-			neighbors [1] = grid [0] [x + 1];
-			neighbors [2] = grid [0] [x - 1];
-			neighbors [3] = grid [1] [x + 1];
-			neighbors [4] = grid [1] [x - 1];
-			grid [0] [x].setNeighbors (neighbors);
-
-			//top row
-			neighbors [0] = grid [nodesPerSide - 2] [x];
-			neighbors [1] = grid [nodesPerSide - 1] [x + 1];
-			neighbors [2] = grid [nodesPerSide - 1] [x - 1];
-			neighbors [3] = grid [nodesPerSide - 2] [x + 1];
-			neighbors [4] = grid [nodesPerSide - 1] [x - 1];
-			grid [nodesPerSide - 1] [x].setNeighbors (neighbors);
+			{
+				//bottom row
+				mapNode[] neighbors = new mapNode[5];
+				neighbors [0] = grid [1] [x];
+				neighbors [1] = grid [0] [x + 1];
+				neighbors [2] = grid [0] [x - 1];
+				neighbors [3] = grid [1] [x + 1];
+				neighbors [4] = grid [1] [x - 1];
+				grid [0] [x].setNeighbors (neighbors);
+			}
+			{
+				//top row
+				mapNode[] neighbors = new mapNode[5];
+				neighbors [0] = grid [nodesPerSide - 2] [x];
+				neighbors [1] = grid [nodesPerSide - 1] [x + 1];
+				neighbors [2] = grid [nodesPerSide - 1] [x - 1];
+				neighbors [3] = grid [nodesPerSide - 2] [x + 1];
+				neighbors [4] = grid [nodesPerSide - 1] [x - 1];
+				grid [nodesPerSide - 1] [x].setNeighbors (neighbors);
+			}
 		}
 
 		for(int z = 1; z < nodesPerSide-1; ++z) {
-			//leftmost column
-			neighbors [0] = grid [z]   [1];
-			neighbors [1] = grid [z+1] [0];
-			neighbors [2] = grid [z-1] [0];
-			neighbors [3] = grid [z+1] [1];
-			neighbors [4] = grid [z-1] [1];
-			grid [z] [0].setNeighbors(neighbors);
-
-			//rightmost column
-			neighbors [0] = grid [z]   [nodesPerSide-2];
-			neighbors [1] = grid [z+1] [nodesPerSide-1];
-			neighbors [2] = grid [z-1] [nodesPerSide-1];
-			neighbors [3] = grid [z+1] [nodesPerSide-2];
-			neighbors [4] = grid [z-1] [nodesPerSide-2];
-			grid [z] [nodesPerSide-1].setNeighbors(neighbors);
+			{
+				//leftmost column
+				mapNode[] neighbors = new mapNode[5];
+				neighbors [0] = grid [z] [1];
+				neighbors [1] = grid [z + 1] [0];
+				neighbors [2] = grid [z - 1] [0];
+				neighbors [3] = grid [z + 1] [1];
+				neighbors [4] = grid [z - 1] [1];
+				grid [z] [0].setNeighbors (neighbors);
+			}
+			{
+				//rightmost column
+				mapNode[] neighbors = new mapNode[5];
+				neighbors [0] = grid [z] [nodesPerSide - 2];
+				neighbors [1] = grid [z + 1] [nodesPerSide - 1];
+				neighbors [2] = grid [z - 1] [nodesPerSide - 1];
+				neighbors [3] = grid [z + 1] [nodesPerSide - 2];
+				neighbors [4] = grid [z - 1] [nodesPerSide - 2];
+				grid [z] [nodesPerSide - 1].setNeighbors (neighbors);
+			}
 		}
 
 		//all middle cells
-		neighbors = new mapNode[8];
 		for (int z = 1; z < nodesPerSide-1; ++z) {
 			for (int x = 1; x < nodesPerSide-1; ++x) {
+				mapNode[] neighbors = new mapNode[8];
 				neighbors [0] = grid [z+1] [x];
 				neighbors [1] = grid [z-1] [x];
 				neighbors [2] = grid [z] [x+1];
@@ -176,6 +301,11 @@ public class mapNode {
 		points[3] = new Vector3(ctr.x + 1f, ctr.y, ctr.z - 1f);
 		zIndex = zIdx;
 		xIndex = xIdx;
+	}
+
+	public bool equalTo(mapNode other){
+		KeyValuePair<int, int> b = other.getIndices ();
+		return (zIndex == b.Key) && (xIndex == b.Value);
 	}
 
 	public void setNeighbors(mapNode[] n){
