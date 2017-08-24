@@ -11,6 +11,7 @@ public class MapPathfind : MonoBehaviour {
 	private Terrain ter;
 	private int numNodes;
 	private int nodesPerSide;
+	public float cellSize;
 	public Vector3 min;
 	public Vector3 max;
 
@@ -20,7 +21,8 @@ public class MapPathfind : MonoBehaviour {
 		Vector3 dimensions = ter.terrainData.size;
 		len = dimensions [2];
 		wid = dimensions [0];
-		numNodes = ((int)(len * wid)) / 4;
+		cellSize = 1f;
+		numNodes = ((int)(len * wid/cellSize));
 		nodesPerSide = (int) Mathf.Sqrt (numNodes);
 		min = transform.position;
 		max = new Vector3 (transform.position.x + wid, transform.position.y, transform.position.z + len);
@@ -29,8 +31,8 @@ public class MapPathfind : MonoBehaviour {
 
 	//return the mapNode cell in the grid that contains the given pt, or NULL if out of bounds
 	public mapNode containingCell(Vector3 givenPt) {
-		int zIndex = (int)((givenPt.z - transform.position.z) / 2f);
-		int xIndex = (int)((givenPt.x - transform.position.x) / 2f);
+		int zIndex = (int)((givenPt.z - transform.position.z) / cellSize);
+		int xIndex = (int)((givenPt.x - transform.position.x) / cellSize);
 
 		if (zIndex < 0 || zIndex >= nodesPerSide || xIndex < 0 || xIndex >= nodesPerSide) {
 			Debug.LogAssertion ("the givenPt is outside of the terrain: " + zIndex + ", " + xIndex + ", nodesPerSide: " + nodesPerSide);
@@ -160,11 +162,11 @@ public class MapPathfind : MonoBehaviour {
 
 		//build each node, starting with the one at (0, 0)
 		Vector3 terrainOrigin = transform.position;
-		Vector3 originCenter = new Vector3 (terrainOrigin.x + 1f, terrainOrigin.y, terrainOrigin.z + 1f);
+		Vector3 originCenter = new Vector3 (terrainOrigin.x + (cellSize/2f), terrainOrigin.y, terrainOrigin.z + (cellSize/2f));
 
 		for (int z = 0; z < nodesPerSide; ++z) {
 			for (int x = 0; x < nodesPerSide; ++x) {
-				grid [z] [x] = new mapNode (new Vector3(originCenter.x + (x*2f), originCenter.y, originCenter.z + (z*2f)), z, x);
+				grid [z] [x] = new mapNode (new Vector3(originCenter.x + (x*cellSize), originCenter.y, originCenter.z + (z*cellSize)), z, x);
 			}
 		}
 
@@ -286,7 +288,7 @@ public class mapNode {
 	//edges are 0 to 1, 1 to 2, 2 to 3, and 3 to 0
 	//the 0,1,2,3 is the order of the points in the points[] array
 
-	Vector3[] points;
+//	Vector3[] points;
 	Vector3 center;
 	mapNode[] neighbors;
 	int zIndex;
@@ -294,11 +296,12 @@ public class mapNode {
 
 	public mapNode(Vector3 ctr, int zIdx, int xIdx) {
 		center = ctr;
-		points = new Vector3[4];
-		points[0] = new Vector3(ctr.x - 1f, ctr.y, ctr.z - 1f);
-		points[1] = new Vector3(ctr.x - 1f, ctr.y, ctr.z + 1f);
-		points[2] = new Vector3(ctr.x + 1f, ctr.y, ctr.z + 1f);
-		points[3] = new Vector3(ctr.x + 1f, ctr.y, ctr.z - 1f);
+//		points = new Vector3[4];
+//		float halfCell = 0.5f * GameObject.Find ("Terrain").GetComponent<MapPathfind> ().cellSize;
+//		points[0] = new Vector3(ctr.x - halfCell, ctr.y, ctr.z - halfCell);
+//		points[1] = new Vector3(ctr.x - halfCell, ctr.y, ctr.z + halfCell);
+//		points[2] = new Vector3(ctr.x + halfCell, ctr.y, ctr.z + halfCell);
+//		points[3] = new Vector3(ctr.x + halfCell, ctr.y, ctr.z - halfCell);
 		zIndex = zIdx;
 		xIndex = xIdx;
 	}
@@ -316,13 +319,30 @@ public class mapNode {
 		return neighbors;
 	}
 
+	public mapNode getClosestNeighbor(mapNode other){
+		float[] distances = new float[neighbors.Length];
+		int idx = 0;
+		foreach (mapNode n in neighbors) {
+			distances [idx++] = Vector3.Distance (other.center, n.center);
+		}
+		float minDist = distances[0];
+		int minIdx = 0;
+		for (idx = 1; idx < distances.Length; ++idx) {
+			if (distances[idx] < minDist) {
+				minDist = distances[idx];
+				minIdx = idx;
+			}
+		}
+		return neighbors [minIdx];
+	}
+
 	public Vector3 getCenter(){
 		return center;
 	}
 
-	public Vector3[] getPoints(){
-		return points;
-	}
+//	public Vector3[] getPoints(){
+//		return points;
+//	}
 
 	public KeyValuePair<int, int> getIndices(){
 		return new KeyValuePair<int, int> (zIndex, xIndex);

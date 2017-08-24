@@ -67,8 +67,7 @@ public class EnemyAI : MonoBehaviour {
 	void initPathToDev(){
 		start = terrain.GetComponent<MapPathfind> ().containingCell (transform.position);
 		devCell = terrain.GetComponent<MapPathfind> ().containingCell (Dev.transform.position);
-		mapNode[] neighbors = devCell.getNeighbors();		
-		finalDest = neighbors [(int)rand (0, neighbors.Length - 1)];
+		finalDest = devCell.getClosestNeighbor(start);
 		path = terrain.GetComponent<MapPathfind> ().findPath (start, finalDest);
 		nextDest = path.Dequeue ();
 	}
@@ -90,8 +89,7 @@ public class EnemyAI : MonoBehaviour {
 
 			//randomly choose one of the neighboring cells of dev's cell as your destination
 			//and create a path to this neighboring cell
-			mapNode[] neighbors = devCell.getNeighbors();		
-			finalDest = neighbors [(int)rand (0, neighbors.Length - 1)];
+			finalDest = devCell.getClosestNeighbor(start);
 			path = terrain.GetComponent<MapPathfind> ().findPath (start, finalDest);
 		}
 
@@ -119,7 +117,7 @@ public class EnemyAI : MonoBehaviour {
 	}
 
 	void moveToTarget(Vector3 targ){
-		if (start.equalTo(finalDest)) {
+		if (start.equalTo(finalDest) || !isEnemyRunning()) {
 			enemyAnim.SetFloat ("enemySpeed", Mathf.MoveTowards (enemyAnim.GetFloat ("enemySpeed"), 0f, 5f * Time.deltaTime));
 		} else {
 			enemyAnim.SetFloat ("enemySpeed", Mathf.MoveTowards(enemyAnim.GetFloat ("enemySpeed"), 1f, 5f * Time.deltaTime));
@@ -141,6 +139,10 @@ public class EnemyAI : MonoBehaviour {
 		return info.IsName ("QUICK1") || info.IsName ("QUICK2") || info.IsName ("QUICK3") || info.IsName ("QUICK4") || info.IsName ("QUICK5");
 	}
 
+	public bool isEnemyRunning(){
+		AnimatorStateInfo info = enemyAnim.GetCurrentAnimatorStateInfo (0);
+		return info.IsTag ("enemyRun");
+	}
 
 	private void attack() {
 		enemyAnim.SetBool ("enemyAttack", true);
