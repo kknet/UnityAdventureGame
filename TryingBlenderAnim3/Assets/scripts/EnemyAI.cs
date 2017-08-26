@@ -24,7 +24,7 @@ public class EnemyAI : MonoBehaviour {
 		enemyAnim = GetComponent<Animator> ();
 		Dev = GameObject.Find ("DevDrake");
 		rotSpeed = 5f;
-		moveSpeed = 3f;
+		moveSpeed = 5f;
 		oldDev = Vector3.zero;
 		target = Vector3.zero;
 		terrain = GameObject.Find ("Terrain");
@@ -83,7 +83,7 @@ public class EnemyAI : MonoBehaviour {
 			return;
 		}
 
-		//if dev's location changed
+//		if dev's location changed
 		if (!temp.equalTo(devCell)) {
 			devCell = temp;
 
@@ -91,7 +91,13 @@ public class EnemyAI : MonoBehaviour {
 			//and create a path to this neighboring cell
 			finalDest = devCell.getClosestNeighbor(start);
 			path = terrain.GetComponent<MapPathfind> ().findPath (start, finalDest);
+			nextDest = path.Dequeue ();
 		}
+
+//		devCell = terrain.GetComponent<MapPathfind> ().containingCell (Dev.transform.position);
+//		finalDest = devCell.getClosestNeighbor(start);
+//		path = terrain.GetComponent<MapPathfind> ().findPath (start, finalDest);
+
 
 		if (start.equalTo(finalDest)) {
 			//rotate towards player

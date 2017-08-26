@@ -106,10 +106,10 @@ MonoBehaviour:
     y: 30
     width: 1280
     height: 932
-  m_MinSize: {x: 583, y: 242}
-  m_MaxSize: {x: 12008, y: 8042}
+  m_MinSize: {x: 583, y: 221}
+  m_MaxSize: {x: 12008, y: 8021}
   vertical: 0
-  controlID: 1691
+  controlID: 996
 --- !u!114 &6
 MonoBehaviour:
   m_ObjectHideFlags: 52
@@ -155,10 +155,10 @@ MonoBehaviour:
     y: 0
     width: 978
     height: 932
-  m_MinSize: {x: 381, y: 242}
-  m_MaxSize: {x: 8006, y: 8042}
+  m_MinSize: {x: 381, y: 221}
+  m_MaxSize: {x: 8006, y: 8021}
   vertical: 1
-  controlID: 1692
+  controlID: 997
 --- !u!114 &8
 MonoBehaviour:
   m_ObjectHideFlags: 52
@@ -182,7 +182,7 @@ MonoBehaviour:
   m_MinSize: {x: 381, y: 121}
   m_MaxSize: {x: 8006, y: 4021}
   vertical: 0
-  controlID: 1693
+  controlID: 998
 --- !u!114 &9
 MonoBehaviour:
   m_ObjectHideFlags: 52
@@ -366,8 +366,8 @@ MonoBehaviour:
     height: 911
   m_TreeViewState:
     scrollPos: {x: 0, y: 0}
-    m_SelectedIDs: f4370000
-    m_LastClickedID: 0
+    m_SelectedIDs: fc320000
+    m_LastClickedID: 13052
     m_ExpandedIDs: e6fbffff00000000
     m_RenameOverlay:
       m_UserAcceptedRename: 0
@@ -465,13 +465,10 @@ MonoBehaviour:
     - {x: 211.00002, y: 212}
     - {x: 686.6, y: 205}
   m_PreviewAnimator: {fileID: 0}
-  m_AnimatorController: {fileID: 9100000, guid: 29641dc74745883409bec32b1180e428,
+  m_AnimatorController: {fileID: 9100000, guid: 9ea4f799bd9a9dd49b201833f1096038,
     type: 2}
   m_BreadCrumbs:
-  - m_Target: {fileID: 1107884758355002826, guid: 29641dc74745883409bec32b1180e428,
-      type: 2}
-    m_ScrollPosition: {x: 0, y: 0}
-  - m_Target: {fileID: 1107940940928886232, guid: 29641dc74745883409bec32b1180e428,
+  - m_Target: {fileID: 1107884758355002826, guid: 9ea4f799bd9a9dd49b201833f1096038,
       type: 2}
     m_ScrollPosition: {x: 0, y: 0}
   stateMachineGraph: {fileID: 0}
@@ -585,7 +582,7 @@ MonoBehaviour:
     y: -933
     width: 361
     height: 504
-  m_ScrollPosition: {x: 0, y: 0}
+  m_ScrollPosition: {x: 0, y: 180}
   m_InspectorMode: 0
   m_PreviewResizer:
     m_CachedPref: 204
