@@ -119,7 +119,8 @@ public class DevMovement : MonoBehaviour {
 
 
 
-		if (inCombat && wepIsOut && !jumping() && GetComponent<DevCombat>().notInCombatMove()) {
+//		if (inCombat && wepIsOut && !jumping() && GetComponent<DevCombat>().notInCombatMove()) {
+		if (inCombat && myAnimator.GetBool("WeaponDrawn") && !jumping() && GetComponent<DevCombat>().notInCombatMove()) {
 
 			int dif = (int)(CamTransform.eulerAngles.y - transform.eulerAngles.y);
 			if (dif < 0)

@@ -191,13 +191,13 @@ public class MouseMovement : MonoBehaviour {
 		AnimatorStateInfo anim = myAnimator.GetCurrentAnimatorStateInfo (0);
 		bool jumping = anim.IsTag("Jumps");
 
-		if (counterZero && camMoved) {
-			if (combating || idle) {
+//		if (counterZero && camMoved) {
+			if (combating || idle || jumping) {
 				transform.RotateAround (player.transform.position + new Vector3(0.0f, 3.0f, 0.0f), Vector3.up, movementX);
 				firstTimeAdjust = true;
 				return;
 			}
-		}
+//		}
 
 		bool vert = !Mathf.Approximately (Input.GetAxisRaw ("Vertical"), 0f); 
 		bool horiz = !Mathf.Approximately (Input.GetAxisRaw ("Horizontal"), 0f); 
@@ -323,20 +323,22 @@ public class MouseMovement : MonoBehaviour {
 		transform.position = player.transform.position + currentOffset;
 		Vector3 enemy = nearestEnemy (); 
 
-		oldInCombatZone = inCombatZone;
+//		oldInCombatZone = inCombatZone;
 		inCombatZone = (enemy != Vector3.zero);
 //		if (!oldInCombatZone && inCombatZone)
 //			triggeredDraw = true;
 //		if (!inCombatZone)
 //			triggeredDraw = false;
 
-		jumping = player.gameObject.GetComponent<DevMovement> ().jumping ();
-		wepIsOut = (myAnimator.GetBool ("WeaponDrawn")) || (!oldInCombatZone && inCombatZone && (Time.time - combatExitTime) >= 10f);
+//		jumping = player.gameObject.GetComponent<DevMovement> ().jumping ();
+//		wepIsOut = (myAnimator.GetBool ("WeaponDrawn")) || (!oldInCombatZone && inCombatZone && (Time.time - combatExitTime) >= 10f);
 
-		if (inCombatZone && wepIsOut) {
-			if(!oldInCombatZone && !myAnimator.GetBool("WeaponDrawn") && (Time.time - combatExitTime) >= 10f)
-				player.GetComponent<WeaponToggle> ().drawScim ();
+//		if (inCombatZone && wepIsOut) {
+//			if(!oldInCombatZone && !myAnimator.GetBool("WeaponDrawn") && (Time.time - combatExitTime) >= 10f)
+//				player.GetComponent<WeaponToggle> ().drawScim ();
 			
+
+		if(inCombatZone && myAnimator.GetBool("WeaponDrawn")){
 			HorizontalCombatRotation (enemy);
 			VerticalCombatRotation ();
 			lastCombatTime = Time.time;
