@@ -42,13 +42,14 @@ public class MapPathfind : MonoBehaviour {
 		return grid [zIndex] [xIndex];
 	}
 
-	public Queue<mapNode> findPath(mapNode start, mapNode dest)
+	public Queue<mapNode> findPath(mapNode start, mapNode dest, int enemyID)
 	{
 		Queue<mapNode> path = new Queue<mapNode>();
 		KeyValuePair<int,int> startCoords = start.getIndices ();
 		KeyValuePair<int,int> destCoords = dest.getIndices ();
+
+		//reached destination (current node = destination node)
 		if (startCoords.Key == destCoords.Key && startCoords.Value == destCoords.Value) {
-//			Debug.LogAssertion ("Start and Dest are the same!");
 			return path;
 		}
 
@@ -61,7 +62,7 @@ public class MapPathfind : MonoBehaviour {
 			//go to the right
 			if (goRight) {
 				path.Enqueue (grid [startCoords.Key] [startCoords.Value + 1]);
-				Queue<mapNode> continuation = findPath (grid [startCoords.Key] [startCoords.Value + 1], dest);
+				Queue<mapNode> continuation = findPath (grid [startCoords.Key] [startCoords.Value + 1], dest, enemyID);
 				while (continuation.Count != 0) {
 					path.Enqueue (continuation.Dequeue());
 				}
@@ -71,7 +72,7 @@ public class MapPathfind : MonoBehaviour {
 			//go to the left
 			else {
 				path.Enqueue (grid [startCoords.Key] [startCoords.Value - 1]);
-				Queue<mapNode> continuation = findPath (grid [startCoords.Key] [startCoords.Value - 1], dest);
+				Queue<mapNode> continuation = findPath (grid [startCoords.Key] [startCoords.Value - 1], dest, enemyID);
 				while (continuation.Count != 0) {
 					path.Enqueue (continuation.Dequeue());
 				}
@@ -85,7 +86,7 @@ public class MapPathfind : MonoBehaviour {
 			//go up
 			if (goUp) {
 				path.Enqueue (grid [startCoords.Key + 1] [startCoords.Value]);
-				Queue<mapNode> continuation = findPath (grid [startCoords.Key + 1] [startCoords.Value], dest);
+				Queue<mapNode> continuation = findPath (grid [startCoords.Key + 1] [startCoords.Value], dest, enemyID);
 				while (continuation.Count != 0) {
 					path.Enqueue (continuation.Dequeue());
 				}
@@ -95,7 +96,7 @@ public class MapPathfind : MonoBehaviour {
 			//go down
 			else {
 				path.Enqueue (grid [startCoords.Key - 1] [startCoords.Value]);
-				Queue<mapNode> continuation = findPath (grid [startCoords.Key - 1] [startCoords.Value], dest);
+				Queue<mapNode> continuation = findPath (grid [startCoords.Key - 1] [startCoords.Value], dest, enemyID);
 				while (continuation.Count != 0) {
 					path.Enqueue (continuation.Dequeue ());
 				}
@@ -107,8 +108,19 @@ public class MapPathfind : MonoBehaviour {
 
 				//go diagonal up and right
 				if (goRight) {
-					path.Enqueue (grid [startCoords.Key + 1] [startCoords.Value + 1]);
-					Queue<mapNode> continuation = findPath (grid [startCoords.Key + 1] [startCoords.Value + 1], dest);
+					mapNode curNode = grid [startCoords.Key + 1] [startCoords.Value + 1];
+					if (curNode.hasOtherOwner(enemyID)) {
+						if (!grid [startCoords.Key] [startCoords.Value + 1].hasOtherOwner(enemyID)) {
+							curNode = grid [startCoords.Key] [startCoords.Value + 1];
+						} else if (!grid [startCoords.Key + 1] [startCoords.Value].hasOtherOwner(enemyID)) {
+							curNode = grid [startCoords.Key + 1] [startCoords.Value];
+						}
+					} else {
+						curNode.setFull (enemyID);
+					}
+
+					path.Enqueue (curNode);
+					Queue<mapNode> continuation = findPath (curNode, dest, enemyID);
 					while (continuation.Count != 0) {
 						path.Enqueue (continuation.Dequeue ());
 					}
@@ -117,8 +129,19 @@ public class MapPathfind : MonoBehaviour {
 
 				//go diagonal up and left
 				else {
-					path.Enqueue (grid [startCoords.Key + 1] [startCoords.Value - 1]);
-					Queue<mapNode> continuation = findPath (grid [startCoords.Key + 1] [startCoords.Value - 1], dest);
+					mapNode curNode = grid [startCoords.Key + 1] [startCoords.Value - 1];
+					if (curNode.hasOtherOwner(enemyID)) {
+						if (!grid [startCoords.Key] [startCoords.Value - 1].hasOtherOwner(enemyID)) {
+							curNode = grid [startCoords.Key] [startCoords.Value - 1];
+						} else if (!grid [startCoords.Key + 1] [startCoords.Value].hasOtherOwner(enemyID)) {
+							curNode = grid [startCoords.Key + 1] [startCoords.Value];
+						}
+					} else {
+						curNode.setFull (enemyID);
+					}
+
+					path.Enqueue (curNode);
+					Queue<mapNode> continuation = findPath (curNode, dest, enemyID);
 					while (continuation.Count != 0) {
 						path.Enqueue (continuation.Dequeue ());
 					}
@@ -128,8 +151,19 @@ public class MapPathfind : MonoBehaviour {
 
 				//go diagonal down and right
 				if (goRight) {
-					path.Enqueue (grid [startCoords.Key - 1] [startCoords.Value + 1]);
-					Queue<mapNode> continuation = findPath (grid [startCoords.Key - 1] [startCoords.Value + 1], dest);
+					mapNode curNode = grid [startCoords.Key - 1] [startCoords.Value + 1];
+					if (curNode.hasOtherOwner(enemyID)) {
+						if (!grid [startCoords.Key] [startCoords.Value + 1].hasOtherOwner(enemyID)) {
+							curNode = grid [startCoords.Key] [startCoords.Value + 1];
+						} else if (!grid [startCoords.Key - 1] [startCoords.Value].hasOtherOwner(enemyID)) {
+							curNode = grid [startCoords.Key - 1] [startCoords.Value];
+						}
+					} else {
+						curNode.setFull (enemyID);
+					}
+
+					path.Enqueue (curNode);
+					Queue<mapNode> continuation = findPath (curNode, dest, enemyID);
 					while (continuation.Count != 0) {
 						path.Enqueue (continuation.Dequeue ());
 					}
@@ -138,23 +172,31 @@ public class MapPathfind : MonoBehaviour {
 
 				//go diagonal down and left
 				else {
-					path.Enqueue (grid [startCoords.Key - 1] [startCoords.Value - 1]);
-					Queue<mapNode> continuation = findPath (grid [startCoords.Key - 1] [startCoords.Value - 1], dest);
+					mapNode curNode = grid [startCoords.Key - 1] [startCoords.Value - 1];
+					if (curNode.hasOtherOwner(enemyID)) {
+						if (!grid [startCoords.Key] [startCoords.Value - 1].hasOtherOwner(enemyID)) {
+							curNode = grid [startCoords.Key] [startCoords.Value - 1];
+						} else if (!grid [startCoords.Key - 1] [startCoords.Value].hasOtherOwner(enemyID)) {
+							curNode = grid [startCoords.Key - 1] [startCoords.Value];
+						}
+					} else {
+						curNode.setFull (enemyID);
+					}
+						
+					path.Enqueue (curNode);
+					Queue<mapNode> continuation = findPath (curNode, dest, enemyID);
 					while (continuation.Count != 0) {
 						path.Enqueue (continuation.Dequeue ());
 					}
 					return path;
 				}
 			}
-		
 		}
-
-
 	}
 
 	void buildGridGraph(){
-		//set up the dimensions of the 2d array
 		
+		//set up the dimensions of the 2d array
 		grid = new mapNode[nodesPerSide][];
 		for (int z = 0; z < nodesPerSide; ++z) {
 			grid [z] = new mapNode[nodesPerSide];
@@ -172,44 +214,65 @@ public class MapPathfind : MonoBehaviour {
 
 		//connect the nodes via setNeighbors, forming a grid graph
 		{
-			mapNode[] neighbors = new mapNode[3];
+//			mapNode[] neighbors = new mapNode[3];
+//			neighbors [0] = grid [0] [1];
+//			neighbors [1] = grid [1] [0];
+//			neighbors [2] = grid [1] [1];
+
+			mapNode[] neighbors = new mapNode[2];
 			neighbors [0] = grid [0] [1];
 			neighbors [1] = grid [1] [0];
-			neighbors [2] = grid [1] [1];
 			grid [0] [0].setNeighbors (neighbors);
 		}
 
 		{
-			mapNode[] neighbors = new mapNode[3];
+//			mapNode[] neighbors = new mapNode[3];
+//			neighbors [0] = grid [0] [nodesPerSide - 2];
+//			neighbors [1] = grid [1] [nodesPerSide - 1];
+//			neighbors [2] = grid [1] [nodesPerSide - 2];
+
+			mapNode[] neighbors = new mapNode[2];
 			neighbors [0] = grid [0] [nodesPerSide - 2];
 			neighbors [1] = grid [1] [nodesPerSide - 1];
-			neighbors [2] = grid [1] [nodesPerSide - 2];
 			grid [0] [nodesPerSide - 1].setNeighbors (neighbors);
 		}
 		{
-			mapNode[] neighbors = new mapNode[3];
+//			mapNode[] neighbors = new mapNode[3];
+//			neighbors [0] = grid [nodesPerSide - 2] [nodesPerSide - 1];
+//			neighbors [1] = grid [nodesPerSide - 1] [nodesPerSide - 2];
+//			neighbors [2] = grid [nodesPerSide - 2] [nodesPerSide - 2];
+
+			mapNode[] neighbors = new mapNode[2];
 			neighbors [0] = grid [nodesPerSide - 2] [nodesPerSide - 1];
 			neighbors [1] = grid [nodesPerSide - 1] [nodesPerSide - 2];
-			neighbors [2] = grid [nodesPerSide - 2] [nodesPerSide - 2];
 			grid [nodesPerSide - 1] [nodesPerSide - 1].setNeighbors (neighbors);
 		}
 		{
-			mapNode[] neighbors = new mapNode[3];
+//			mapNode[] neighbors = new mapNode[3];
+//			neighbors [0] = grid [nodesPerSide - 2] [0];
+//			neighbors [1] = grid [nodesPerSide - 1] [1];
+//			neighbors [2] = grid [nodesPerSide - 2] [1];
+
+			mapNode[] neighbors = new mapNode[2];
 			neighbors [0] = grid [nodesPerSide - 2] [0];
 			neighbors [1] = grid [nodesPerSide - 1] [1];
-			neighbors [2] = grid [nodesPerSide - 2] [1];
 			grid [nodesPerSide - 1] [0].setNeighbors (neighbors);
 		}
 
 		for (int x = 1; x < nodesPerSide - 1; ++x) {
 			{
 				//bottom row
-				mapNode[] neighbors = new mapNode[5];
+//				mapNode[] neighbors = new mapNode[5];
+//				neighbors [0] = grid [1] [x];
+//				neighbors [1] = grid [0] [x + 1];
+//				neighbors [2] = grid [0] [x - 1];
+//				neighbors [3] = grid [1] [x + 1];
+//				neighbors [4] = grid [1] [x - 1];
+
+				mapNode[] neighbors = new mapNode[3];
 				neighbors [0] = grid [1] [x];
 				neighbors [1] = grid [0] [x + 1];
 				neighbors [2] = grid [0] [x - 1];
-				neighbors [3] = grid [1] [x + 1];
-				neighbors [4] = grid [1] [x - 1];
 				grid [0] [x].setNeighbors (neighbors);
 			}
 			{
@@ -227,22 +290,32 @@ public class MapPathfind : MonoBehaviour {
 		for(int z = 1; z < nodesPerSide-1; ++z) {
 			{
 				//leftmost column
-				mapNode[] neighbors = new mapNode[5];
+//				mapNode[] neighbors = new mapNode[5];
+//				neighbors [0] = grid [z] [1];
+//				neighbors [1] = grid [z + 1] [0];
+//				neighbors [2] = grid [z - 1] [0];
+//				neighbors [3] = grid [z + 1] [1];
+//				neighbors [4] = grid [z - 1] [1];
+
+				mapNode[] neighbors = new mapNode[3];
 				neighbors [0] = grid [z] [1];
 				neighbors [1] = grid [z + 1] [0];
 				neighbors [2] = grid [z - 1] [0];
-				neighbors [3] = grid [z + 1] [1];
-				neighbors [4] = grid [z - 1] [1];
 				grid [z] [0].setNeighbors (neighbors);
 			}
 			{
 				//rightmost column
-				mapNode[] neighbors = new mapNode[5];
+//				mapNode[] neighbors = new mapNode[5];
+//				neighbors [0] = grid [z] [nodesPerSide - 2];
+//				neighbors [1] = grid [z + 1] [nodesPerSide - 1];
+//				neighbors [2] = grid [z - 1] [nodesPerSide - 1];
+//				neighbors [3] = grid [z + 1] [nodesPerSide - 2];
+//				neighbors [4] = grid [z - 1] [nodesPerSide - 2];
+
+				mapNode[] neighbors = new mapNode[3];
 				neighbors [0] = grid [z] [nodesPerSide - 2];
 				neighbors [1] = grid [z + 1] [nodesPerSide - 1];
 				neighbors [2] = grid [z - 1] [nodesPerSide - 1];
-				neighbors [3] = grid [z + 1] [nodesPerSide - 2];
-				neighbors [4] = grid [z - 1] [nodesPerSide - 2];
 				grid [z] [nodesPerSide - 1].setNeighbors (neighbors);
 			}
 		}
@@ -250,15 +323,21 @@ public class MapPathfind : MonoBehaviour {
 		//all middle cells
 		for (int z = 1; z < nodesPerSide-1; ++z) {
 			for (int x = 1; x < nodesPerSide-1; ++x) {
-				mapNode[] neighbors = new mapNode[8];
-				neighbors [0] = grid [z+1] [x];
-				neighbors [1] = grid [z-1] [x];
-				neighbors [2] = grid [z] [x+1];
-				neighbors [3] = grid [z] [x-1];
-				neighbors [4] = grid [z+1] [x+1];
-				neighbors [5] = grid [z+1] [x-1];
-				neighbors [6] = grid [z-1] [x+1];
-				neighbors [7] = grid [z-1] [x-1];
+//				mapNode[] neighbors = new mapNode[8];
+//				neighbors [0] = grid [z+1] [x];
+//				neighbors [1] = grid [z-1] [x];
+//				neighbors [2] = grid [z] [x+1];
+//				neighbors [3] = grid [z] [x-1];
+//				neighbors [4] = grid [z+1] [x+1];
+//				neighbors [5] = grid [z+1] [x-1];
+//				neighbors [6] = grid [z-1] [x+1];
+//				neighbors [7] = grid [z-1] [x-1];
+
+				mapNode[] neighbors = new mapNode[4];
+				neighbors [0] = grid [z+1] [x+1];
+				neighbors [1] = grid [z+1] [x-1];
+				neighbors [2] = grid [z-1] [x+1];
+				neighbors [3] = grid [z-1] [x-1];
 				grid [z] [x].setNeighbors(neighbors);
 			}
 		}
@@ -282,30 +361,49 @@ public class MapPathfind : MonoBehaviour {
 
 public class mapNode { 
 
-	//format for points: 
-	// 1: (minX, maxZ), 2: (maxX, maxZ)
-	// 0: (minX, minZ), 3: (maxX, minZ)
-	//edges are 0 to 1, 1 to 2, 2 to 3, and 3 to 0
-	//the 0,1,2,3 is the order of the points in the points[] array
-
+//format for points: 
+// 1: (minX, maxZ), 2: (maxX, maxZ)
+// 0: (minX, minZ), 3: (maxX, minZ)
+//edges are 0 to 1, 1 to 2, 2 to 3, and 3 to 0
+//the 0,1,2,3 is the order of the points in the points[] array
 //	Vector3[] points;
+
 	Vector3 center;
 	mapNode[] neighbors;
 	int zIndex;
 	int xIndex;
+	int owner;
 
 	public mapNode(Vector3 ctr, int zIdx, int xIdx) {
 		center = ctr;
+		zIndex = zIdx;
+		xIndex = xIdx;
+		owner = -1;
 //		points = new Vector3[4];
 //		float halfCell = 0.5f * GameObject.Find ("Terrain").GetComponent<MapPathfind> ().cellSize;
 //		points[0] = new Vector3(ctr.x - halfCell, ctr.y, ctr.z - halfCell);
 //		points[1] = new Vector3(ctr.x - halfCell, ctr.y, ctr.z + halfCell);
 //		points[2] = new Vector3(ctr.x + halfCell, ctr.y, ctr.z + halfCell);
 //		points[3] = new Vector3(ctr.x + halfCell, ctr.y, ctr.z - halfCell);
-		zIndex = zIdx;
-		xIndex = xIdx;
 	}
 
+	public bool hasOtherOwner (int yourEnemyID) {
+		return owner != -1 && owner != yourEnemyID;
+	}
+
+//	public bool isFull(){
+//		return owner != -1;
+//	}
+
+
+	public void setFull(int enemyID){
+		owner = enemyID;
+	}
+
+	public void setEmpty(){
+		owner = -1;
+	}
+		
 	public bool equalTo(mapNode other){
 		KeyValuePair<int, int> b = other.getIndices ();
 		return (zIndex == b.Key) && (xIndex == b.Value);
@@ -319,11 +417,22 @@ public class mapNode {
 		return neighbors;
 	}
 
-	public mapNode getClosestNeighbor(mapNode other){
-		float[] distances = new float[neighbors.Length];
-		int idx = 0;
+	private object[] getEmptyNeighbors(int yourEnemyID){
+		ArrayList emptyNeighbors = new ArrayList ();
 		foreach (mapNode n in neighbors) {
-			distances [idx++] = Vector3.Distance (other.center, n.center);
+			if (!n.hasOtherOwner (yourEnemyID))
+				emptyNeighbors.Add (n);
+		}
+		return emptyNeighbors.ToArray ();
+	}
+
+	public mapNode getClosestNeighbor(mapNode other, int yourEnemyID){
+		object[] emptyNeighbors = getEmptyNeighbors (yourEnemyID);
+
+		float[] distances = new float[emptyNeighbors.Length];
+		int idx = 0;
+		foreach (object n in emptyNeighbors) {
+			distances [idx++] = Vector3.Distance (other.center, ((mapNode)(n)).center);
 		}
 		float minDist = distances[0];
 		int minIdx = 0;
@@ -340,13 +449,14 @@ public class mapNode {
 		return center;
 	}
 
+	public KeyValuePair<int, int> getIndices(){
+		return new KeyValuePair<int, int> (zIndex, xIndex);
+	}
+
 //	public Vector3[] getPoints(){
 //		return points;
 //	}
 
-	public KeyValuePair<int, int> getIndices(){
-		return new KeyValuePair<int, int> (zIndex, xIndex);
-	}
 
 //	public Vector3 getCenter(){
 //		float cenX = 0f;

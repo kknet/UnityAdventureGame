@@ -4,6 +4,8 @@ using UnityEngine;
 
 public class EnemyAI : MonoBehaviour {
 
+	public int enemyID;
+
 	private Animator enemyAnim;
 	private GameObject Dev;
 	private float rotSpeed;
@@ -67,14 +69,19 @@ public class EnemyAI : MonoBehaviour {
 	void initPathToDev(){
 		start = terrain.GetComponent<MapPathfind> ().containingCell (transform.position);
 		devCell = terrain.GetComponent<MapPathfind> ().containingCell (Dev.transform.position);
-		finalDest = devCell.getClosestNeighbor(start);
-		path = terrain.GetComponent<MapPathfind> ().findPath (start, finalDest);
+		finalDest = devCell.getClosestNeighbor(start, enemyID);
+		path = terrain.GetComponent<MapPathfind> ().findPath (start, finalDest, enemyID);
 		nextDest = path.Dequeue ();
 	}
 
 	void moveToDev(){
 		//enemy's current location
+		mapNode oldStart = start;
 		start = terrain.GetComponent<MapPathfind> ().containingCell (transform.position);
+		if (!oldStart.equalTo (start)) {
+			oldStart.setEmpty ();
+		}
+		start.setFull (enemyID);
 
 		//dev's current location
 		mapNode temp = terrain.GetComponent<MapPathfind> ().containingCell (Dev.transform.position);
@@ -83,21 +90,26 @@ public class EnemyAI : MonoBehaviour {
 			return;
 		}
 
-//		if dev's location changed
-		if (!temp.equalTo(devCell)) {
+//		if dev's location changed or the current path is blocked
+		if (!temp.equalTo(devCell) || nextDest.hasOtherOwner(enemyID)) {
 			devCell = temp;
 
 			//randomly choose one of the neighboring cells of dev's cell as your destination
 			//and create a path to this neighboring cell
-			finalDest = devCell.getClosestNeighbor(start);
-			path = terrain.GetComponent<MapPathfind> ().findPath (start, finalDest);
+
+			while (finalDest.hasOtherOwner (enemyID)) {
+				finalDest = devCell.getClosestNeighbor (start, enemyID);
+			}
+
+			finalDest.setFull (enemyID);
+			while (path.Count > 0) {
+				mapNode trashNode = path.Dequeue ();
+				trashNode.setEmpty ();
+			}
+
+			path = terrain.GetComponent<MapPathfind> ().findPath (start, finalDest, enemyID);
 			nextDest = path.Dequeue ();
 		}
-
-//		devCell = terrain.GetComponent<MapPathfind> ().containingCell (Dev.transform.position);
-//		finalDest = devCell.getClosestNeighbor(start);
-//		path = terrain.GetComponent<MapPathfind> ().findPath (start, finalDest);
-
 
 		if (start.equalTo(finalDest)) {
 			//rotate towards player
@@ -133,9 +145,9 @@ public class EnemyAI : MonoBehaviour {
 
 
 	void rotateToTarget(Vector3 targ){
-		dif = targ - transform.position;
-		dif = new Vector3 (dif.x, 0f, dif.z);
-		transform.forward = Vector3.RotateTowards (transform.forward, dif, rotSpeed * Time.deltaTime, 0.0f); 
+			dif = targ - transform.position;
+			dif = new Vector3 (dif.x, 0f, dif.z);
+			transform.forward = Vector3.RotateTowards (transform.forward, dif, rotSpeed * Time.deltaTime, 0.0f); 
 	}
 
 
