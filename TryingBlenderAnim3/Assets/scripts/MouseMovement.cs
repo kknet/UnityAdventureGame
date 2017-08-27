@@ -118,11 +118,6 @@ public class MouseMovement : MonoBehaviour {
 			//choose a random position that is near the enemy
 			//and using this random position, and the player's position
 			//calculate the desired rotation of the player
-		bool moving = !Mathf.Approximately(myAnimator.GetFloat("VSpeed"), 0f) || !Mathf.Approximately(myAnimator.GetFloat("HorizSpeed"), 0f);
-		Vector3 coolio = (displacement.normalized - player.transform.forward.normalized);
-
-//		Debug.Log (coolio.magnitude);
-
 		displacement = closestEnemy - player.transform.position;
 		displacement = new Vector3 (displacement.x, 0f, displacement.z);
 		Vector3 perpenDif = Vector3.Normalize (Vector3.Cross (displacement, -1.0f * displacement)) * rand (1f, 0f);

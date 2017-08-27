@@ -14,6 +14,7 @@ public class MapPathfind : MonoBehaviour {
 	public float cellSize;
 	public Vector3 min;
 	public Vector3 max;
+	public mapNode[] devSurroundingSpots;
 
 	// Use this for initialization
 	void Start () {
@@ -214,65 +215,70 @@ public class MapPathfind : MonoBehaviour {
 
 		//connect the nodes via setNeighbors, forming a grid graph
 		{
-//			mapNode[] neighbors = new mapNode[3];
-//			neighbors [0] = grid [0] [1];
-//			neighbors [1] = grid [1] [0];
-//			neighbors [2] = grid [1] [1];
-
-			mapNode[] neighbors = new mapNode[2];
+			mapNode[] neighbors = new mapNode[3];
 			neighbors [0] = grid [0] [1];
 			neighbors [1] = grid [1] [0];
+			neighbors [2] = grid [1] [1];
+
+//			mapNode[] neighbors = new mapNode[2];
+//			neighbors [0] = grid [0] [1];
+//			neighbors [1] = grid [1] [0];
+
 			grid [0] [0].setNeighbors (neighbors);
 		}
 
 		{
-//			mapNode[] neighbors = new mapNode[3];
-//			neighbors [0] = grid [0] [nodesPerSide - 2];
-//			neighbors [1] = grid [1] [nodesPerSide - 1];
-//			neighbors [2] = grid [1] [nodesPerSide - 2];
-
-			mapNode[] neighbors = new mapNode[2];
+			mapNode[] neighbors = new mapNode[3];
 			neighbors [0] = grid [0] [nodesPerSide - 2];
 			neighbors [1] = grid [1] [nodesPerSide - 1];
+			neighbors [2] = grid [1] [nodesPerSide - 2];
+
+//			mapNode[] neighbors = new mapNode[2];
+//			neighbors [0] = grid [0] [nodesPerSide - 2];
+//			neighbors [1] = grid [1] [nodesPerSide - 1];
+
 			grid [0] [nodesPerSide - 1].setNeighbors (neighbors);
 		}
 		{
-//			mapNode[] neighbors = new mapNode[3];
-//			neighbors [0] = grid [nodesPerSide - 2] [nodesPerSide - 1];
-//			neighbors [1] = grid [nodesPerSide - 1] [nodesPerSide - 2];
-//			neighbors [2] = grid [nodesPerSide - 2] [nodesPerSide - 2];
-
-			mapNode[] neighbors = new mapNode[2];
+			mapNode[] neighbors = new mapNode[3];
 			neighbors [0] = grid [nodesPerSide - 2] [nodesPerSide - 1];
 			neighbors [1] = grid [nodesPerSide - 1] [nodesPerSide - 2];
+			neighbors [2] = grid [nodesPerSide - 2] [nodesPerSide - 2];
+
+//			mapNode[] neighbors = new mapNode[2];
+//			neighbors [0] = grid [nodesPerSide - 2] [nodesPerSide - 1];
+//			neighbors [1] = grid [nodesPerSide - 1] [nodesPerSide - 2];
+
 			grid [nodesPerSide - 1] [nodesPerSide - 1].setNeighbors (neighbors);
 		}
 		{
-//			mapNode[] neighbors = new mapNode[3];
-//			neighbors [0] = grid [nodesPerSide - 2] [0];
-//			neighbors [1] = grid [nodesPerSide - 1] [1];
-//			neighbors [2] = grid [nodesPerSide - 2] [1];
-
-			mapNode[] neighbors = new mapNode[2];
+			mapNode[] neighbors = new mapNode[3];
 			neighbors [0] = grid [nodesPerSide - 2] [0];
 			neighbors [1] = grid [nodesPerSide - 1] [1];
+			neighbors [2] = grid [nodesPerSide - 2] [1];
+
+//			mapNode[] neighbors = new mapNode[2];
+//			neighbors [0] = grid [nodesPerSide - 2] [0];
+//			neighbors [1] = grid [nodesPerSide - 1] [1];
+
 			grid [nodesPerSide - 1] [0].setNeighbors (neighbors);
 		}
 
 		for (int x = 1; x < nodesPerSide - 1; ++x) {
 			{
 				//bottom row
-//				mapNode[] neighbors = new mapNode[5];
-//				neighbors [0] = grid [1] [x];
-//				neighbors [1] = grid [0] [x + 1];
-//				neighbors [2] = grid [0] [x - 1];
-//				neighbors [3] = grid [1] [x + 1];
-//				neighbors [4] = grid [1] [x - 1];
-
-				mapNode[] neighbors = new mapNode[3];
+				mapNode[] neighbors = new mapNode[5];
 				neighbors [0] = grid [1] [x];
 				neighbors [1] = grid [0] [x + 1];
 				neighbors [2] = grid [0] [x - 1];
+				neighbors [3] = grid [1] [x + 1];
+				neighbors [4] = grid [1] [x - 1];
+
+//				mapNode[] neighbors = new mapNode[3];
+//				neighbors [0] = grid [1] [x];
+//				neighbors [1] = grid [0] [x + 1];
+//				neighbors [2] = grid [0] [x - 1];
+
 				grid [0] [x].setNeighbors (neighbors);
 			}
 			{
@@ -290,32 +296,34 @@ public class MapPathfind : MonoBehaviour {
 		for(int z = 1; z < nodesPerSide-1; ++z) {
 			{
 				//leftmost column
-//				mapNode[] neighbors = new mapNode[5];
-//				neighbors [0] = grid [z] [1];
-//				neighbors [1] = grid [z + 1] [0];
-//				neighbors [2] = grid [z - 1] [0];
-//				neighbors [3] = grid [z + 1] [1];
-//				neighbors [4] = grid [z - 1] [1];
-
-				mapNode[] neighbors = new mapNode[3];
+				mapNode[] neighbors = new mapNode[5];
 				neighbors [0] = grid [z] [1];
 				neighbors [1] = grid [z + 1] [0];
 				neighbors [2] = grid [z - 1] [0];
+				neighbors [3] = grid [z + 1] [1];
+				neighbors [4] = grid [z - 1] [1];
+
+//				mapNode[] neighbors = new mapNode[3];
+//				neighbors [0] = grid [z] [1];
+//				neighbors [1] = grid [z + 1] [0];
+//				neighbors [2] = grid [z - 1] [0];
+
 				grid [z] [0].setNeighbors (neighbors);
 			}
 			{
 				//rightmost column
-//				mapNode[] neighbors = new mapNode[5];
-//				neighbors [0] = grid [z] [nodesPerSide - 2];
-//				neighbors [1] = grid [z + 1] [nodesPerSide - 1];
-//				neighbors [2] = grid [z - 1] [nodesPerSide - 1];
-//				neighbors [3] = grid [z + 1] [nodesPerSide - 2];
-//				neighbors [4] = grid [z - 1] [nodesPerSide - 2];
-
-				mapNode[] neighbors = new mapNode[3];
+				mapNode[] neighbors = new mapNode[5];
 				neighbors [0] = grid [z] [nodesPerSide - 2];
 				neighbors [1] = grid [z + 1] [nodesPerSide - 1];
 				neighbors [2] = grid [z - 1] [nodesPerSide - 1];
+				neighbors [3] = grid [z + 1] [nodesPerSide - 2];
+				neighbors [4] = grid [z - 1] [nodesPerSide - 2];
+
+//				mapNode[] neighbors = new mapNode[3];
+//				neighbors [0] = grid [z] [nodesPerSide - 2];
+//				neighbors [1] = grid [z + 1] [nodesPerSide - 1];
+//				neighbors [2] = grid [z - 1] [nodesPerSide - 1];
+
 				grid [z] [nodesPerSide - 1].setNeighbors (neighbors);
 			}
 		}
@@ -323,21 +331,22 @@ public class MapPathfind : MonoBehaviour {
 		//all middle cells
 		for (int z = 1; z < nodesPerSide-1; ++z) {
 			for (int x = 1; x < nodesPerSide-1; ++x) {
-//				mapNode[] neighbors = new mapNode[8];
-//				neighbors [0] = grid [z+1] [x];
-//				neighbors [1] = grid [z-1] [x];
-//				neighbors [2] = grid [z] [x+1];
-//				neighbors [3] = grid [z] [x-1];
-//				neighbors [4] = grid [z+1] [x+1];
-//				neighbors [5] = grid [z+1] [x-1];
-//				neighbors [6] = grid [z-1] [x+1];
-//				neighbors [7] = grid [z-1] [x-1];
+				mapNode[] neighbors = new mapNode[8];
+				neighbors [0] = grid [z+1] [x];
+				neighbors [1] = grid [z-1] [x];
+				neighbors [2] = grid [z] [x+1];
+				neighbors [3] = grid [z] [x-1];
+				neighbors [4] = grid [z+1] [x+1];
+				neighbors [5] = grid [z+1] [x-1];
+				neighbors [6] = grid [z-1] [x+1];
+				neighbors [7] = grid [z-1] [x-1];
 
-				mapNode[] neighbors = new mapNode[4];
-				neighbors [0] = grid [z+1] [x+1];
-				neighbors [1] = grid [z+1] [x-1];
-				neighbors [2] = grid [z-1] [x+1];
-				neighbors [3] = grid [z-1] [x-1];
+//				mapNode[] neighbors = new mapNode[4];
+//				neighbors [0] = grid [z+1] [x+1];
+//				neighbors [1] = grid [z+1] [x-1];
+//				neighbors [2] = grid [z-1] [x+1];
+//				neighbors [3] = grid [z-1] [x-1];
+
 				grid [z] [x].setNeighbors(neighbors);
 			}
 		}
@@ -414,7 +423,38 @@ public class mapNode {
 	}
 
 	public mapNode[] getNeighbors(){
-		return neighbors;
+		return neighbors; 
+	}
+
+	public void setSurroundingSpots(){
+		GameObject.Find ("Terrain").GetComponent<MapPathfind> ().devSurroundingSpots = getSurroundingSpots ();
+	}
+
+	//get the spots around Dev's neighbors where enemies can gather and wait their turn to attack
+	public mapNode[] getSurroundingSpots(){
+
+		//get the neighbors of the neighbors
+		ArrayList outerCircle = new ArrayList();
+		foreach (mapNode neighbor in neighbors) {
+			outerCircle.AddRange(neighbor.getNeighbors());
+		}
+
+		//remove all of the direct neighbors of Dev from outerCircle
+		//so that we are only left with the indirect neighbors
+		foreach(mapNode directNeighbor in neighbors){
+			int idx = -1;
+			while ((idx = outerCircle.IndexOf (directNeighbor)) >= 0) {
+				outerCircle.RemoveAt(idx);
+				idx = -1;
+			}
+		}
+
+		mapNode[] outerCircleArr = new mapNode[outerCircle.Capacity];
+		for(int idx = 0; idx < outerCircle.Capacity; ++idx) {
+			outerCircleArr [idx] = (mapNode) outerCircle [idx];
+		}
+
+		return outerCircleArr;
 	}
 
 	private object[] getEmptyNeighbors(int yourEnemyID){

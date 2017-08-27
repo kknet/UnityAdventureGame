@@ -5,7 +5,7 @@ using UnityEngine;
 public class WeaponHitsStrong : MonoBehaviour {
 
 	private AudioSource strongHit;
-	private GameObject wep;
+//	private GameObject wep;
 //	private CapsuleCollider wepColl;
 	private GameObject Character;
 	private Animator myAnimator;
@@ -13,7 +13,7 @@ public class WeaponHitsStrong : MonoBehaviour {
 	void Start () {
 		//Model/hips/leftleg/spine/spine1/spine2/rightshoulder/rightarm/rightforearm/righthand/PrimaryWeapon
 		Character = getAncestor (this.gameObject);
-		wep = GameObject.Find (Character.name + "/" + Character.name + "Model/mixamorig:Hips/mixamorig:Spine/mixamorig:Spine1/mixamorig:Spine2/mixamorig:RightShoulder/mixamorig:RightArm/mixamorig:RightForeArm/mixamorig:RightHand/ScimitarOut");
+//		wep = GameObject.Find (Character.name + "/" + Character.name + "Model/mixamorig:Hips/mixamorig:Spine/mixamorig:Spine1/mixamorig:Spine2/mixamorig:RightShoulder/mixamorig:RightArm/mixamorig:RightForeArm/mixamorig:RightHand/ScimitarOut");
 //		wepColl = wep.GetComponent<CapsuleCollider> ();
 		myAnimator = Character.GetComponent<Animator> ();
 		strongHit = findSound ("Strong Hit");

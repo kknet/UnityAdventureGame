@@ -12,8 +12,8 @@ public class EnemyAI : MonoBehaviour {
 	private float moveSpeed;
 	private Vector3 dif;
 	private Vector3 oldDev;
-	private Vector3 target;
-	private Vector3 devTarget;
+//	private Vector3 target;
+//	private Vector3 devTarget;
 	private mapNode devCell;
 	private Queue<mapNode> path;
 	private GameObject terrain;
@@ -27,8 +27,7 @@ public class EnemyAI : MonoBehaviour {
 		Dev = GameObject.Find ("DevDrake");
 		rotSpeed = 5f;
 		moveSpeed = 5f;
-		oldDev = Vector3.zero;
-		target = Vector3.zero;
+//		target = Vector3.zero;
 		terrain = GameObject.Find ("Terrain");
 		initPathToDev ();
 	}
@@ -41,18 +40,6 @@ public class EnemyAI : MonoBehaviour {
 //		}
 //		if (GetComponent<ManageHealth> ().isDead ())
 //			this.gameObject.SetActive (false);
-//		Debug.Log ("oldDev: "+ oldDev + " dev: "+ Dev.transform.position + " enemy: " + transform.position + " dif: " + dif);
-//		applyRotation ();
-//		if (!Approx (dif, Vector3.zero)) {
-//			oldDev = devTarget;
-//			applySpeed ();
-//		} 
-//			else {
-//			reduceSpeed ();
-//		}
-//		if (!isEnemyAttacking() && Vector3.Magnitude (Dev.transform.position - transform.position) < 2f) {
-//			attack ();
-//		}
 
 		moveToDev ();
 
@@ -63,7 +50,7 @@ public class EnemyAI : MonoBehaviour {
 //			s += (coords.Key + "_" + coords.Value + ", " );
 			s += (node.getCenter() + " ");
 		}
-		Debug.Log (s + "nextDest: " + nextDest.getIndices() + "start: " + start.getIndices() + "dev: " + finalDest.getIndices());
+//		Debug.Log (s + "nextDest: " + nextDest.getIndices() + "start: " + start.getIndices() + "dev: " + finalDest.getIndices());
 	}
 
 	void initPathToDev(){
@@ -91,15 +78,17 @@ public class EnemyAI : MonoBehaviour {
 		}
 
 //		if dev's location changed or the current path is blocked
-		if (!temp.equalTo(devCell) || nextDest.hasOtherOwner(enemyID)) {
+		if (!temp.equalTo(devCell) || (nextDest!= null && nextDest.hasOtherOwner(enemyID))) {
+
+			devCell.setEmpty ();
 			devCell = temp;
+			devCell.setFull (0);
+
+
 
 			//randomly choose one of the neighboring cells of dev's cell as your destination
 			//and create a path to this neighboring cell
-
-			while (finalDest.hasOtherOwner (enemyID)) {
-				finalDest = devCell.getClosestNeighbor (start, enemyID);
-			}
+			finalDest = devCell.getClosestNeighbor (start, enemyID);
 
 			finalDest.setFull (enemyID);
 			while (path.Count > 0) {
@@ -108,15 +97,26 @@ public class EnemyAI : MonoBehaviour {
 			}
 
 			path = terrain.GetComponent<MapPathfind> ().findPath (start, finalDest, enemyID);
-			nextDest = path.Dequeue ();
+
+			if (path.Count == 0)
+				nextDest = null;
+			else
+				nextDest = path.Dequeue ();
 		}
 
-		if (start.equalTo(finalDest)) {
+		if (start.equalTo (finalDest) || nextDest == null) {
+			if (Vector3.Distance (Dev.transform.position, transform.position) < 1f) {
+				rotateToTarget (Dev.transform.position);
+				
+			}
+
 			//rotate towards player
-			rotateToTarget(Dev.transform.position);
+			rotateToTarget (Dev.transform.position);
 			//attack
-			attack();
+			attack ();
 			return;
+		} else {
+			stopEnemyAttack ();
 		}
 
 		//reached intermediate destination
@@ -130,8 +130,23 @@ public class EnemyAI : MonoBehaviour {
 
 		//rotate towards nextDest
 		rotateToTarget(nextDest.getCenter());
+
 		//move towards nextDest
 		moveToTarget(nextDest.getCenter());
+
+//
+//		//move backwards
+//		if (Vector3.Distance (Dev.transform.position, transform.position) < 1f)
+//			moveBack();
+//		
+//		//move towards nextDest
+//		else
+//			moveToTarget(nextDest.getCenter());
+	}
+
+	void moveBack(){
+		enemyAnim.SetFloat ("enemySpeed", Mathf.MoveTowards(enemyAnim.GetFloat ("enemySpeed"), -1f, 5f * Time.deltaTime));
+		transform.Translate(Vector3.forward * enemyAnim.GetFloat("enemySpeed") * Time.deltaTime * moveSpeed);
 	}
 
 	void moveToTarget(Vector3 targ){
