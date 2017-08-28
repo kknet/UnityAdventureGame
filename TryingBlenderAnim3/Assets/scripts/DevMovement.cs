@@ -15,13 +15,15 @@ public class DevMovement : MonoBehaviour {
 	public AudioSource land;
 	public AudioSource flipJump;
 	public bool horizRot;
+//	public bool devCellChanged;
 
-//	private int turnCounter;
-//	private float turn;
+	private GameObject terrain;
 	private float desiredRot;
 	private bool applyJumpTrans;
 	private float needToRot;
 	private int runCounter;
+	//	private int turnCounter;
+	//	private float turn;
 
 	// Use this for initialization
 	void Start () {
@@ -34,69 +36,41 @@ public class DevMovement : MonoBehaviour {
 //		turn = 0f;
 		desiredRot = Camera.main.transform.eulerAngles.y;
 		horizRot = false;
+//		devCellChanged = false;
+		terrain = GameObject.Find ("Terrain");
+		initDevCell ();
+		getDevCell ().setSurroundingSpots ();
 	}
 
-	public void adjustToCam(float dif, bool firstTimeAdjust)
-	{
-		if (!firstTimeAdjust && adjustCounter == 0)
-			return;
-		if(firstTimeAdjust)  {
-			if (dif > 180f)
-				dif = dif - 360f;
-			else if (dif < -180f)
-				dif = dif + 360f;
+	private mapNode getDevCell(){
+		return terrain.GetComponent<MapPathfind> ().devCell;
+	}
 
-			needToRot = dif / 20.0f;
-			adjustCounter = 20;
+	private void initDevCell(){
+		terrain.GetComponent<MapPathfind> ().devCell = terrain.GetComponent<MapPathfind> ().containingCell (transform.position);
+	}
+
+	private void setDevCell(){
+		//dev's current location
+		mapNode newDevCell = terrain.GetComponent<MapPathfind> ().containingCell (transform.position);
+		if (newDevCell == null) {
+			Debug.LogAssertion ("bad");
 		}
-		transform.Rotate (Vector3.up * needToRot);
-		--adjustCounter;
-	}
-
-	private float clamp(float angle){
-		if (angle < -180f) {
-			angle += 360f;
-			return clamp (angle);
+		else if (!newDevCell.equalTo (terrain.GetComponent<MapPathfind> ().devCell)) {
+			terrain.GetComponent<MapPathfind> ().devCell.setEmpty ();
+			terrain.GetComponent<MapPathfind> ().devCell = newDevCell;
+			terrain.GetComponent<MapPathfind> ().devCell.setFull (0);
+			terrain.GetComponent<MapPathfind> ().devCell.setSurroundingSpots ();
+			GameObject[] enemies = GameObject.FindGameObjectsWithTag ("Enemy");
+			foreach (GameObject enemy in enemies) {
+				enemy.GetComponent<EnemyAI> ().plotNewPath ();
+			}
 		}
-		else if (angle > 180f) {
-			angle -= 360f;
-			return clamp (angle);
-		}
-
-		return angle;
 	}
-
-	public bool isIdle()
-	{
-		AnimatorStateInfo anim = myAnimator.GetCurrentAnimatorStateInfo (0);
-
-		if (!anim.IsTag("Jumps") && myAnimator.GetFloat ("VSpeed") == 0 && myAnimator.GetFloat ("HorizSpeed") == 0 && myAnimator.GetBool ("shouldFrontFlip") == false && myAnimator.GetBool ("Jumping") == false)
-		{
-			return true;
-		}
-		return false;
-	}
-
-	public bool jumping(){
-		AnimatorStateInfo anim = myAnimator.GetCurrentAnimatorStateInfo (0);
-		return anim.IsTag ("Jumps");
-	}
-
-	public bool rolling(){
-		AnimatorStateInfo anim = myAnimator.GetCurrentAnimatorStateInfo (0);
-		return anim.IsTag ("roll");
-	}
-
-	public bool turning(){
-		return !Mathf.Approximately(desiredRot, transform.eulerAngles.y);
-	}
-
-	private bool camRotChanged(){
-		return !Mathf.Approximately (Camera.main.transform.eulerAngles.y, desiredRot);
-	}
-
 
 	void Update () {
+//		Debug.LogError (devCellChanged.ToString());
+		setDevCell ();
 		mapNode ourCell = GameObject.Find ("Terrain").GetComponent<MapPathfind> ().containingCell (transform.position);
 		if (ourCell!=null) {
 			KeyValuePair<int, int> coords = ourCell.getIndices ();
@@ -347,4 +321,64 @@ public class DevMovement : MonoBehaviour {
 	void stopTurnLeft(){
 		myAnimator.SetBool ("TurnLeft", false);
 	}
+
+	public void adjustToCam(float dif, bool firstTimeAdjust)
+	{
+		if (!firstTimeAdjust && adjustCounter == 0)
+			return;
+		if(firstTimeAdjust)  {
+			if (dif > 180f)
+				dif = dif - 360f;
+			else if (dif < -180f)
+				dif = dif + 360f;
+
+			needToRot = dif / 20.0f;
+			adjustCounter = 20;
+		}
+		transform.Rotate (Vector3.up * needToRot);
+		--adjustCounter;
+	}
+
+	private float clamp(float angle){
+		if (angle < -180f) {
+			angle += 360f;
+			return clamp (angle);
+		}
+		else if (angle > 180f) {
+			angle -= 360f;
+			return clamp (angle);
+		}
+
+		return angle;
+	}
+
+	public bool isIdle()
+	{
+		AnimatorStateInfo anim = myAnimator.GetCurrentAnimatorStateInfo (0);
+
+		if (!anim.IsTag("Jumps") && myAnimator.GetFloat ("VSpeed") == 0 && myAnimator.GetFloat ("HorizSpeed") == 0 && myAnimator.GetBool ("shouldFrontFlip") == false && myAnimator.GetBool ("Jumping") == false)
+		{
+			return true;
+		}
+		return false;
+	}
+
+	public bool jumping(){
+		AnimatorStateInfo anim = myAnimator.GetCurrentAnimatorStateInfo (0);
+		return anim.IsTag ("Jumps");
+	}
+
+	public bool rolling(){
+		AnimatorStateInfo anim = myAnimator.GetCurrentAnimatorStateInfo (0);
+		return anim.IsTag ("roll");
+	}
+
+	public bool turning(){
+		return !Mathf.Approximately(desiredRot, transform.eulerAngles.y);
+	}
+
+	private bool camRotChanged(){
+		return !Mathf.Approximately (Camera.main.transform.eulerAngles.y, desiredRot);
+	}
+
 }

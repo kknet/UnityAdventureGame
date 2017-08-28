@@ -14,12 +14,14 @@ public class EnemyAI : MonoBehaviour {
 	private Vector3 oldDev;
 //	private Vector3 target;
 //	private Vector3 devTarget;
-	private mapNode devCell;
 	private Queue<mapNode> path;
 	private GameObject terrain;
 	private mapNode nextDest;
 	private mapNode finalDest;
 	private mapNode start;
+	private float restStartTime;
+	private bool resting;
+	private mapNode oldDevCell;
 
 	// Use this for initialization
 	void Start () {
@@ -30,86 +32,98 @@ public class EnemyAI : MonoBehaviour {
 //		target = Vector3.zero;
 		terrain = GameObject.Find ("Terrain");
 		initPathToDev ();
+		resting = false;
+		restStartTime = Time.time;
+	}
+
+	public mapNode getDevCell(){
+		return terrain.GetComponent<MapPathfind> ().devCell;
 	}
 
 	// Update is called once per frame
 	void Update () {
+
+//--------CHECKING IF DEV IS NEAR ENOUGH FOR ENEMIES TO NOTICE HIM--------//
 //		if (!Camera.main.GetComponent<MouseMovement> ().inCombatZone) {
 //			enemyAnim.SetFloat ("enemySpeed", Mathf.MoveTowards(enemyAnim.GetFloat ("enemySpeed"), 0f, 5f * Time.deltaTime));
 //			return;
 //		}
+
+//--------CHECKING IF THIS ENEMY IS DEAD--------------//
 //		if (GetComponent<ManageHealth> ().isDead ())
 //			this.gameObject.SetActive (false);
 
 		moveToDev ();
 
-		mapNode[] arr = path.ToArray ();
-		string s = "";
-		foreach(mapNode node in arr){
+//-------------- ALL FOR DEBUGGING-------------//
+//		mapNode[] arr = path.ToArray ();
+//		string s = "";
+//		foreach(mapNode node in arr){
 //			KeyValuePair<int, int> coords = node.getIndices ();
 //			s += (coords.Key + "_" + coords.Value + ", " );
-			s += (node.getCenter() + " ");
-		}
+//			s += (node.getCenter() + " ");
+//		}
 //		Debug.Log (s + "nextDest: " + nextDest.getIndices() + "start: " + start.getIndices() + "dev: " + finalDest.getIndices());
 	}
 
 	void initPathToDev(){
 		start = terrain.GetComponent<MapPathfind> ().containingCell (transform.position);
-		devCell = terrain.GetComponent<MapPathfind> ().containingCell (Dev.transform.position);
-		finalDest = devCell.getClosestNeighbor(start, enemyID);
+//		finalDest = getDevCell().getClosestNeighbor(start, enemyID);
+		finalDest = getDevCell().getEmptySurroundingSpot(enemyID);
 		path = terrain.GetComponent<MapPathfind> ().findPath (start, finalDest, enemyID);
 		nextDest = path.Dequeue ();
 	}
 
-	void moveToDev(){
-		//enemy's current location
+	//keep track of this agent's current location
+	void updateYourCell() {
 		mapNode oldStart = start;
 		start = terrain.GetComponent<MapPathfind> ().containingCell (transform.position);
 		if (!oldStart.equalTo (start)) {
 			oldStart.setEmpty ();
 		}
 		start.setFull (enemyID);
+	}
+		
+	public void plotNewPath(){
+		//randomly choose one of the neighboring cells of dev's cell as your destination
+		//and create a path to this neighboring cell
 
-		//dev's current location
-		mapNode temp = terrain.GetComponent<MapPathfind> ().containingCell (Dev.transform.position);
-		if (temp == null) {
-			Debug.LogAssertion ("bad");
+//		finalDest = getDevCell().getClosestNeighbor (start, enemyID);
+		finalDest = getDevCell().getEmptySurroundingSpot(enemyID);
+//		Debug.LogError ("finalDest:" + finalDest.getIndices().ToString() + ", dev: " + getDevCell().getIndices().ToString());
+
+		if (finalDest == null) {
+			Debug.LogError ("finalDest = null");
+			stop ();
 			return;
 		}
+		finalDest.setFull (enemyID);
+		while (path !=null && path.Count > 0) {
+			mapNode trashNode = path.Dequeue ();
+			trashNode.setEmpty ();
+		}
+
+		path = terrain.GetComponent<MapPathfind> ().findPath (start, finalDest, enemyID);
+
+		if (path.Count == 0)
+			nextDest = null;
+		else
+			nextDest = path.Dequeue ();
+	}
+
+	void moveToDev(){
+		updateYourCell ();
 
 //		if dev's location changed or the current path is blocked
-		if (!temp.equalTo(devCell) || (nextDest!= null && nextDest.hasOtherOwner(enemyID))) {
-
-			devCell.setEmpty ();
-			devCell = temp;
-			devCell.setFull (0);
-
-
-
-			//randomly choose one of the neighboring cells of dev's cell as your destination
-			//and create a path to this neighboring cell
-			finalDest = devCell.getClosestNeighbor (start, enemyID);
-
-			finalDest.setFull (enemyID);
-			while (path.Count > 0) {
-				mapNode trashNode = path.Dequeue ();
-				trashNode.setEmpty ();
-			}
-
-			path = terrain.GetComponent<MapPathfind> ().findPath (start, finalDest, enemyID);
-
-			if (path.Count == 0)
-				nextDest = null;
-			else
-				nextDest = path.Dequeue ();
+//		if (finalDest == null || didDevCellChange() || (nextDest!= null && nextDest.hasOtherOwner(enemyID))) {
+		if (finalDest == null || (nextDest!= null && nextDest.hasOtherOwner(enemyID))) {
+			plotNewPath ();
 		}
 
 		if (start.equalTo (finalDest) || nextDest == null) {
 			if (Vector3.Distance (Dev.transform.position, transform.position) < 1f) {
 				rotateToTarget (Dev.transform.position);
-				
 			}
-
 			//rotate towards player
 			rotateToTarget (Dev.transform.position);
 			//attack
@@ -127,13 +141,11 @@ public class EnemyAI : MonoBehaviour {
 				return;
 			}
 		}
-
 		//rotate towards nextDest
 		rotateToTarget(nextDest.getCenter());
 
 		//move towards nextDest
-		moveToTarget(nextDest.getCenter());
-
+		moveToTarget();
 //
 //		//move backwards
 //		if (Vector3.Distance (Dev.transform.position, transform.position) < 1f)
@@ -149,9 +161,13 @@ public class EnemyAI : MonoBehaviour {
 		transform.Translate(Vector3.forward * enemyAnim.GetFloat("enemySpeed") * Time.deltaTime * moveSpeed);
 	}
 
-	void moveToTarget(Vector3 targ){
-		if (start.equalTo(finalDest) || !isEnemyRunning()) {
-			enemyAnim.SetFloat ("enemySpeed", Mathf.MoveTowards (enemyAnim.GetFloat ("enemySpeed"), 0f, 5f * Time.deltaTime));
+	void stop(){
+		enemyAnim.SetFloat ("enemySpeed", Mathf.MoveTowards (enemyAnim.GetFloat ("enemySpeed"), 0f, 5f * Time.deltaTime));
+	}
+
+	void moveToTarget(){
+		if (finalDest == null || start.equalTo(finalDest) || !isEnemyRunning()) {
+			stop ();
 		} else {
 			enemyAnim.SetFloat ("enemySpeed", Mathf.MoveTowards(enemyAnim.GetFloat ("enemySpeed"), 1f, 5f * Time.deltaTime));
 			transform.Translate(Vector3.forward * enemyAnim.GetFloat("enemySpeed") * Time.deltaTime * moveSpeed);

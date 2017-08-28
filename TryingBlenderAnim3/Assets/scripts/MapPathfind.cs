@@ -15,6 +15,7 @@ public class MapPathfind : MonoBehaviour {
 	public Vector3 min;
 	public Vector3 max;
 	public mapNode[] devSurroundingSpots;
+	public mapNode devCell;
 
 	// Use this for initialization
 	void Start () {
@@ -28,6 +29,7 @@ public class MapPathfind : MonoBehaviour {
 		min = transform.position;
 		max = new Vector3 (transform.position.x + wid, transform.position.y, transform.position.z + len);
 		buildGridGraph ();
+
 	}
 
 	//return the mapNode cell in the grid that contains the given pt, or NULL if out of bounds
@@ -434,9 +436,12 @@ public class mapNode {
 	public mapNode[] getSurroundingSpots(){
 
 		//get the neighbors of the neighbors
-		ArrayList outerCircle = new ArrayList();
+		int count = 0;
+		List<mapNode> outerCircle = new List<mapNode>();
 		foreach (mapNode neighbor in neighbors) {
-			outerCircle.AddRange(neighbor.getNeighbors());
+			mapNode[] neighborsSquared = neighbor.getNeighbors ();
+			outerCircle.AddRange(neighborsSquared);
+			count += neighborsSquared.Length;
 		}
 
 		//remove all of the direct neighbors of Dev from outerCircle
@@ -446,15 +451,34 @@ public class mapNode {
 			while ((idx = outerCircle.IndexOf (directNeighbor)) >= 0) {
 				outerCircle.RemoveAt(idx);
 				idx = -1;
+				--count;
 			}
 		}
 
-		mapNode[] outerCircleArr = new mapNode[outerCircle.Capacity];
-		for(int idx = 0; idx < outerCircle.Capacity; ++idx) {
-			outerCircleArr [idx] = (mapNode) outerCircle [idx];
-		}
 
-		return outerCircleArr;
+//		mapNode[] outerCircleArr = new mapNode[outerCircle.Capacity];
+//		for(int idx = 0; idx < count; ++idx) {
+//			outerCircleArr [idx] = (mapNode) outerCircle [idx];
+//		}
+//
+//		return outerCircleArr;
+
+		return outerCircle.ToArray ();
+	}
+
+	public mapNode getEmptySurroundingSpot(int yourEnemyID){
+		mapNode[] outerCircle = GameObject.Find ("Terrain").GetComponent<MapPathfind> ().devSurroundingSpots;
+//		string s = "";
+//		foreach (mapNode node in outerCircle) {
+//			s += (node.toString() + " ");
+//		}
+//		Debug.LogError (s);
+		foreach (mapNode node in outerCircle) {
+			if (!node.hasOtherOwner (yourEnemyID)) {
+				return node;
+			}
+		}
+		return null;
 	}
 
 	private object[] getEmptyNeighbors(int yourEnemyID){
@@ -491,6 +515,10 @@ public class mapNode {
 
 	public KeyValuePair<int, int> getIndices(){
 		return new KeyValuePair<int, int> (zIndex, xIndex);
+	}
+
+	public string toString(){
+		return getIndices ().ToString ();
 	}
 
 //	public Vector3[] getPoints(){
