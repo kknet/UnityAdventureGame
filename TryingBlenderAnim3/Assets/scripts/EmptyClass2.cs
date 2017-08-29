@@ -1,130 +1,294 @@
-﻿//using UnityEngine;
+﻿//using System.Collections;
+//using System.Collections.Generic;
+//using UnityEngine;
 //
-//public class MouseMovement : MonoBehaviour {
+//public class EnemyAI : MonoBehaviour {
 //
-//	private bool firstTimeAdjust;
-//	//	private float deltaVert;
-//	//	private float deltaHoriz;
+//	public int enemyID;
 //
-//	public float sensitivityX;
-//	public float sensitivityY;
-//	public GameObject player;
+//	private Animator enemyAnim;
+//	private GameObject Dev;
+//	private float rotSpeed;
+//	private float moveSpeed;
+//	private Vector3 dif;
+//	private Vector3 oldDev;
+//	//	private Vector3 target;
+//	//	private Vector3 devTarget;
+//	private Queue<mapNode> path;
+//	private GameObject terrain;
+//	private mapNode nextDest;
+//	private mapNode finalDest;
+//	private mapNode start;
+//	private float restStartTime;
+//	private bool resting;
+//	private mapNode oldDevCell;
 //
-//	private Vector3 closePos;
-//
-//	[SerializeField][HideInInspector]
-//	private Vector3 initialOffset;
-//	private Vector3 currentOffset;
-//
-//	[ContextMenu("Set Current Offset")]
-//	private void SetCurrentOffset () {
-//		initialOffset = transform.position - player.transform.position;
+//	// Use this for initialization
+//	void Start () {
+//		enemyAnim = GetComponent<Animator> ();
+//		Dev = GameObject.Find ("DevDrake");
+//		rotSpeed = 5f;
+//		moveSpeed = 5f;
+//		//		target = Vector3.zero;
+//		terrain = GameObject.Find ("Terrain");
+//		initPathToDev ();
+//		resting = false;
+//		restStartTime = Time.time;
 //	}
 //
-//	//	private bool Approx(Vector3 a, Vector3 b){
-//	//		return Mathf.Approximately (a.x, b.x) && Mathf.Approximately (a.y, b.y) && Mathf.Approximately (a.z, b.z);
-//	//	}
-//	//
-//	//	public void ZoomIn() {
-//	////		Vector3 dir = transform.position - closePos;
-//	//		transform.position.Set (closePos.x, closePos.y, closePos.z);
-//	//		currentOffset = transform.position - player.transform.position;
-//	//	}
-//	//
-//	//	public void ZoomOut(Vector3 direction) {
-//	//		Vector3 current = transform.position - player.transform.position;
-//	//		if (!Approx (current, initialOffset)) {
-//	//			transform.Translate (direction);		
-//	//		}
-//	//	}
-//
-//	private void Start () {
-//		if(player == null) {
-//			Debug.LogError ("Assign a player for the camera in Unity's inspector");
+//	public mapNode getDevCell(){
+//		mapNode ret = terrain.GetComponent<MapPathfind> ().devCell;
+//		if (ret == null) {
+//			Dev.GetComponent<DevMovement> ().initDevCell ();
+//			ret = terrain.GetComponent<MapPathfind> ().devCell;
 //		}
-//		currentOffset = initialOffset;
-//		firstTimeAdjust = false;
-//		closePos = new Vector3 (0f, 1.54f, -1.425f);
+//		return ret;
 //	}
 //
-//	private void VerticalRotation()  {
-//		float movementY = Input.GetAxis ("Mouse Y") * sensitivityY * Time.deltaTime;
-//		if (!Mathf.Approximately (movementY, 0f)) {
-//			float total = movementY + transform.rotation.eulerAngles.x;
-//			if (total > 180f)
-//				movementY -= 360f;
-//			else if (total < -180f)
-//				movementY += 360f;
-//			total = movementY + transform.rotation.eulerAngles.x;//recalculate total		
-//			total = Mathf.Clamp (total, -30f, 50f);//clamp it with limits
-//			//			deltaVert = total;
-//			transform.rotation = Quaternion.Euler (total, 0f, 0f);//calculate resulting quaternion
+//	// Update is called once per frame
+//	void Update () {
+//
+//		//--------CHECKING IF DEV IS NEAR ENOUGH FOR ENEMIES TO NOTICE HIM--------//
+//		//		if (!Camera.main.GetComponent<MouseMovement> ().inCombatZone) {
+//		//			enemyAnim.SetFloat ("enemySpeed", Mathf.MoveTowards(enemyAnim.GetFloat ("enemySpeed"), 0f, 5f * Time.deltaTime));
+//		//			return;
+//		//		}
+//
+//		//--------CHECKING IF THIS ENEMY IS DEAD--------------//
+//		//		if (GetComponent<ManageHealth> ().isDead ())
+//		//			this.gameObject.SetActive (false);
+//
+//		moveToDev ();
+//
+//		//-------------- ALL FOR DEBUGGING-------------//
+//		//		mapNode[] arr = path.ToArray ();
+//		//		string s = "";
+//		//		foreach(mapNode node in arr){
+//		//			KeyValuePair<int, int> coords = node.getIndices ();
+//		//			s += (coords.Key + "_" + coords.Value + ", " );
+//		//			s += (node.getCenter() + " ");
+//		//		}
+//		//		Debug.Log (s + "nextDest: " + nextDest.getIndices() + "start: " + start.getIndices() + "dev: " + finalDest.getIndices());
+//	}
+//
+//	void initPathToDev(){
+//		start = terrain.GetComponent<MapPathfind> ().containingCell (transform.position);
+//		plotNewPath ();
+//	}
+//
+//	//keep track of this agent's current location
+//	void updateYourCell() {
+//		mapNode oldStart = start;
+//		start = terrain.GetComponent<MapPathfind> ().containingCell (transform.position);
+//		if (!oldStart.equalTo (start)) {
+//			oldStart.setEmpty ();
 //		}
+//		start.setFull (enemyID);
 //	}
 //
+//	public void plotNewPath(){
+//		getDevCell ().setFull (0);
 //
-//	private void HorizontalRotation(){
-//		bool idle = player.GetComponent<DevMovement>().isIdle ();
-//		float movementX = Input.GetAxis ("Mouse X") * sensitivityX * Time.deltaTime;
-//		bool combating = !player.GetComponent<DevCombat> ().notInCombatMove ();
-//		bool counterZero = (player.GetComponent<DevMovement> ().adjustCounter == 0);
-//		bool camMoved = !Mathf.Approximately (movementX, 0f);
-//		if ((counterZero) && combating) {
-//			if (camMoved) {
-//				transform.RotateAround (player.transform.position, Vector3.up, movementX);
-//				firstTimeAdjust = true;
-//			}
+//		//		finalDest = getDevCell().getClosestNeighbor (start, enemyID);
+//		finalDest = getDevCell().getEmptySurroundingSpot(enemyID);
+//		//		Debug.LogError ("finalDest:" + finalDest.getIndices().ToString() + ", dev: " + getDevCell().getIndices().ToString());
+//
+//		if (finalDest == null) {
+//			Debug.LogError ("finalDest = null");
+//			stop ();
 //			return;
 //		}
-//		if (camMoved) {
-//			if (counterZero && idle) {
-//				transform.RotateAround (player.transform.position, Vector3.up, movementX);
-//				firstTimeAdjust = true;
+//		finalDest.setFull (enemyID);
+//		while (path !=null && path.Count > 0) {
+//			mapNode trashNode = path.Dequeue ();
+//			trashNode.setEmpty ();
+//		}
+//
+//		path = terrain.GetComponent<MapPathfind> ().findPath (start, finalDest, enemyID);
+//
+//		if (path.Count == 0)
+//			nextDest = null;
+//		else
+//			nextDest = path.Dequeue ();
+//	}
+//
+//	void moveToDev(){
+//		updateYourCell ();
+//
+//		//		if dev's location changed or the current path is blocked
+//		//		if (finalDest == null || didDevCellChange() || (nextDest!= null && nextDest.hasOtherOwner(enemyID))) {
+//		if (finalDest == null || (nextDest!= null && nextDest.hasOtherOwner(enemyID))) {
+//			plotNewPath ();
+//		}
+//
+//		if (start.equalTo (finalDest) || nextDest == null) {
+//			if (Vector3.Distance (Dev.transform.position, transform.position) < 1f) {
+//				rotateToTarget (Dev.transform.position);
+//			}
+//			//rotate towards player
+//			rotateToTarget (Dev.transform.position);
+//			//attack
+//			attack ();
+//			return;
+//		} else {
+//			stopEnemyAttack ();
+//		}
+//
+//		//reached intermediate destination
+//		if (nextDest == null || start.equalTo(nextDest)) {
+//			nextDest = path.Dequeue ();
+//			if (nextDest == null || nextDest.getCenter () == null) {
+//				Debug.LogAssertion ("nextDest is messed up");
 //				return;
 //			}
 //		}
-//		bool vert = !Mathf.Approximately (Input.GetAxis ("Vertical"), 0f); 
-//		bool horiz = !Mathf.Approximately (Input.GetAxis ("Horizontal"), 0f); 
-//		float dif = 0f;
-//		if (vert && (Input.GetKey (KeyCode.W) || (Input.GetKey (KeyCode.UpArrow)))) {
-//			dif = (transform.rotation.eulerAngles.y - player.transform.rotation.eulerAngles.y);						
-//			firstTimeAdjust = (!Mathf.Approximately (dif, 0f)) && (counterZero);
-//		}
-//		else if (vert && (Input.GetKey (KeyCode.S) || (Input.GetKey (KeyCode.DownArrow)))) {
-//			dif = (transform.rotation.eulerAngles.y - player.transform.rotation.eulerAngles.y + 180f);						
-//			firstTimeAdjust = (!Mathf.Approximately (dif, 0f)) && (counterZero);
-//		}
-//		else if (horiz && (Input.GetKey (KeyCode.A) || (Input.GetKey (KeyCode.LeftArrow)))) {
-//			dif = (transform.rotation.eulerAngles.y - player.transform.rotation.eulerAngles.y - 90f);						
-//			firstTimeAdjust = (!Mathf.Approximately (dif, 0f)) && (counterZero);
-//		}
-//		else if (horiz && (Input.GetKey (KeyCode.D) || (Input.GetKey (KeyCode.RightArrow)))) {
-//			dif = (transform.rotation.eulerAngles.y - player.transform.rotation.eulerAngles.y + 90f);						
-//			firstTimeAdjust = (!Mathf.Approximately (dif, 0f)) && (counterZero);
-//		}
-//		if (!Mathf.Approximately(dif,0)) {
-//			player.GetComponent<DevMovement>().adjustToCam (dif, firstTimeAdjust);
-//			firstTimeAdjust = false;
-//		}
-//		transform.RotateAround (player.transform.position, Vector3.up, movementX);
-//	}
+//		//rotate towards nextDest
+//		rotateToTarget(nextDest.getCenter());
 //
-//
-//
-//
-//
-//	private void LateUpdate () {
-//		transform.position = player.transform.position + currentOffset;
-//
-//		//		VerticalRotation ();
-//		HorizontalRotation ();
-//
-//		//		transform.RotateAround (player.transform.position, Vector3.up, deltaHoriz);
-//		//		transform.RotateAround (transform.position, Vector3.right, deltaVert * 0.1f);
+//		//move towards nextDest
+//		moveToTarget();
 //		//
-//		//		deltaVert = 0f;
-//		//		deltaHoriz = 0f;
-//
-//		currentOffset = transform.position - player.transform.position;
+//		//		//move backwards
+//		//		if (Vector3.Distance (Dev.transform.position, transform.position) < 1f)
+//		//			moveBack();
+//		//		
+//		//		//move towards nextDest
+//		//		else
+//		//			moveToTarget(nextDest.getCenter());
 //	}
+//
+//	void moveBack(){
+//		enemyAnim.SetFloat ("enemySpeed", Mathf.MoveTowards(enemyAnim.GetFloat ("enemySpeed"), -1f, 5f * Time.deltaTime));
+//		transform.Translate(Vector3.forward * enemyAnim.GetFloat("enemySpeed") * Time.deltaTime * moveSpeed);
+//	}
+//
+//	void stop(){
+//		enemyAnim.SetFloat ("enemySpeed", Mathf.MoveTowards (enemyAnim.GetFloat ("enemySpeed"), 0f, 5f * Time.deltaTime));
+//	}
+//
+//	void moveToTarget(){
+//		if (finalDest == null || start.equalTo(finalDest) || !isEnemyRunning()) {
+//			stop ();
+//		} else {
+//			enemyAnim.SetFloat ("enemySpeed", Mathf.MoveTowards(enemyAnim.GetFloat ("enemySpeed"), 1f, 5f * Time.deltaTime));
+//			transform.Translate(Vector3.forward * enemyAnim.GetFloat("enemySpeed") * Time.deltaTime * moveSpeed);
+//		}
+//	}
+//
+//
+//	void rotateToTarget(Vector3 targ){
+//		dif = targ - transform.position;
+//		dif = new Vector3 (dif.x, 0f, dif.z);
+//		transform.forward = Vector3.RotateTowards (transform.forward, dif, rotSpeed * Time.deltaTime, 0.0f); 
+//	}
+//
+//
+//
+//	public bool isEnemyAttacking() {
+//		AnimatorStateInfo info = enemyAnim.GetCurrentAnimatorStateInfo (0);
+//		return info.IsName ("QUICK1") || info.IsName ("QUICK2") || info.IsName ("QUICK3") || info.IsName ("QUICK4") || info.IsName ("QUICK5");
+//	}
+//
+//	public bool isEnemyRunning(){
+//		AnimatorStateInfo info = enemyAnim.GetCurrentAnimatorStateInfo (0);
+//		return info.IsTag ("enemyRun");
+//	}
+//
+//	private void attack() {
+//		enemyAnim.SetBool ("enemyAttack", true);
+//		Invoke ("switchAttack", 0.5f);
+//	}
+//
+//	public void stopEnemyAttack(){
+//		enemyAnim.SetBool ("enemyAttack", false);
+//	}
+//
+//
+//	private void switchAttack(){
+//		switch (enemyAnim.GetInteger ("enemyQuick")) {
+//		case 1:
+//			enemyAnim.SetInteger ("enemyQuick", 2);
+//			break;
+//		case 2:
+//			enemyAnim.SetInteger ("enemyQuick", 3);
+//			break;
+//		case 3:
+//			enemyAnim.SetInteger ("enemyQuick", 4);
+//			break;
+//		case 4:
+//			enemyAnim.SetInteger ("enemyQuick", 5);
+//			break;
+//		case 5:
+//			enemyAnim.SetInteger ("enemyQuick", 1);
+//			break;
+//		default:
+//			Debug.LogAssertion ("quickAttack is not set to 1-5, look at EnemyAI.cs script (switchAttack method)");
+//			break;
+//		}
+//	}
+//
+//
+//
+//	private float rand(float a, float b){
+//		return UnityEngine.Random.Range (a, b);
+//	}
+//
+//	private bool Approx(Vector3 a, Vector3 b){
+//		return Mathf.Approximately (a.x, b.x) && Mathf.Approximately (a.y, b.y) && Mathf.Approximately (a.z, b.z);
+//	}
+//
+//	//	private void applyRotation() {
+//	//		//if not moving
+//	//		if (Mathf.Approximately (enemyAnim.GetFloat ("enemySpeed"), 0f)) {
+//	//			if ((oldDev == Vector3.zero) || (Vector3.Magnitude (oldDev - Dev.transform.position) > 0.7f && Vector3.Magnitude (Dev.transform.position - transform.position) > 0.7f)) {
+//	//				dif = Dev.transform.position - transform.position;
+//	//				dif = new Vector3 (dif.x, 0f, dif.z);
+//	//				Vector3 perpenDif = Vector3.Normalize (Vector3.Cross (dif, -1.0f * dif)) * rand (1f, -1f);
+//	//				devTarget = Dev.transform.position;
+//	//				target = Dev.transform.position + perpenDif;
+//	//				dif = target - transform.position;
+//	//				dif = new Vector3 (dif.x, 0f, dif.z);
+//	//			}		
+//	//		//if moving
+//	//		} else {
+//	//			if ((Vector3.Magnitude (oldDev - Dev.transform.position) > 0.7f && Vector3.Magnitude (Dev.transform.position - transform.position) > 0.7f)) {
+//	//				dif = Dev.transform.position - transform.position;
+//	//				dif = new Vector3 (dif.x, 0f, dif.z);
+//	//				Vector3 perpenDif = Vector3.Normalize (Vector3.Cross (dif, -1.0f * dif)) * rand (1f, -1f);
+//	//				devTarget = Dev.transform.position;
+//	//				target = Dev.transform.position + perpenDif;
+//	//				dif = target - transform.position;
+//	//				dif = new Vector3 (dif.x, 0f, dif.z);
+//	//			} else {
+//	//				dif = target - transform.position;
+//	//				dif = new Vector3 (dif.x, 0f, dif.z);
+//	//			}
+//	//		}
+//	//
+//	//		transform.forward = Vector3.RotateTowards (transform.forward, dif, rotSpeed * Time.deltaTime, 0.0f); 
+//	//	}
+//	//
+//	//	private void applySpeed() {
+//	//		if (isEnemyAttacking ()) {
+//	//			enemyAnim.SetFloat ("enemySpeed", Mathf.MoveTowards(enemyAnim.GetFloat ("enemySpeed"), 0f, 5f * Time.deltaTime));
+//	//			return;
+//	//		}
+//	//		if (Vector3.Magnitude (dif) < 2f) {
+//	//			enemyAnim.SetFloat ("enemySpeed", Mathf.MoveTowards (enemyAnim.GetFloat ("enemySpeed"), 0f, 5f * Time.deltaTime));
+//	//		}
+//	////		else if (Vector3.Magnitude (dif) < 1f) {
+//	////			enemyAnim.SetFloat ("enemySpeed", Mathf.MoveTowards (enemyAnim.GetFloat ("enemySpeed"), -1f, 5f * Time.deltaTime));
+//	////			transform.Translate(Vector3.forward * enemyAnim.GetFloat("enemySpeed") * Time.deltaTime * moveSpeed);
+//	////		}
+//	//		else {
+//	//			enemyAnim.SetFloat ("enemySpeed", Mathf.MoveTowards(enemyAnim.GetFloat ("enemySpeed"), 1f, 2f * Time.deltaTime));
+//	//			transform.Translate(Vector3.forward * enemyAnim.GetFloat("enemySpeed") * Time.deltaTime * moveSpeed);
+//	//		}
+//	//	}
+//
+//	//	private void reduceSpeed(){
+//	//		enemyAnim.SetFloat ("enemySpeed", Mathf.Max (0f, enemyAnim.GetFloat ("enemySpeed") - 0.03f));
+//	//	}
+//
+//
 //}

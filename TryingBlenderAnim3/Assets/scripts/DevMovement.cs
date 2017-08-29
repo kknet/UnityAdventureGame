@@ -26,7 +26,8 @@ public class DevMovement : MonoBehaviour {
 	//	private float turn;
 
 	// Use this for initialization
-	void Start () {
+	public void Start () {
+		terrain = GameObject.Find ("Terrain");
 		myAnimator = GetComponent<Animator>();
 		needToRot = 0;
 		adjustCounter = 0;
@@ -37,7 +38,6 @@ public class DevMovement : MonoBehaviour {
 		desiredRot = Camera.main.transform.eulerAngles.y;
 		horizRot = false;
 //		devCellChanged = false;
-		terrain = GameObject.Find ("Terrain");
 		initDevCell ();
 		getDevCell ().setSurroundingSpots ();
 	}
@@ -46,7 +46,9 @@ public class DevMovement : MonoBehaviour {
 		return terrain.GetComponent<MapPathfind> ().devCell;
 	}
 
-	private void initDevCell(){
+	public void initDevCell(){
+		if(terrain==null)
+			terrain = GameObject.Find ("Terrain");
 		terrain.GetComponent<MapPathfind> ().devCell = terrain.GetComponent<MapPathfind> ().containingCell (transform.position);
 	}
 

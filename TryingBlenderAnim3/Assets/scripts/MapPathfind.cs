@@ -16,9 +16,11 @@ public class MapPathfind : MonoBehaviour {
 	public Vector3 max;
 	public mapNode[] devSurroundingSpots;
 	public mapNode devCell;
+	public bool doneBuilding;
 
 	// Use this for initialization
-	void Start () {
+	public void Start () {
+		doneBuilding = false;
 		ter = this.GetComponent<Terrain> ();
 		Vector3 dimensions = ter.terrainData.size;
 		len = dimensions [2];
@@ -29,7 +31,8 @@ public class MapPathfind : MonoBehaviour {
 		min = transform.position;
 		max = new Vector3 (transform.position.x + wid, transform.position.y, transform.position.z + len);
 		buildGridGraph ();
-
+		doneBuilding = true;
+		GameObject.Find ("DevDrake").GetComponent<DevMovement> ().Start ();
 	}
 
 	//return the mapNode cell in the grid that contains the given pt, or NULL if out of bounds
@@ -185,7 +188,7 @@ public class MapPathfind : MonoBehaviour {
 					} else {
 						curNode.setFull (enemyID);
 					}
-						
+
 					path.Enqueue (curNode);
 					Queue<mapNode> continuation = findPath (curNode, dest, enemyID);
 					while (continuation.Count != 0) {
@@ -198,7 +201,7 @@ public class MapPathfind : MonoBehaviour {
 	}
 
 	void buildGridGraph(){
-		
+
 		//set up the dimensions of the 2d array
 		grid = new mapNode[nodesPerSide][];
 		for (int z = 0; z < nodesPerSide; ++z) {
@@ -222,9 +225,9 @@ public class MapPathfind : MonoBehaviour {
 			neighbors [1] = grid [1] [0];
 			neighbors [2] = grid [1] [1];
 
-//			mapNode[] neighbors = new mapNode[2];
-//			neighbors [0] = grid [0] [1];
-//			neighbors [1] = grid [1] [0];
+			//			mapNode[] neighbors = new mapNode[2];
+			//			neighbors [0] = grid [0] [1];
+			//			neighbors [1] = grid [1] [0];
 
 			grid [0] [0].setNeighbors (neighbors);
 		}
@@ -235,9 +238,9 @@ public class MapPathfind : MonoBehaviour {
 			neighbors [1] = grid [1] [nodesPerSide - 1];
 			neighbors [2] = grid [1] [nodesPerSide - 2];
 
-//			mapNode[] neighbors = new mapNode[2];
-//			neighbors [0] = grid [0] [nodesPerSide - 2];
-//			neighbors [1] = grid [1] [nodesPerSide - 1];
+			//			mapNode[] neighbors = new mapNode[2];
+			//			neighbors [0] = grid [0] [nodesPerSide - 2];
+			//			neighbors [1] = grid [1] [nodesPerSide - 1];
 
 			grid [0] [nodesPerSide - 1].setNeighbors (neighbors);
 		}
@@ -247,9 +250,9 @@ public class MapPathfind : MonoBehaviour {
 			neighbors [1] = grid [nodesPerSide - 1] [nodesPerSide - 2];
 			neighbors [2] = grid [nodesPerSide - 2] [nodesPerSide - 2];
 
-//			mapNode[] neighbors = new mapNode[2];
-//			neighbors [0] = grid [nodesPerSide - 2] [nodesPerSide - 1];
-//			neighbors [1] = grid [nodesPerSide - 1] [nodesPerSide - 2];
+			//			mapNode[] neighbors = new mapNode[2];
+			//			neighbors [0] = grid [nodesPerSide - 2] [nodesPerSide - 1];
+			//			neighbors [1] = grid [nodesPerSide - 1] [nodesPerSide - 2];
 
 			grid [nodesPerSide - 1] [nodesPerSide - 1].setNeighbors (neighbors);
 		}
@@ -259,9 +262,9 @@ public class MapPathfind : MonoBehaviour {
 			neighbors [1] = grid [nodesPerSide - 1] [1];
 			neighbors [2] = grid [nodesPerSide - 2] [1];
 
-//			mapNode[] neighbors = new mapNode[2];
-//			neighbors [0] = grid [nodesPerSide - 2] [0];
-//			neighbors [1] = grid [nodesPerSide - 1] [1];
+			//			mapNode[] neighbors = new mapNode[2];
+			//			neighbors [0] = grid [nodesPerSide - 2] [0];
+			//			neighbors [1] = grid [nodesPerSide - 1] [1];
 
 			grid [nodesPerSide - 1] [0].setNeighbors (neighbors);
 		}
@@ -276,10 +279,10 @@ public class MapPathfind : MonoBehaviour {
 				neighbors [3] = grid [1] [x + 1];
 				neighbors [4] = grid [1] [x - 1];
 
-//				mapNode[] neighbors = new mapNode[3];
-//				neighbors [0] = grid [1] [x];
-//				neighbors [1] = grid [0] [x + 1];
-//				neighbors [2] = grid [0] [x - 1];
+				//				mapNode[] neighbors = new mapNode[3];
+				//				neighbors [0] = grid [1] [x];
+				//				neighbors [1] = grid [0] [x + 1];
+				//				neighbors [2] = grid [0] [x - 1];
 
 				grid [0] [x].setNeighbors (neighbors);
 			}
@@ -305,10 +308,10 @@ public class MapPathfind : MonoBehaviour {
 				neighbors [3] = grid [z + 1] [1];
 				neighbors [4] = grid [z - 1] [1];
 
-//				mapNode[] neighbors = new mapNode[3];
-//				neighbors [0] = grid [z] [1];
-//				neighbors [1] = grid [z + 1] [0];
-//				neighbors [2] = grid [z - 1] [0];
+				//				mapNode[] neighbors = new mapNode[3];
+				//				neighbors [0] = grid [z] [1];
+				//				neighbors [1] = grid [z + 1] [0];
+				//				neighbors [2] = grid [z - 1] [0];
 
 				grid [z] [0].setNeighbors (neighbors);
 			}
@@ -321,10 +324,10 @@ public class MapPathfind : MonoBehaviour {
 				neighbors [3] = grid [z + 1] [nodesPerSide - 2];
 				neighbors [4] = grid [z - 1] [nodesPerSide - 2];
 
-//				mapNode[] neighbors = new mapNode[3];
-//				neighbors [0] = grid [z] [nodesPerSide - 2];
-//				neighbors [1] = grid [z + 1] [nodesPerSide - 1];
-//				neighbors [2] = grid [z - 1] [nodesPerSide - 1];
+				//				mapNode[] neighbors = new mapNode[3];
+				//				neighbors [0] = grid [z] [nodesPerSide - 2];
+				//				neighbors [1] = grid [z + 1] [nodesPerSide - 1];
+				//				neighbors [2] = grid [z - 1] [nodesPerSide - 1];
 
 				grid [z] [nodesPerSide - 1].setNeighbors (neighbors);
 			}
@@ -343,20 +346,20 @@ public class MapPathfind : MonoBehaviour {
 				neighbors [6] = grid [z-1] [x+1];
 				neighbors [7] = grid [z-1] [x-1];
 
-//				mapNode[] neighbors = new mapNode[4];
-//				neighbors [0] = grid [z+1] [x+1];
-//				neighbors [1] = grid [z+1] [x-1];
-//				neighbors [2] = grid [z-1] [x+1];
-//				neighbors [3] = grid [z-1] [x-1];
+				//				mapNode[] neighbors = new mapNode[4];
+				//				neighbors [0] = grid [z+1] [x+1];
+				//				neighbors [1] = grid [z+1] [x-1];
+				//				neighbors [2] = grid [z-1] [x+1];
+				//				neighbors [3] = grid [z-1] [x-1];
 
 				grid [z] [x].setNeighbors(neighbors);
 			}
 		}
 	}
-	
+
 	// Update is called once per frame
 	void Update () {
-		
+
 	}
 
 
@@ -372,12 +375,12 @@ public class MapPathfind : MonoBehaviour {
 
 public class mapNode { 
 
-//format for points: 
-// 1: (minX, maxZ), 2: (maxX, maxZ)
-// 0: (minX, minZ), 3: (maxX, minZ)
-//edges are 0 to 1, 1 to 2, 2 to 3, and 3 to 0
-//the 0,1,2,3 is the order of the points in the points[] array
-//	Vector3[] points;
+	//format for points: 
+	// 1: (minX, maxZ), 2: (maxX, maxZ)
+	// 0: (minX, minZ), 3: (maxX, minZ)
+	//edges are 0 to 1, 1 to 2, 2 to 3, and 3 to 0
+	//the 0,1,2,3 is the order of the points in the points[] array
+	//	Vector3[] points;
 
 	Vector3 center;
 	mapNode[] neighbors;
@@ -385,26 +388,29 @@ public class mapNode {
 	int xIndex;
 	int owner;
 
+	public mapNode(){
+	}
+
 	public mapNode(Vector3 ctr, int zIdx, int xIdx) {
 		center = ctr;
 		zIndex = zIdx;
 		xIndex = xIdx;
 		owner = -1;
-//		points = new Vector3[4];
-//		float halfCell = 0.5f * GameObject.Find ("Terrain").GetComponent<MapPathfind> ().cellSize;
-//		points[0] = new Vector3(ctr.x - halfCell, ctr.y, ctr.z - halfCell);
-//		points[1] = new Vector3(ctr.x - halfCell, ctr.y, ctr.z + halfCell);
-//		points[2] = new Vector3(ctr.x + halfCell, ctr.y, ctr.z + halfCell);
-//		points[3] = new Vector3(ctr.x + halfCell, ctr.y, ctr.z - halfCell);
+		//		points = new Vector3[4];
+		//		float halfCell = 0.5f * GameObject.Find ("Terrain").GetComponent<MapPathfind> ().cellSize;
+		//		points[0] = new Vector3(ctr.x - halfCell, ctr.y, ctr.z - halfCell);
+		//		points[1] = new Vector3(ctr.x - halfCell, ctr.y, ctr.z + halfCell);
+		//		points[2] = new Vector3(ctr.x + halfCell, ctr.y, ctr.z + halfCell);
+		//		points[3] = new Vector3(ctr.x + halfCell, ctr.y, ctr.z - halfCell);
 	}
 
 	public bool hasOtherOwner (int yourEnemyID) {
 		return owner != -1 && owner != yourEnemyID;
 	}
 
-//	public bool isFull(){
-//		return owner != -1;
-//	}
+	//	public bool isFull(){
+	//		return owner != -1;
+	//	}
 
 
 	public void setFull(int enemyID){
@@ -414,7 +420,7 @@ public class mapNode {
 	public void setEmpty(){
 		owner = -1;
 	}
-		
+
 	public bool equalTo(mapNode other){
 		KeyValuePair<int, int> b = other.getIndices ();
 		return (zIndex == b.Key) && (xIndex == b.Value);
@@ -446,33 +452,56 @@ public class mapNode {
 
 		//remove all of the direct neighbors of Dev from outerCircle
 		//so that we are only left with the indirect neighbors
-		foreach(mapNode directNeighbor in neighbors){
-			int idx = -1;
-			while ((idx = outerCircle.IndexOf (directNeighbor)) >= 0) {
-				outerCircle.RemoveAt(idx);
-				idx = -1;
-				--count;
+		bool directFound = false;
+		do{
+			directFound = false;
+			foreach(mapNode directNeighbor in neighbors){
+				int idx = outerCircle.IndexOf (directNeighbor);
+				if (idx >= 0) {
+					outerCircle.RemoveAt(idx);
+					idx = -1;
+					--count;
+					directFound = true;
+				}
 			}
+		} while(directFound == true);
+
+		//get the neighbors of the outercircle
+		count = 0;
+		List<mapNode> outerCircleSquared = new List<mapNode>();
+		foreach (mapNode neighbor in outerCircle) {
+			mapNode[] neighborsSquared = neighbor.getNeighbors ();
+			outerCircleSquared.AddRange(neighborsSquared);
+			count += neighborsSquared.Length;
 		}
 
-
-//		mapNode[] outerCircleArr = new mapNode[outerCircle.Capacity];
-//		for(int idx = 0; idx < count; ++idx) {
-//			outerCircleArr [idx] = (mapNode) outerCircle [idx];
-//		}
-//
-//		return outerCircleArr;
-
-		return outerCircle.ToArray ();
+		//remove all of the outerCircle from the outerCircleSquared
+		//so that we are only left with the indirect neighbors of a degree of 2
+		do{
+			directFound = false;
+			foreach(mapNode directNeighbor in outerCircle){
+				int idx = outerCircleSquared.IndexOf (directNeighbor);
+				if (idx >= 0) {
+					outerCircleSquared.RemoveAt(idx);
+					idx = -1;
+					--count;
+					directFound = true;
+				}
+			}
+		} while(directFound == true);
+		return outerCircleSquared.ToArray ();
 	}
 
 	public mapNode getEmptySurroundingSpot(int yourEnemyID){
+		if (!GameObject.Find("Terrain").GetComponent<MapPathfind>().doneBuilding) {
+			GameObject.Find ("Terrain").GetComponent<MapPathfind> ().Start ();
+		}
 		mapNode[] outerCircle = GameObject.Find ("Terrain").GetComponent<MapPathfind> ().devSurroundingSpots;
-//		string s = "";
-//		foreach (mapNode node in outerCircle) {
-//			s += (node.toString() + " ");
-//		}
-//		Debug.LogError (s);
+		//		string s = "";
+		//		foreach (mapNode node in outerCircle) {
+		//			s += (node.toString() + " ");
+		//		}
+		//		Debug.LogError (s);
 		foreach (mapNode node in outerCircle) {
 			if (!node.hasOtherOwner (yourEnemyID)) {
 				return node;
@@ -521,79 +550,79 @@ public class mapNode {
 		return getIndices ().ToString ();
 	}
 
-//	public Vector3[] getPoints(){
-//		return points;
-//	}
+	//	public Vector3[] getPoints(){
+	//		return points;
+	//	}
 
 
-//	public Vector3 getCenter(){
-//		float cenX = 0f;
-//		float cenZ = 0f;
-//		foreach(Vector3 pt in points){
-//			cenX += pt[0];
-//			cenZ += pt[2];
-//		}
-//		cenX = cenX/4f;
-//		cenZ = cenZ/4f;
-//		return new Vector3(cenX, 0f, cenZ);
-//	}
-//
-//	public mapNode[] getNeighbors(){
-//		bool hasMinX = Mathf.Approximately (points [0][0], GameObject.Find ("Terrain").GetComponent<MapPathfind> ().min [0]);
-//		bool hasMaxX = Mathf.Approximately (points [4][0], GameObject.Find ("Terrain").GetComponent<MapPathfind> ().max [0]);
-//
-//		bool hasMinZ = Mathf.Approximately (points [0][2], GameObject.Find ("Terrain").GetComponent<MapPathfind> ().min [2]);
-//		bool hasMaxZ = Mathf.Approximately (points [4][2], GameObject.Find ("Terrain").GetComponent<MapPathfind> ().max [2]);
-//
-//		//-------------------------------------------------------------------------------------------------
-//	   //rotate your camera so that forward is +Z and right is +X, and you're looking down at the terrain
-//	  //-------------------------------------------------------------------------------------------------
-//		if (hasMinX) {
-//			if (hasMinZ) {//minX & minZ (bottom left corner)
-//			//3 neighbors: 1 up, and 1 diagonal
-//				//1 right
-//				Vector3 [][] neighbors = new Vector3[4][3];
-//				neighbors [0] [0] = points [2];
-//				neighbors [0] [1] = points [3];
-//				neighbors [0] [2] = new Vector3 (points [2] [0] + 2f, points [2] [1], points [2] [2]);
-//				neighbors [0] [3] = new Vector3 (points [3] [0] + 2f, points [3] [1], points [3] [2]);
-//			
-//				//1 up
-//				neighbors [0] [0] = points [1];
-//				neighbors [0] [1] = points [3];
-//				neighbors[0][
-//				neighbors [0] [2] = new Vector3 (points [2] [0] + 2f, points [2] [1], points [2] [2]);
-//				neighbors [0] [3] = new Vector3 (points [3] [0] + 2f, points [3] [1], points [3] [2]);
-//			
-//				
-//			
-//			
-//			} else if (hasMaxZ) {//minX & maxZ (top left corner)
-//			//3 neighbors: 1 right, 1 down, and 1 diagonal
-//				Vector3 [] neighbors = new Vector3[3];
-//
-//			} else {//just minX (leftmost column (excluding corners))
-//			//5 neighbors: 1 down, 1 right, 1 up, 2 diagonals
-//				Vector3 [] neighbors = new Vector3[5];
-//			}
-//		} else if (hasMaxX) {
-//			if (hasMinZ) {//maxX & minZ (bottom right corner)
-//			//3 neighbors: 1 left, 1 up, 1 diagonal
-//				Vector3 [] neighbors = new Vector3[3];
-//
-//			} else if (hasMaxZ) {//maxX & maxZ (top right corner)
-//			//3 neighbors: 1 left, 1 down, 1 diagonal
-//				Vector3 [] neighbors = new Vector3[3];
-//
-//			} else {//just maxX (rightmost column (excluding corners))
-//			//5 neighbors: 1 down, 1 left, 1 up, 2 diagonals
-//			}
-//		} else if (hasMinZ) {//just minZ (bottom row)
-//			//5 neighbors: 
-//		} else if (hasMaxZ) {//just maxZ (top row)
-//		} else {//not in any of the edges or corners; in the middle --> 8 neighbors!
-//		}
-//
-//
-//	}
+	//	public Vector3 getCenter(){
+	//		float cenX = 0f;
+	//		float cenZ = 0f;
+	//		foreach(Vector3 pt in points){
+	//			cenX += pt[0];
+	//			cenZ += pt[2];
+	//		}
+	//		cenX = cenX/4f;
+	//		cenZ = cenZ/4f;
+	//		return new Vector3(cenX, 0f, cenZ);
+	//	}
+	//
+	//	public mapNode[] getNeighbors(){
+	//		bool hasMinX = Mathf.Approximately (points [0][0], GameObject.Find ("Terrain").GetComponent<MapPathfind> ().min [0]);
+	//		bool hasMaxX = Mathf.Approximately (points [4][0], GameObject.Find ("Terrain").GetComponent<MapPathfind> ().max [0]);
+	//
+	//		bool hasMinZ = Mathf.Approximately (points [0][2], GameObject.Find ("Terrain").GetComponent<MapPathfind> ().min [2]);
+	//		bool hasMaxZ = Mathf.Approximately (points [4][2], GameObject.Find ("Terrain").GetComponent<MapPathfind> ().max [2]);
+	//
+	//		//-------------------------------------------------------------------------------------------------
+	//	   //rotate your camera so that forward is +Z and right is +X, and you're looking down at the terrain
+	//	  //-------------------------------------------------------------------------------------------------
+	//		if (hasMinX) {
+	//			if (hasMinZ) {//minX & minZ (bottom left corner)
+	//			//3 neighbors: 1 up, and 1 diagonal
+	//				//1 right
+	//				Vector3 [][] neighbors = new Vector3[4][3];
+	//				neighbors [0] [0] = points [2];
+	//				neighbors [0] [1] = points [3];
+	//				neighbors [0] [2] = new Vector3 (points [2] [0] + 2f, points [2] [1], points [2] [2]);
+	//				neighbors [0] [3] = new Vector3 (points [3] [0] + 2f, points [3] [1], points [3] [2]);
+	//			
+	//				//1 up
+	//				neighbors [0] [0] = points [1];
+	//				neighbors [0] [1] = points [3];
+	//				neighbors[0][
+	//				neighbors [0] [2] = new Vector3 (points [2] [0] + 2f, points [2] [1], points [2] [2]);
+	//				neighbors [0] [3] = new Vector3 (points [3] [0] + 2f, points [3] [1], points [3] [2]);
+	//			
+	//				
+	//			
+	//			
+	//			} else if (hasMaxZ) {//minX & maxZ (top left corner)
+	//			//3 neighbors: 1 right, 1 down, and 1 diagonal
+	//				Vector3 [] neighbors = new Vector3[3];
+	//
+	//			} else {//just minX (leftmost column (excluding corners))
+	//			//5 neighbors: 1 down, 1 right, 1 up, 2 diagonals
+	//				Vector3 [] neighbors = new Vector3[5];
+	//			}
+	//		} else if (hasMaxX) {
+	//			if (hasMinZ) {//maxX & minZ (bottom right corner)
+	//			//3 neighbors: 1 left, 1 up, 1 diagonal
+	//				Vector3 [] neighbors = new Vector3[3];
+	//
+	//			} else if (hasMaxZ) {//maxX & maxZ (top right corner)
+	//			//3 neighbors: 1 left, 1 down, 1 diagonal
+	//				Vector3 [] neighbors = new Vector3[3];
+	//
+	//			} else {//just maxX (rightmost column (excluding corners))
+	//			//5 neighbors: 1 down, 1 left, 1 up, 2 diagonals
+	//			}
+	//		} else if (hasMinZ) {//just minZ (bottom row)
+	//			//5 neighbors: 
+	//		} else if (hasMaxZ) {//just maxZ (top row)
+	//		} else {//not in any of the edges or corners; in the middle --> 8 neighbors!
+	//		}
+	//
+	//
+	//	}
 }
