@@ -16,9 +16,11 @@
 //	public Vector3 max;
 //	public mapNode[] devSurroundingSpots;
 //	public mapNode devCell;
+//	public bool doneBuilding;
 //
 //	// Use this for initialization
-//	void Start () {
+//	public void Start () {
+//		doneBuilding = false;
 //		ter = this.GetComponent<Terrain> ();
 //		Vector3 dimensions = ter.terrainData.size;
 //		len = dimensions [2];
@@ -29,7 +31,8 @@
 //		min = transform.position;
 //		max = new Vector3 (transform.position.x + wid, transform.position.y, transform.position.z + len);
 //		buildGridGraph ();
-//
+//		doneBuilding = true;
+//		GameObject.Find ("DevDrake").GetComponent<DevMovement> ().Start ();
 //	}
 //
 //	//return the mapNode cell in the grid that contains the given pt, or NULL if out of bounds
@@ -43,6 +46,27 @@
 //		}
 //
 //		return grid [zIndex] [xIndex];
+//	}
+//
+//	public mapNode[] calculateDevCombatCircle(int stepsOut) {
+//		KeyValuePair<int, int> devInd = devCell
+//			switch (stepsOut) {
+//		case 1:
+//			{
+//				mapNode[] combatCircle = new mapNode[8];
+//				break;
+//			}
+//		case 2:
+//			{
+//				mapNode[] combatCircle = new mapNode[16];
+//				break;
+//			}
+//		case 3:
+//			{
+//				mapNode[] combatCircle = new mapNode[24];
+//				break;				
+//			}
+//		}
 //	}
 //
 //	public Queue<mapNode> findPath(mapNode start, mapNode dest, int enemyID)
@@ -490,6 +514,9 @@
 //	}
 //
 //	public mapNode getEmptySurroundingSpot(int yourEnemyID){
+//		if (!GameObject.Find("Terrain").GetComponent<MapPathfind>().doneBuilding) {
+//			GameObject.Find ("Terrain").GetComponent<MapPathfind> ().Start ();
+//		}
 //		mapNode[] outerCircle = GameObject.Find ("Terrain").GetComponent<MapPathfind> ().devSurroundingSpots;
 //		//		string s = "";
 //		//		foreach (mapNode node in outerCircle) {

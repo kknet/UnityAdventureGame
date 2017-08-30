@@ -48,6 +48,84 @@ public class MapPathfind : MonoBehaviour {
 		return grid [zIndex] [xIndex];
 	}
 
+	//calculates the box-shaped list of cells that are STEPSOUT steps out from dev's cell
+	//only supported for 1, 2, or 3 stepsOut 
+	public mapNode[] calculateDevCombatCircle(int stepsOut) {
+		KeyValuePair<int, int> devInd = devCell.getIndices ();
+		int z = devInd.Key;
+		int x = devInd.Value;
+		switch (stepsOut) {
+		case 1:
+			{
+				mapNode[] combatCircle = new mapNode[8];
+				combatCircle [0] = grid [z] [x-1];
+				combatCircle [1] = grid [z] [x+1];
+				combatCircle [2] = grid [z-1] [x];
+				combatCircle [3] = grid [z+1] [x];
+				combatCircle [4] = grid [z-1] [x-1];
+				combatCircle [5] = grid [z-1] [x+1];
+				combatCircle [6] = grid [z+1] [x-1];
+				combatCircle [7] = grid [z+1] [x+1];
+				return combatCircle;
+			}
+		case 2:
+			{
+				mapNode[] combatCircle = new mapNode[16];
+				combatCircle [0] = grid [z] [x-2];
+				combatCircle [1] = grid [z] [x+2];
+				combatCircle [2] = grid [z-1] [x-2];
+				combatCircle [3] = grid [z-1] [x+2];
+				combatCircle [4] = grid [z-2] [x-2];
+				combatCircle [5] = grid [z-2] [x+2];
+				combatCircle [6] = grid [z-2] [x-1];
+				combatCircle [7] = grid [z-2] [x+1];
+				combatCircle [8] = grid [z+1] [x-2];
+				combatCircle [9] = grid [z+1] [x+2];
+				combatCircle [10] = grid [z+2] [x-2];
+				combatCircle [11] = grid [z+2] [x+2];
+				combatCircle [12] = grid [z+2] [x-1];
+				combatCircle [13] = grid [z+2] [x+1];
+				combatCircle [14] = grid [z-2] [x];
+				combatCircle [15] = grid [z+2] [x];
+				return combatCircle;
+			}
+		case 3:
+			{
+				mapNode[] combatCircle = new mapNode[24];
+				combatCircle [0] = grid [z] [x-3];
+				combatCircle [1] = grid [z] [x+3];
+				combatCircle [2] = grid [z+1] [x-3];
+				combatCircle [3] = grid [z+1] [x+3];
+				combatCircle [4] = grid [z+2] [x-3];
+				combatCircle [5] = grid [z+2] [x+3];
+				combatCircle [6] = grid [z+3] [x-3];
+				combatCircle [7] = grid [z+3] [x+3];
+				combatCircle [8] = grid [z-1] [x-3];
+				combatCircle [9] = grid [z-1] [x+3];
+				combatCircle [10] = grid [z-2] [x-3];
+				combatCircle [11] = grid [z-2] [x+3];
+				combatCircle [12] = grid [z-3] [x-3];
+				combatCircle [13] = grid [z-3] [x+3];
+				combatCircle [14] = grid [z-3] [x+2];
+				combatCircle [15] = grid [z+3] [x+2];
+				combatCircle [16] = grid [z-3] [x-2];
+				combatCircle [17] = grid [z+3] [x-2];
+				combatCircle [18] = grid [z-3] [x+1];
+				combatCircle [19] = grid [z+3] [x+1];
+				combatCircle [20] = grid [z-3] [x-1];
+				combatCircle [21] = grid [z+3] [x-1];
+				combatCircle [22] = grid [z-3] [x];
+				combatCircle [23] = grid [z+3] [x];
+				return combatCircle;				
+			}
+		default:
+			{
+				Debug.LogAssertion("input 'stepsOut' needs to 1, 2 or 3. You input " + stepsOut + " !");
+				return null;
+			}
+		}
+	}
+
 	public Queue<mapNode> findPath(mapNode start, mapNode dest, int enemyID)
 	{
 		Queue<mapNode> path = new Queue<mapNode>();
