@@ -39,7 +39,7 @@ public class DevMovement : MonoBehaviour {
 		horizRot = false;
 //		devCellChanged = false;
 		initDevCell ();
-		getDevCell ().setSurroundingSpots ();
+//		getDevCell ().setSurroundingSpots ();
 	}
 
 	private mapNode getDevCell(){
@@ -62,7 +62,7 @@ public class DevMovement : MonoBehaviour {
 			terrain.GetComponent<MapPathfind> ().devCell.setEmpty ();
 			terrain.GetComponent<MapPathfind> ().devCell = newDevCell;
 			terrain.GetComponent<MapPathfind> ().devCell.setFull (0);
-			terrain.GetComponent<MapPathfind> ().devCell.setSurroundingSpots ();
+//			terrain.GetComponent<MapPathfind> ().devCell.setSurroundingSpots ();
 			GameObject[] enemies = GameObject.FindGameObjectsWithTag ("Enemy");
 			foreach (GameObject enemy in enemies) {
 				enemy.GetComponent<EnemyAI> ().plotNewPath ();

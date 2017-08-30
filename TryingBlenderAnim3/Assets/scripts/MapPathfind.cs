@@ -37,8 +37,8 @@ public class MapPathfind : MonoBehaviour {
 
 	//return the mapNode cell in the grid that contains the given pt, or NULL if out of bounds
 	public mapNode containingCell(Vector3 givenPt) {
-		int zIndex = (int)((givenPt.z - transform.position.z) / cellSize);
-		int xIndex = (int)((givenPt.x - transform.position.x) / cellSize);
+		int zIndex = Mathf.RoundToInt((givenPt.z - transform.position.z) / cellSize);
+		int xIndex = Mathf.RoundToInt((givenPt.x - transform.position.x) / cellSize);
 
 		if (zIndex < 0 || zIndex >= nodesPerSide || xIndex < 0 || xIndex >= nodesPerSide) {
 			Debug.LogAssertion ("the givenPt is outside of the terrain: " + zIndex + ", " + xIndex + ", nodesPerSide: " + nodesPerSide);
@@ -48,6 +48,25 @@ public class MapPathfind : MonoBehaviour {
 		return grid [zIndex] [xIndex];
 	}
 
+	//extracts all empty nodes from given list.
+	//in this case, empty nodes are nodes which are not occupied by anyone
+	//and nodes that are occupied by the caller. The caller is described by 'yourEnemyID'
+	private mapNode[] extractEmptyNodes(mapNode[] list, int yourEnemyID){
+		List<mapNode> empties = new List<mapNode> ();
+		foreach (mapNode node in list) {
+			if (!node.hasOtherOwner (yourEnemyID)) {
+				empties.Add (node);
+			}
+		}
+		return empties.ToArray();
+	}
+
+
+	public mapNode[] getEmptyDevCombatCircle(int stepsOut, int yourEnemyID){
+		mapNode[] combatCircle = calculateDevCombatCircle (stepsOut);
+		return extractEmptyNodes (combatCircle, yourEnemyID); 
+	}
+			
 	//calculates the box-shaped list of cells that are STEPSOUT steps out from dev's cell
 	//only supported for 1, 2, or 3 stepsOut 
 	public mapNode[] calculateDevCombatCircle(int stepsOut) {
@@ -575,19 +594,13 @@ public class mapNode {
 			GameObject.Find ("Terrain").GetComponent<MapPathfind> ().Start ();
 		}
 		mapNode[] outerCircle = GameObject.Find ("Terrain").GetComponent<MapPathfind> ().devSurroundingSpots;
-		//		string s = "";
-		//		foreach (mapNode node in outerCircle) {
-		//			s += (node.toString() + " ");
-		//		}
-		//		Debug.LogError (s);
 		foreach (mapNode node in outerCircle) {
-			if (!node.hasOtherOwner (yourEnemyID)) {
+			if (!node.hasOtherOwner (yourEnemyID))
 				return node;
-			}
 		}
 		return null;
 	}
-
+		
 	private object[] getEmptyNeighbors(int yourEnemyID){
 		ArrayList emptyNeighbors = new ArrayList ();
 		foreach (mapNode n in neighbors) {
@@ -630,77 +643,5 @@ public class mapNode {
 
 	//	public Vector3[] getPoints(){
 	//		return points;
-	//	}
-
-
-	//	public Vector3 getCenter(){
-	//		float cenX = 0f;
-	//		float cenZ = 0f;
-	//		foreach(Vector3 pt in points){
-	//			cenX += pt[0];
-	//			cenZ += pt[2];
-	//		}
-	//		cenX = cenX/4f;
-	//		cenZ = cenZ/4f;
-	//		return new Vector3(cenX, 0f, cenZ);
-	//	}
-	//
-	//	public mapNode[] getNeighbors(){
-	//		bool hasMinX = Mathf.Approximately (points [0][0], GameObject.Find ("Terrain").GetComponent<MapPathfind> ().min [0]);
-	//		bool hasMaxX = Mathf.Approximately (points [4][0], GameObject.Find ("Terrain").GetComponent<MapPathfind> ().max [0]);
-	//
-	//		bool hasMinZ = Mathf.Approximately (points [0][2], GameObject.Find ("Terrain").GetComponent<MapPathfind> ().min [2]);
-	//		bool hasMaxZ = Mathf.Approximately (points [4][2], GameObject.Find ("Terrain").GetComponent<MapPathfind> ().max [2]);
-	//
-	//		//-------------------------------------------------------------------------------------------------
-	//	   //rotate your camera so that forward is +Z and right is +X, and you're looking down at the terrain
-	//	  //-------------------------------------------------------------------------------------------------
-	//		if (hasMinX) {
-	//			if (hasMinZ) {//minX & minZ (bottom left corner)
-	//			//3 neighbors: 1 up, and 1 diagonal
-	//				//1 right
-	//				Vector3 [][] neighbors = new Vector3[4][3];
-	//				neighbors [0] [0] = points [2];
-	//				neighbors [0] [1] = points [3];
-	//				neighbors [0] [2] = new Vector3 (points [2] [0] + 2f, points [2] [1], points [2] [2]);
-	//				neighbors [0] [3] = new Vector3 (points [3] [0] + 2f, points [3] [1], points [3] [2]);
-	//			
-	//				//1 up
-	//				neighbors [0] [0] = points [1];
-	//				neighbors [0] [1] = points [3];
-	//				neighbors[0][
-	//				neighbors [0] [2] = new Vector3 (points [2] [0] + 2f, points [2] [1], points [2] [2]);
-	//				neighbors [0] [3] = new Vector3 (points [3] [0] + 2f, points [3] [1], points [3] [2]);
-	//			
-	//				
-	//			
-	//			
-	//			} else if (hasMaxZ) {//minX & maxZ (top left corner)
-	//			//3 neighbors: 1 right, 1 down, and 1 diagonal
-	//				Vector3 [] neighbors = new Vector3[3];
-	//
-	//			} else {//just minX (leftmost column (excluding corners))
-	//			//5 neighbors: 1 down, 1 right, 1 up, 2 diagonals
-	//				Vector3 [] neighbors = new Vector3[5];
-	//			}
-	//		} else if (hasMaxX) {
-	//			if (hasMinZ) {//maxX & minZ (bottom right corner)
-	//			//3 neighbors: 1 left, 1 up, 1 diagonal
-	//				Vector3 [] neighbors = new Vector3[3];
-	//
-	//			} else if (hasMaxZ) {//maxX & maxZ (top right corner)
-	//			//3 neighbors: 1 left, 1 down, 1 diagonal
-	//				Vector3 [] neighbors = new Vector3[3];
-	//
-	//			} else {//just maxX (rightmost column (excluding corners))
-	//			//5 neighbors: 1 down, 1 left, 1 up, 2 diagonals
-	//			}
-	//		} else if (hasMinZ) {//just minZ (bottom row)
-	//			//5 neighbors: 
-	//		} else if (hasMaxZ) {//just maxZ (top row)
-	//		} else {//not in any of the edges or corners; in the middle --> 8 neighbors!
-	//		}
-	//
-	//
 	//	}
 }

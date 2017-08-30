@@ -26,12 +26,14 @@ public class EnemyAI : MonoBehaviour {
 	// Use this for initialization
 	void Start () {
 		terrain = GameObject.Find ("Terrain");
-		while (!terrain.GetComponent<MapPathfind> ().doneBuilding) {}
+//		while (!terrain.GetComponent<MapPathfind> ().doneBuilding) {}
 		enemyAnim = GetComponent<Animator> ();
 		Dev = GameObject.Find ("DevDrake");
 		rotSpeed = 5f;
 		moveSpeed = 5f;
-		//		target = Vector3.zero;
+		if (!GameObject.Find("Terrain").GetComponent<MapPathfind>().doneBuilding) {
+			GameObject.Find ("Terrain").GetComponent<MapPathfind> ().Start ();
+		}
 		initPathToDev ();
 		resting = false;
 		restStartTime = Time.time;
@@ -90,10 +92,10 @@ public class EnemyAI : MonoBehaviour {
 	public void plotNewPath(){
 		getDevCell ().setFull (0);
 
-		//		finalDest = getDevCell().getClosestNeighbor (start, enemyID);
-		finalDest = getDevCell().getEmptySurroundingSpot(enemyID);
-		//		Debug.LogError ("finalDest:" + finalDest.getIndices().ToString() + ", dev: " + getDevCell().getIndices().ToString());
-
+		//finalDest = getDevCell().getClosestNeighbor (start, enemyID);
+		//finalDest = getDevCell().getEmptySurroundingSpot(enemyID);
+		mapNode[] circle = terrain.GetComponent<MapPathfind>().getEmptyDevCombatCircle(3, enemyID);
+		finalDest = circle [Mathf.RoundToInt (rand (0, circle.Length-1))];
 		if (finalDest == null) {
 			Debug.LogError ("finalDest = null");
 			stop ();
@@ -118,7 +120,8 @@ public class EnemyAI : MonoBehaviour {
 
 		//		if dev's location changed or the current path is blocked
 		//		if (finalDest == null || didDevCellChange() || (nextDest!= null && nextDest.hasOtherOwner(enemyID))) {
-		if (finalDest == null || (nextDest!= null && nextDest.hasOtherOwner(enemyID))) {
+//		if (finalDest == null || (nextDest!= null && nextDest.hasOtherOwner(enemyID))) {
+		if (finalDest == null) {
 			plotNewPath ();
 		}
 
@@ -148,14 +151,6 @@ public class EnemyAI : MonoBehaviour {
 
 		//move towards nextDest
 		moveToTarget();
-		//
-		//		//move backwards
-		//		if (Vector3.Distance (Dev.transform.position, transform.position) < 1f)
-		//			moveBack();
-		//		
-		//		//move towards nextDest
-		//		else
-		//			moveToTarget(nextDest.getCenter());
 	}
 
 	void moveBack(){
@@ -176,14 +171,11 @@ public class EnemyAI : MonoBehaviour {
 		}
 	}
 
-
 	void rotateToTarget(Vector3 targ){
 		dif = targ - transform.position;
 		dif = new Vector3 (dif.x, 0f, dif.z);
 		transform.forward = Vector3.RotateTowards (transform.forward, dif, rotSpeed * Time.deltaTime, 0.0f); 
 	}
-
-
 
 	public bool isEnemyAttacking() {
 		AnimatorStateInfo info = enemyAnim.GetCurrentAnimatorStateInfo (0);
@@ -227,9 +219,7 @@ public class EnemyAI : MonoBehaviour {
 			break;
 		}
 	}
-
-
-
+		
 	private float rand(float a, float b){
 		return UnityEngine.Random.Range (a, b);
 	}
