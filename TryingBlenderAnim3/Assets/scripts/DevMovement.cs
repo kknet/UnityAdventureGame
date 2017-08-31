@@ -31,15 +31,11 @@ public class DevMovement : MonoBehaviour {
 		myAnimator = GetComponent<Animator>();
 		needToRot = 0;
 		adjustCounter = 0;
-//		turnCounter = 0;
 		runCounter = 0;
 		applyJumpTrans = false;
-//		turn = 0f;
 		desiredRot = Camera.main.transform.eulerAngles.y;
 		horizRot = false;
-//		devCellChanged = false;
 		initDevCell ();
-//		getDevCell ().setSurroundingSpots ();
 	}
 
 	private mapNode getDevCell(){
@@ -52,7 +48,11 @@ public class DevMovement : MonoBehaviour {
 		terrain.GetComponent<MapPathfind> ().devCell = terrain.GetComponent<MapPathfind> ().containingCell (transform.position);
 	}
 
-	private void setDevCell(){
+	public GameObject[] getEnemies(){
+		return GameObject.FindGameObjectsWithTag ("Enemy");
+	}
+
+	private void setDevCell() {
 		//dev's current location
 		mapNode newDevCell = terrain.GetComponent<MapPathfind> ().containingCell (transform.position);
 		if (newDevCell == null) {
@@ -62,16 +62,106 @@ public class DevMovement : MonoBehaviour {
 			terrain.GetComponent<MapPathfind> ().devCell.setEmpty ();
 			terrain.GetComponent<MapPathfind> ().devCell = newDevCell;
 			terrain.GetComponent<MapPathfind> ().devCell.setFull (0);
-//			terrain.GetComponent<MapPathfind> ().devCell.setSurroundingSpots ();
-			GameObject[] enemies = GameObject.FindGameObjectsWithTag ("Enemy");
+			GameObject[] enemies = getEnemies();
 			foreach (GameObject enemy in enemies) {
 				enemy.GetComponent<EnemyAI> ().plotNewPath ();
 			}
 		}
 	}
 
+	private void nonCombatMovement(){
+		AnimatorStateInfo anim = myAnimator.GetCurrentAnimatorStateInfo (0);
+		if ((Time.time - Camera.main.GetComponent<MouseMovement> ().combatExitTime) < 1f) {
+			myAnimator.SetFloat ("VSpeed", 0f);
+			myAnimator.SetFloat ("HorizSpeed", 0f);
+		}
+		else if(anim.IsTag("Running")) {
+			float doIt = 1f;
+			if (Input.GetKey (KeyCode.W) || Input.GetKey (KeyCode.UpArrow)) {
+				myAnimator.SetFloat ("VSpeed", Mathf.MoveTowards (myAnimator.GetFloat ("VSpeed"), Input.GetAxisRaw ("Vertical"), 0.05f)); 
+			} else if (Input.GetKey (KeyCode.S) || Input.GetKey (KeyCode.DownArrow)) {
+				myAnimator.SetFloat ("VSpeed", Mathf.MoveTowards (myAnimator.GetFloat ("VSpeed"), -1.0f * Input.GetAxisRaw ("Vertical"), 0.05f)); 
+			} else if (Input.GetKey (KeyCode.A) || Input.GetKey (KeyCode.LeftArrow)) {
+				myAnimator.SetFloat ("VSpeed", Mathf.MoveTowards (myAnimator.GetFloat ("VSpeed"), -1.0f * Input.GetAxisRaw ("Horizontal"), 0.05f));
+			} else if (Input.GetKey (KeyCode.D) || Input.GetKey (KeyCode.RightArrow)) {
+				myAnimator.SetFloat ("VSpeed", Mathf.MoveTowards (myAnimator.GetFloat ("VSpeed"), Input.GetAxisRaw ("Horizontal"), 0.05f));
+			}  else {
+				if(!horizRot)
+					myAnimator.SetFloat ("VSpeed", Mathf.MoveTowards (myAnimator.GetFloat ("VSpeed"), Input.GetAxisRaw ("Vertical"), 0.05f)); 
+				doIt = 0f;
+			}
+			transform.Translate (Vector3.forward * Time.deltaTime * 5f * myAnimator.GetFloat ("VSpeed") * doIt);
+		}
+	}
+
+	private void combatMovement() {
+		int dif = (int)(CamTransform.eulerAngles.y - transform.eulerAngles.y);
+		if (dif < 0)
+			dif += 360;
+
+		bool W = (Input.GetKey (KeyCode.W) || Input.GetKey (KeyCode.UpArrow));
+		bool A = (Input.GetKey (KeyCode.A) || Input.GetKey (KeyCode.LeftArrow));
+		bool S = (Input.GetKey (KeyCode.S) || Input.GetKey (KeyCode.DownArrow));
+		bool D = (Input.GetKey (KeyCode.D) || Input.GetKey (KeyCode.RightArrow));
+		W = W && !S;
+		S = S && !W;
+		A = A && !D;
+		D = D && !A;
+
+		int X = 0;
+		int Y = 0;
+
+		//round to the nearest 90 degrees
+		int div = dif / 90;
+		int rem = dif % 90;
+		if (rem >= 45 || rem <= -45) {
+			if (div < 0) {
+				--div;
+			} else {
+				++div;
+			}
+		}
+		dif = div * 90;
+		if (W || A || S || D) {
+			bool angle0 = dif == 0 || dif == 360 || dif == -360;
+			bool angle90 = dif == 90 || dif == -270;
+			bool angleN90 = dif == -90 || dif == 270;
+			bool angle180 = dif == 180 || dif == -180;
+			if(angle0) {
+				if (W)	X=1;
+				else if (S) X=-1;
+				if (D) Y=1;
+				else if (A) Y=-1;
+			}
+			else if (angle90) {
+				if (W) Y=1;
+				else if (S) Y=-1;
+				if (D) X=-1;
+				else if (A) X=1;
+			}
+			else if(angle180) {
+				if (W) X=-1;
+				else if (S) X=1;
+				if (D) Y=-1;
+				else if (A) Y=1;
+			}
+			else if(angleN90) {
+				if (W) Y=-1;
+				else if (S) Y=1;
+				if (D) X=1;
+				else if (A) X=-1;
+			}
+		}
+		myAnimator.SetFloat ("VSpeed", Mathf.MoveTowards (myAnimator.GetFloat ("VSpeed"), X * 1f, 4f * Time.deltaTime));
+		myAnimator.SetFloat ("HorizSpeed", Mathf.MoveTowards (myAnimator.GetFloat ("HorizSpeed"), Y * 1f, 4f * Time.deltaTime));
+
+		if(S && !D && !A)
+			transform.Translate (((Vector3.forward * X) + (Vector3.right * Y)) * Time.deltaTime * 2f);
+		else
+			transform.Translate (((Vector3.forward * X) + (Vector3.right * Y)) * Time.deltaTime * 3f);
+	}
+
 	void Update () {
-//		Debug.LogError (devCellChanged.ToString());
 		setDevCell ();
 		mapNode ourCell = GameObject.Find ("Terrain").GetComponent<MapPathfind> ().containingCell (transform.position);
 		if (ourCell!=null) {
@@ -79,116 +169,25 @@ public class DevMovement : MonoBehaviour {
 			Debug.Log (coords.Key + ", " + coords.Value);
 		}
 		AnimatorStateInfo anim = myAnimator.GetCurrentAnimatorStateInfo (0);
-
-		if (anim.IsTag ("impact"))
-			impactMoveBack ();
+		bool inCombatZone = Camera.main.GetComponent<MouseMovement> ().inCombatZone;
+		bool weaponDrawn = myAnimator.GetBool ("WeaponDrawn");
+		bool inCombatMove = !GetComponent<DevCombat> ().notInCombatMove ();
+		bool movingVert = !Mathf.Approximately (myAnimator.GetFloat ("VSpeed"), 0f);
+		bool movingHoriz = !Mathf.Approximately (myAnimator.GetFloat ("HorizSpeed"), 0f);
 
 		if (anim.IsTag ("equip"))
 			return;
-
-		bool inCombat = Camera.main.GetComponent<MouseMovement> ().inCombatZone;
-		bool wepIsOut = Camera.main.GetComponent<MouseMovement> ().wepIsOut;
-
-		if (rolling ()) {
+		if (anim.IsTag ("impact"))
+			impactMoveBack ();
+		if (rolling ())
 			transform.Translate (Vector3.forward * Time.deltaTime * 0.5f);
-		}
+						
+		if (inCombatZone && weaponDrawn && !jumping() && !inCombatMove)
+			combatMovement ();
+		else
+			nonCombatMovement ();
 
-
-
-//		if (inCombat && wepIsOut && !jumping() && GetComponent<DevCombat>().notInCombatMove()) {
-		if (inCombat && myAnimator.GetBool("WeaponDrawn") && !jumping() && GetComponent<DevCombat>().notInCombatMove()) {
-
-			int dif = (int)(CamTransform.eulerAngles.y - transform.eulerAngles.y);
-			if (dif < 0)
-				dif += 360;
-			
-			bool W = (Input.GetKey (KeyCode.W) || Input.GetKey (KeyCode.UpArrow));
-			bool A = (Input.GetKey (KeyCode.A) || Input.GetKey (KeyCode.LeftArrow));
-			bool S = (Input.GetKey (KeyCode.S) || Input.GetKey (KeyCode.DownArrow));
-			bool D = (Input.GetKey (KeyCode.D) || Input.GetKey (KeyCode.RightArrow));
-			W = W && !S;
-			S = S && !W;
-			A = A && !D;
-			D = D && !A;
-
-			int X = 0;
-			int Y = 0;
-
-			//round to the nearest 90 degrees
-			int div = dif / 90;
-			int rem = dif % 90;
-			if (rem >= 45 || rem <= -45) {
-				if (div < 0) {
-					--div;
-				} else {
-					++div;
-				}
-			}
-			dif = div * 90;
-//			Debug.Log (dif);
-
-			if (W || A || S || D) {
-				bool angle0 = dif == 0 || dif == 360 || dif == -360;
-				bool angle90 = dif == 90 || dif == -270;
-				bool angleN90 = dif == -90 || dif == 270;
-				bool angle180 = dif == 180 || dif == -180;
-				if(angle0) {
-					if (W)	X=1;
-					else if (S) X=-1;
-					if (D) Y=1;
-					else if (A) Y=-1;
-				}
-				else if (angle90) {
-					if (W) Y=1;
-					else if (S) Y=-1;
-					if (D) X=-1;
-					else if (A) X=1;
-				}
-				else if(angle180) {
-					if (W) X=-1;
-					else if (S) X=1;
-					if (D) Y=-1;
-					else if (A) Y=1;
-				}
-				else if(angleN90) {
-					if (W) Y=-1;
-					else if (S) Y=1;
-					if (D) X=1;
-					else if (A) X=-1;
-				}
-			}
-			myAnimator.SetFloat ("VSpeed", Mathf.MoveTowards (myAnimator.GetFloat ("VSpeed"), X * 1f, 4f * Time.deltaTime));
-			myAnimator.SetFloat ("HorizSpeed", Mathf.MoveTowards (myAnimator.GetFloat ("HorizSpeed"), Y * 1f, 4f * Time.deltaTime));
-
-			if(S && !D && !A)
-				transform.Translate (((Vector3.forward * X) + (Vector3.right * Y)) * Time.deltaTime * 2f);
-			else
-				transform.Translate (((Vector3.forward * X) + (Vector3.right * Y)) * Time.deltaTime * 3f);
-		} else {
-			if ((Time.time - Camera.main.GetComponent<MouseMovement> ().combatExitTime) < 1f) {
-				myAnimator.SetFloat ("VSpeed", 0f);
-				myAnimator.SetFloat ("HorizSpeed", 0f);
-			}
-			else if(anim.IsTag("Running")) {
-				float doIt = 1f;
-				if (Input.GetKey (KeyCode.W) || Input.GetKey (KeyCode.UpArrow)) {
-					myAnimator.SetFloat ("VSpeed", Mathf.MoveTowards (myAnimator.GetFloat ("VSpeed"), Input.GetAxisRaw ("Vertical"), 0.05f)); 
-				} else if (Input.GetKey (KeyCode.S) || Input.GetKey (KeyCode.DownArrow)) {
-					myAnimator.SetFloat ("VSpeed", Mathf.MoveTowards (myAnimator.GetFloat ("VSpeed"), -1.0f * Input.GetAxisRaw ("Vertical"), 0.05f)); 
-				} else if (Input.GetKey (KeyCode.A) || Input.GetKey (KeyCode.LeftArrow)) {
-					myAnimator.SetFloat ("VSpeed", Mathf.MoveTowards (myAnimator.GetFloat ("VSpeed"), -1.0f * Input.GetAxisRaw ("Horizontal"), 0.05f));
-				} else if (Input.GetKey (KeyCode.D) || Input.GetKey (KeyCode.RightArrow)) {
-					myAnimator.SetFloat ("VSpeed", Mathf.MoveTowards (myAnimator.GetFloat ("VSpeed"), Input.GetAxisRaw ("Horizontal"), 0.05f));
-				}  else {
-					if(!horizRot)
-						myAnimator.SetFloat ("VSpeed", Mathf.MoveTowards (myAnimator.GetFloat ("VSpeed"), Input.GetAxisRaw ("Vertical"), 0.05f)); 
-					doIt = 0f;
-				}
-				transform.Translate (Vector3.forward * Time.deltaTime * 5f * myAnimator.GetFloat ("VSpeed") * doIt);
-			}
-		}
-			
-		if (Mathf.Approximately(myAnimator.GetFloat("VSpeed"), 0f) && Mathf.Approximately(myAnimator.GetFloat("HorizSpeed"), 0f)) {
+		if (!movingVert && !movingHoriz) {
 			stopFootstepSound ();
 		}
 
@@ -209,19 +208,22 @@ public class DevMovement : MonoBehaviour {
 			transform.Translate (Vector3.forward * Time.deltaTime * 2f);
 		}
 
-		if(Input.GetButtonDown("Jump") && myAnimator.GetFloat("VSpeed") > 0f && adjustCounter == 0 
+		if(Input.GetButtonDown("Jump") && movingVert && adjustCounter == 0 
 			&& player.GetComponent<DevCombat>().notInCombatMove())
 		{
 			myAnimator.SetBool("Jumping", true);
 			Invoke ("stopJumping", 0.8f);
 		}
-		else if(Input.GetButtonDown("FrontFlip") && myAnimator.GetFloat("VSpeed") > 0f && adjustCounter == 0
+		else if(Input.GetButtonDown("FrontFlip") && movingVert && adjustCounter == 0
 			&& player.GetComponent<DevCombat>().notInCombatMove())
 		{
 			myAnimator.SetBool ("shouldFrontFlip", true);
 			Invoke ("stopFrontFlip", 2.1f);
 		}
-		if(!inCombat && adjustCounter == 0 && (!Mathf.Approximately(myAnimator.GetFloat("VSpeed"), 0f) || !Mathf.Approximately(myAnimator.GetFloat("HorizSpeed"), 0f))) {
+
+		//rotate dev horizontally IF dev is moving and in a non-combat zone, 
+		//but is not currently adjusting to a camera shift, jumping, flipping, or attacking/blocking
+		if(!inCombatZone && adjustCounter == 0 && (movingVert || movingHoriz)) {
 			if (!anim.IsTag("Jumps") && !myAnimator.GetBool ("Jumping") && !myAnimator.GetBool ("shouldFrontFlip") && player.GetComponent<DevCombat>().notInCombatMove()) {
 				transform.Rotate (Vector3.up * Input.GetAxisRaw("Mouse X") * Time.deltaTime * Camera.main.GetComponent<MouseMovement>().sensitivityX);
 			}
@@ -277,9 +279,7 @@ public class DevMovement : MonoBehaviour {
 	void offApplyTrans(){
 		applyJumpTrans = false;
 	}
-
-
-
+		
 	void flipTakeOffSound(){
 		flipJump.Play ();
 	}

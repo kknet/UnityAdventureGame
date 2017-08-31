@@ -59,6 +59,7 @@
      <Compile Include="Assets\scripts\PersonHit.cs" />
      <Compile Include="Assets\scripts\WeaponHitsStrong.cs" />
      <Compile Include="Assets\scripts\WeaponToggle.cs" />
+     <Compile Include="Assets\scripts\mapNode.cs" />
      <None Include="Assets\A Steel Oxidised Bracer\readme.txt" />
      <None Include="Assets\Standard Assets\Environment\Water\Water4\Shaders\FXWater4Simple.shader" />
      <None Include="Assets\Long Sword with sheath\readme.txt" />

@@ -5,18 +5,17 @@ using UnityEngine;
 public class MapPathfind : MonoBehaviour {
 
 	public mapNode[][] grid;
+	public float cellSize;
+	public Vector3 min;
+	public Vector3 max;
+	public mapNode devCell;
+	public bool doneBuilding;
 
 	private float len;
 	private float wid;
 	private Terrain ter;
 	private int numNodes;
 	private int nodesPerSide;
-	public float cellSize;
-	public Vector3 min;
-	public Vector3 max;
-	public mapNode[] devSurroundingSpots;
-	public mapNode devCell;
-	public bool doneBuilding;
 
 	// Use this for initialization
 	public void Start () {
@@ -48,9 +47,27 @@ public class MapPathfind : MonoBehaviour {
 		return grid [zIndex] [xIndex];
 	}
 
-	//extracts all empty nodes from given list.
-	//in this case, empty nodes are nodes which are not occupied by anyone
-	//and nodes that are occupied by the caller. The caller is described by 'yourEnemyID'
+	//Finding the node out of a list that is nearest to your node.
+	//Based on a naive computation of distance between the centers of two nodes
+	//A better computation would compute distance on the basis of 
+	//the shortest available path between the nodes.
+	public mapNode findClosestNode(mapNode[] list, mapNode yourNode){
+		float minDistance = Vector3.Distance (list [0].getCenter (), yourNode.getCenter ());	
+		int closestIdx = 0;
+		for (int idx = 1; idx < list.Length; ++idx) {
+			float thisDistance = Vector3.Distance (list [idx].getCenter (), yourNode.getCenter ());
+			if (thisDistance < minDistance) {
+				minDistance = thisDistance;
+				closestIdx = idx;
+			}
+		}
+		return list [closestIdx];
+	}
+
+	//Extracts all empty nodes from given list.
+	//'Empty' nodes include those nodes which are not occupied by anyone
+	//and those nodes which are occupied by the caller itself. 
+	//The caller is described by 'yourEnemyID'
 	private mapNode[] extractEmptyNodes(mapNode[] list, int yourEnemyID){
 		List<mapNode> empties = new List<mapNode> ();
 		foreach (mapNode node in list) {
@@ -61,14 +78,34 @@ public class MapPathfind : MonoBehaviour {
 		return empties.ToArray();
 	}
 
+	//returns the empty version of the spacedDevCombatCircle
+	public mapNode[] getEmptySpacedDevCombatCircle(int stepsOut, int yourEnemyID){
+		mapNode[] spacedCombatCircle = getSpacedDevCombatCircle (stepsOut);
+		return extractEmptyNodes (spacedCombatCircle, yourEnemyID); 
+	}
 
+	//returns a list of nodes with the maximum spacing in between the nodes to ensure
+	//that each enemy gets its own space. The nodes may not be empty!
+	public mapNode[] getSpacedDevCombatCircle(int stepsOut){
+		mapNode[] combatCircle = calculateDevCombatCircle (stepsOut);
+		GameObject[] enemies = GameObject.Find ("DevDrake").GetComponent<DevMovement> ().getEnemies ();
+		int spacing = Mathf.FloorToInt(combatCircle.Length / enemies.Length);
+		mapNode[] spacedCombatCircle = new mapNode[enemies.Length];
+		for (int idx = 0; idx < enemies.Length; ++idx) {
+			spacedCombatCircle [idx] = combatCircle [idx * spacing];
+		}
+		return spacedCombatCircle;
+	}
+
+	//returns the list of empty nodes of the devCombatCircle
 	public mapNode[] getEmptyDevCombatCircle(int stepsOut, int yourEnemyID){
 		mapNode[] combatCircle = calculateDevCombatCircle (stepsOut);
 		return extractEmptyNodes (combatCircle, yourEnemyID); 
 	}
-			
-	//calculates the box-shaped list of cells that are STEPSOUT steps out from dev's cell
-	//only supported for 1, 2, or 3 stepsOut 
+
+
+	//Calculates the box-shaped list of cells that are STEPSOUT steps 
+	//out from dev's cell (only supported for 1, 2, or 3 stepsOut) 
 	public mapNode[] calculateDevCombatCircle(int stepsOut) {
 		KeyValuePair<int, int> devInd = devCell.getIndices ();
 		int z = devInd.Key;
@@ -77,64 +114,64 @@ public class MapPathfind : MonoBehaviour {
 		case 1:
 			{
 				mapNode[] combatCircle = new mapNode[8];
-				combatCircle [0] = grid [z] [x-1];
-				combatCircle [1] = grid [z] [x+1];
-				combatCircle [2] = grid [z-1] [x];
-				combatCircle [3] = grid [z+1] [x];
-				combatCircle [4] = grid [z-1] [x-1];
-				combatCircle [5] = grid [z-1] [x+1];
-				combatCircle [6] = grid [z+1] [x-1];
-				combatCircle [7] = grid [z+1] [x+1];
+				combatCircle [0] = grid [z+1] [x-1];
+				combatCircle [1] = grid [z+1] [x];
+				combatCircle [2] = grid [z+1] [x+1];
+				combatCircle [3] = grid [z] [x+1];
+				combatCircle [4] = grid [z-1] [x+1];
+				combatCircle [5] = grid [z-1] [x];
+				combatCircle [6] = grid [z-1] [x-1];
+				combatCircle [7] = grid [z] [x-1];
 				return combatCircle;
 			}
 		case 2:
 			{
 				mapNode[] combatCircle = new mapNode[16];
-				combatCircle [0] = grid [z] [x-2];
-				combatCircle [1] = grid [z] [x+2];
-				combatCircle [2] = grid [z-1] [x-2];
-				combatCircle [3] = grid [z-1] [x+2];
-				combatCircle [4] = grid [z-2] [x-2];
-				combatCircle [5] = grid [z-2] [x+2];
-				combatCircle [6] = grid [z-2] [x-1];
-				combatCircle [7] = grid [z-2] [x+1];
-				combatCircle [8] = grid [z+1] [x-2];
-				combatCircle [9] = grid [z+1] [x+2];
-				combatCircle [10] = grid [z+2] [x-2];
-				combatCircle [11] = grid [z+2] [x+2];
-				combatCircle [12] = grid [z+2] [x-1];
-				combatCircle [13] = grid [z+2] [x+1];
-				combatCircle [14] = grid [z-2] [x];
-				combatCircle [15] = grid [z+2] [x];
+				combatCircle [0] = grid [z+2] [x-2];
+				combatCircle [1] = grid [z+2] [x-1];
+				combatCircle [2] = grid [z+2] [x];
+				combatCircle [3] = grid [z+2] [x+1];
+				combatCircle [4] = grid [z+2] [x+2];
+				combatCircle [5] = grid [z+1] [x+2];
+				combatCircle [6] = grid [z] [x+2];
+				combatCircle [7] = grid [z-1] [x+2];
+				combatCircle [8] = grid [z-2] [x+2];
+				combatCircle [9] = grid [z-2] [x+1];
+				combatCircle [10] = grid [z-2] [x];
+				combatCircle [11] = grid [z-2] [x-1];
+				combatCircle [12] = grid [z-2] [x-2];
+				combatCircle [13] = grid [z-1] [x-2];
+				combatCircle [14] = grid [z] [x-2];
+				combatCircle [15] = grid [z+1] [x-2];
 				return combatCircle;
 			}
 		case 3:
 			{
 				mapNode[] combatCircle = new mapNode[24];
-				combatCircle [0] = grid [z] [x-3];
-				combatCircle [1] = grid [z] [x+3];
-				combatCircle [2] = grid [z+1] [x-3];
-				combatCircle [3] = grid [z+1] [x+3];
-				combatCircle [4] = grid [z+2] [x-3];
-				combatCircle [5] = grid [z+2] [x+3];
-				combatCircle [6] = grid [z+3] [x-3];
-				combatCircle [7] = grid [z+3] [x+3];
-				combatCircle [8] = grid [z-1] [x-3];
-				combatCircle [9] = grid [z-1] [x+3];
-				combatCircle [10] = grid [z-2] [x-3];
+				combatCircle [0] = grid [z+3] [x-3];
+				combatCircle [1] = grid [z+3] [x-2];
+				combatCircle [2] = grid [z+3] [x-1];
+				combatCircle [3] = grid [z+3] [x];
+				combatCircle [4] = grid [z+3] [x+1];
+				combatCircle [5] = grid [z+3] [x+2];
+				combatCircle [6] = grid [z+3] [x+3];
+				combatCircle [7] = grid [z+2] [x+3];
+				combatCircle [8] = grid [z+1] [x+3];
+				combatCircle [9] = grid [z] [x+3];
+				combatCircle [10] = grid [z-1] [x+3];
 				combatCircle [11] = grid [z-2] [x+3];
-				combatCircle [12] = grid [z-3] [x-3];
-				combatCircle [13] = grid [z-3] [x+3];
-				combatCircle [14] = grid [z-3] [x+2];
-				combatCircle [15] = grid [z+3] [x+2];
-				combatCircle [16] = grid [z-3] [x-2];
-				combatCircle [17] = grid [z+3] [x-2];
-				combatCircle [18] = grid [z-3] [x+1];
-				combatCircle [19] = grid [z+3] [x+1];
-				combatCircle [20] = grid [z-3] [x-1];
-				combatCircle [21] = grid [z+3] [x-1];
-				combatCircle [22] = grid [z-3] [x];
-				combatCircle [23] = grid [z+3] [x];
+				combatCircle [12] = grid [z-3] [x+3];
+				combatCircle [13] = grid [z-3] [x+2];
+				combatCircle [14] = grid [z-3] [x+1];
+				combatCircle [15] = grid [z-3] [x];
+				combatCircle [16] = grid [z-3] [x-1];
+				combatCircle [17] = grid [z-3] [x-2];
+				combatCircle [18] = grid [z-3] [x-3];
+				combatCircle [19] = grid [z-2] [x-3];
+				combatCircle [20] = grid [z-1] [x-3];
+				combatCircle [21] = grid [z] [x-3];
+				combatCircle [22] = grid [z+1] [x-3];
+				combatCircle [23] = grid [z+2] [x-3];
 				return combatCircle;				
 			}
 		default:
@@ -145,6 +182,7 @@ public class MapPathfind : MonoBehaviour {
 		}
 	}
 
+	//finds a path from START to DEST with no 'empty' nodes in between
 	public Queue<mapNode> findPath(mapNode start, mapNode dest, int enemyID)
 	{
 		Queue<mapNode> path = new Queue<mapNode>();
@@ -298,7 +336,6 @@ public class MapPathfind : MonoBehaviour {
 	}
 
 	void buildGridGraph(){
-
 		//set up the dimensions of the 2d array
 		grid = new mapNode[nodesPerSide][];
 		for (int z = 0; z < nodesPerSide; ++z) {
@@ -321,24 +358,13 @@ public class MapPathfind : MonoBehaviour {
 			neighbors [0] = grid [0] [1];
 			neighbors [1] = grid [1] [0];
 			neighbors [2] = grid [1] [1];
-
-			//			mapNode[] neighbors = new mapNode[2];
-			//			neighbors [0] = grid [0] [1];
-			//			neighbors [1] = grid [1] [0];
-
 			grid [0] [0].setNeighbors (neighbors);
 		}
-
 		{
 			mapNode[] neighbors = new mapNode[3];
 			neighbors [0] = grid [0] [nodesPerSide - 2];
 			neighbors [1] = grid [1] [nodesPerSide - 1];
 			neighbors [2] = grid [1] [nodesPerSide - 2];
-
-			//			mapNode[] neighbors = new mapNode[2];
-			//			neighbors [0] = grid [0] [nodesPerSide - 2];
-			//			neighbors [1] = grid [1] [nodesPerSide - 1];
-
 			grid [0] [nodesPerSide - 1].setNeighbors (neighbors);
 		}
 		{
@@ -346,11 +372,6 @@ public class MapPathfind : MonoBehaviour {
 			neighbors [0] = grid [nodesPerSide - 2] [nodesPerSide - 1];
 			neighbors [1] = grid [nodesPerSide - 1] [nodesPerSide - 2];
 			neighbors [2] = grid [nodesPerSide - 2] [nodesPerSide - 2];
-
-			//			mapNode[] neighbors = new mapNode[2];
-			//			neighbors [0] = grid [nodesPerSide - 2] [nodesPerSide - 1];
-			//			neighbors [1] = grid [nodesPerSide - 1] [nodesPerSide - 2];
-
 			grid [nodesPerSide - 1] [nodesPerSide - 1].setNeighbors (neighbors);
 		}
 		{
@@ -358,11 +379,6 @@ public class MapPathfind : MonoBehaviour {
 			neighbors [0] = grid [nodesPerSide - 2] [0];
 			neighbors [1] = grid [nodesPerSide - 1] [1];
 			neighbors [2] = grid [nodesPerSide - 2] [1];
-
-			//			mapNode[] neighbors = new mapNode[2];
-			//			neighbors [0] = grid [nodesPerSide - 2] [0];
-			//			neighbors [1] = grid [nodesPerSide - 1] [1];
-
 			grid [nodesPerSide - 1] [0].setNeighbors (neighbors);
 		}
 
@@ -375,12 +391,6 @@ public class MapPathfind : MonoBehaviour {
 				neighbors [2] = grid [0] [x - 1];
 				neighbors [3] = grid [1] [x + 1];
 				neighbors [4] = grid [1] [x - 1];
-
-				//				mapNode[] neighbors = new mapNode[3];
-				//				neighbors [0] = grid [1] [x];
-				//				neighbors [1] = grid [0] [x + 1];
-				//				neighbors [2] = grid [0] [x - 1];
-
 				grid [0] [x].setNeighbors (neighbors);
 			}
 			{
@@ -404,12 +414,6 @@ public class MapPathfind : MonoBehaviour {
 				neighbors [2] = grid [z - 1] [0];
 				neighbors [3] = grid [z + 1] [1];
 				neighbors [4] = grid [z - 1] [1];
-
-				//				mapNode[] neighbors = new mapNode[3];
-				//				neighbors [0] = grid [z] [1];
-				//				neighbors [1] = grid [z + 1] [0];
-				//				neighbors [2] = grid [z - 1] [0];
-
 				grid [z] [0].setNeighbors (neighbors);
 			}
 			{
@@ -420,12 +424,6 @@ public class MapPathfind : MonoBehaviour {
 				neighbors [2] = grid [z - 1] [nodesPerSide - 1];
 				neighbors [3] = grid [z + 1] [nodesPerSide - 2];
 				neighbors [4] = grid [z - 1] [nodesPerSide - 2];
-
-				//				mapNode[] neighbors = new mapNode[3];
-				//				neighbors [0] = grid [z] [nodesPerSide - 2];
-				//				neighbors [1] = grid [z + 1] [nodesPerSide - 1];
-				//				neighbors [2] = grid [z - 1] [nodesPerSide - 1];
-
 				grid [z] [nodesPerSide - 1].setNeighbors (neighbors);
 			}
 		}
@@ -442,23 +440,10 @@ public class MapPathfind : MonoBehaviour {
 				neighbors [5] = grid [z+1] [x-1];
 				neighbors [6] = grid [z-1] [x+1];
 				neighbors [7] = grid [z-1] [x-1];
-
-				//				mapNode[] neighbors = new mapNode[4];
-				//				neighbors [0] = grid [z+1] [x+1];
-				//				neighbors [1] = grid [z+1] [x-1];
-				//				neighbors [2] = grid [z-1] [x+1];
-				//				neighbors [3] = grid [z-1] [x-1];
-
 				grid [z] [x].setNeighbors(neighbors);
 			}
 		}
 	}
-
-	// Update is called once per frame
-	void Update () {
-
-	}
-
 
 	public float length(){
 		return len;
@@ -470,178 +455,3 @@ public class MapPathfind : MonoBehaviour {
 
 
 
-public class mapNode { 
-
-	//format for points: 
-	// 1: (minX, maxZ), 2: (maxX, maxZ)
-	// 0: (minX, minZ), 3: (maxX, minZ)
-	//edges are 0 to 1, 1 to 2, 2 to 3, and 3 to 0
-	//the 0,1,2,3 is the order of the points in the points[] array
-	//	Vector3[] points;
-
-	Vector3 center;
-	mapNode[] neighbors;
-	int zIndex;
-	int xIndex;
-	int owner;
-
-	public mapNode(){
-	}
-
-	public mapNode(Vector3 ctr, int zIdx, int xIdx) {
-		center = ctr;
-		zIndex = zIdx;
-		xIndex = xIdx;
-		owner = -1;
-		//		points = new Vector3[4];
-		//		float halfCell = 0.5f * GameObject.Find ("Terrain").GetComponent<MapPathfind> ().cellSize;
-		//		points[0] = new Vector3(ctr.x - halfCell, ctr.y, ctr.z - halfCell);
-		//		points[1] = new Vector3(ctr.x - halfCell, ctr.y, ctr.z + halfCell);
-		//		points[2] = new Vector3(ctr.x + halfCell, ctr.y, ctr.z + halfCell);
-		//		points[3] = new Vector3(ctr.x + halfCell, ctr.y, ctr.z - halfCell);
-	}
-
-	public bool hasOtherOwner (int yourEnemyID) {
-		return owner != -1 && owner != yourEnemyID;
-	}
-
-	//	public bool isFull(){
-	//		return owner != -1;
-	//	}
-
-
-	public void setFull(int enemyID){
-		owner = enemyID;
-	}
-
-	public void setEmpty(){
-		owner = -1;
-	}
-
-	public bool equalTo(mapNode other){
-		KeyValuePair<int, int> b = other.getIndices ();
-		return (zIndex == b.Key) && (xIndex == b.Value);
-	}
-
-	public void setNeighbors(mapNode[] n){
-		neighbors = n;
-	}
-
-	public mapNode[] getNeighbors(){
-		return neighbors; 
-	}
-
-	public void setSurroundingSpots(){
-		GameObject.Find ("Terrain").GetComponent<MapPathfind> ().devSurroundingSpots = getSurroundingSpots ();
-	}
-
-	//get the spots around Dev's neighbors where enemies can gather and wait their turn to attack
-	public mapNode[] getSurroundingSpots(){
-
-		//get the neighbors of the neighbors
-		int count = 0;
-		List<mapNode> outerCircle = new List<mapNode>();
-		foreach (mapNode neighbor in neighbors) {
-			mapNode[] neighborsSquared = neighbor.getNeighbors ();
-			outerCircle.AddRange(neighborsSquared);
-			count += neighborsSquared.Length;
-		}
-
-		//remove all of the direct neighbors of Dev from outerCircle
-		//so that we are only left with the indirect neighbors
-		bool directFound = false;
-		do{
-			directFound = false;
-			foreach(mapNode directNeighbor in neighbors){
-				int idx = outerCircle.IndexOf (directNeighbor);
-				if (idx >= 0) {
-					outerCircle.RemoveAt(idx);
-					idx = -1;
-					--count;
-					directFound = true;
-				}
-			}
-		} while(directFound == true);
-
-		//get the neighbors of the outercircle
-		count = 0;
-		List<mapNode> outerCircleSquared = new List<mapNode>();
-		foreach (mapNode neighbor in outerCircle) {
-			mapNode[] neighborsSquared = neighbor.getNeighbors ();
-			outerCircleSquared.AddRange(neighborsSquared);
-			count += neighborsSquared.Length;
-		}
-
-		//remove all of the outerCircle from the outerCircleSquared
-		//so that we are only left with the indirect neighbors of a degree of 2
-		do{
-			directFound = false;
-			foreach(mapNode directNeighbor in outerCircle){
-				int idx = outerCircleSquared.IndexOf (directNeighbor);
-				if (idx >= 0) {
-					outerCircleSquared.RemoveAt(idx);
-					idx = -1;
-					--count;
-					directFound = true;
-				}
-			}
-		} while(directFound == true);
-		return outerCircleSquared.ToArray ();
-	}
-
-	public mapNode getEmptySurroundingSpot(int yourEnemyID){
-		if (!GameObject.Find("Terrain").GetComponent<MapPathfind>().doneBuilding) {
-			GameObject.Find ("Terrain").GetComponent<MapPathfind> ().Start ();
-		}
-		mapNode[] outerCircle = GameObject.Find ("Terrain").GetComponent<MapPathfind> ().devSurroundingSpots;
-		foreach (mapNode node in outerCircle) {
-			if (!node.hasOtherOwner (yourEnemyID))
-				return node;
-		}
-		return null;
-	}
-		
-	private object[] getEmptyNeighbors(int yourEnemyID){
-		ArrayList emptyNeighbors = new ArrayList ();
-		foreach (mapNode n in neighbors) {
-			if (!n.hasOtherOwner (yourEnemyID))
-				emptyNeighbors.Add (n);
-		}
-		return emptyNeighbors.ToArray ();
-	}
-
-	public mapNode getClosestNeighbor(mapNode other, int yourEnemyID){
-		object[] emptyNeighbors = getEmptyNeighbors (yourEnemyID);
-
-		float[] distances = new float[emptyNeighbors.Length];
-		int idx = 0;
-		foreach (object n in emptyNeighbors) {
-			distances [idx++] = Vector3.Distance (other.center, ((mapNode)(n)).center);
-		}
-		float minDist = distances[0];
-		int minIdx = 0;
-		for (idx = 1; idx < distances.Length; ++idx) {
-			if (distances[idx] < minDist) {
-				minDist = distances[idx];
-				minIdx = idx;
-			}
-		}
-		return neighbors [minIdx];
-	}
-
-	public Vector3 getCenter(){
-		return center;
-	}
-
-	public KeyValuePair<int, int> getIndices(){
-		return new KeyValuePair<int, int> (zIndex, xIndex);
-	}
-
-	public string toString(){
-		return getIndices ().ToString ();
-	}
-
-	//	public Vector3[] getPoints(){
-	//		return points;
-	//	}
-}
