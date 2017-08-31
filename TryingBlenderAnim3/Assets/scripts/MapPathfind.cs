@@ -79,9 +79,13 @@ public class MapPathfind : MonoBehaviour {
 	}
 
 	//returns the empty version of the spacedDevCombatCircle
-	public mapNode[] getEmptySpacedDevCombatCircle(int stepsOut, int yourEnemyID){
+	public mapNode[] getEmptySpacedDevCombatCircle(int stepsOut, int yourEnemyID) {
 		mapNode[] spacedCombatCircle = getSpacedDevCombatCircle (stepsOut);
-		return extractEmptyNodes (spacedCombatCircle, yourEnemyID); 
+		mapNode[] empties =  extractEmptyNodes (spacedCombatCircle, yourEnemyID); 
+		if (empties.Length == 0) {
+			return getEmptyDevCombatCircle (stepsOut, yourEnemyID);
+		}
+		return empties;
 	}
 
 	//returns a list of nodes with the maximum spacing in between the nodes to ensure

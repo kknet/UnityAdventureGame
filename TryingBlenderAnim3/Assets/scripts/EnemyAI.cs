@@ -95,7 +95,7 @@ public class EnemyAI : MonoBehaviour {
 		//finalDest = getDevCell().getClosestNeighbor (start, enemyID);
 		//finalDest = getDevCell().getEmptySurroundingSpot(enemyID);
 		//finalDest = circle [Mathf.RoundToInt (rand (0, circle.Length-1))];
-//		mapNode[] circle = terrain.GetComponent<MapPathfind>().getEmptyDevCombatCircle(3, enemyID);
+		//mapNode[] circle = terrain.GetComponent<MapPathfind>().getEmptyDevCombatCircle(3, enemyID);
 
 		mapNode[] circle = terrain.GetComponent<MapPathfind>().getEmptySpacedDevCombatCircle(3, enemyID);
 		finalDest = terrain.GetComponent<MapPathfind> ().findClosestNode (circle, start);
