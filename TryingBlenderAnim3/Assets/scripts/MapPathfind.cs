@@ -34,6 +34,66 @@ public class MapPathfind : MonoBehaviour {
 		GameObject.Find ("DevDrake").GetComponent<DevMovement> ().Start ();
 	}
 
+	public mapNode[] removeFromList(mapNode trashItem, mapNode[] list){
+		List<mapNode> newList = new List<mapNode>(list);
+		newList.Remove (trashItem);
+//		foreach (mapNode item in list) {
+//			if (!trashItem.equalTo (item)) {
+//				newList.Add(item);
+//			}
+//		}
+		return newList.ToArray();
+	}
+
+	public GameObject[] getEnemies(){
+		return GameObject.FindGameObjectsWithTag ("Enemy");
+	}
+
+	public void fixAllOverlaps(){
+		GameObject[] enemies = getEnemies();
+
+		foreach (GameObject enemy in enemies) {
+			if (!enemy.GetComponent<EnemyAI> ().doneStarting)
+				return;
+		}
+
+		foreach (GameObject enemy in enemies) {
+			Debug.LogError (enemy.GetComponent<EnemyAI> ().finalDest.getIndices () + " " + enemy.GetComponent<EnemyAI> ().enemyID);
+		}
+
+
+		GameObject overlapper = overlappingAgent ();
+		if (overlapper != null) {
+			Debug.Log ("overlapper: " + overlapper.GetComponent<EnemyAI> ().enemyID);
+			overlapper.GetComponent<EnemyAI> ().plotNewPath ();
+			Debug.LogError ("Worked!");
+		}
+	}
+
+	public GameObject overlappingAgent(){
+		//find out what cells the enemies' finalDests are
+		GameObject[] enemies = GameObject.FindGameObjectsWithTag ("Enemy");
+		mapNode[] locs = new mapNode[enemies.Length];
+		for (int idx = 0; idx < enemies.Length; ++idx) {
+			locs [idx] = containingCell (enemies [idx].GetComponent<EnemyAI> ().finalDest.getCenter());
+		}
+			
+		//if there is an enemy that shares a finalDest with another enemy, return that enemy
+		for(int checkIdx = 0; checkIdx < enemies.Length; ++checkIdx) {
+			mapNode checkNode = locs [checkIdx];
+			for (int idx = 0; idx < enemies.Length; ++idx) {
+				if (idx == checkIdx)
+					continue;
+
+				if (checkNode == locs [idx])
+					return enemies [idx];
+			}
+		}
+
+		//if no two enemies are in the same finalDest, return null
+		return null;
+	}
+
 	//return the mapNode cell in the grid that contains the given pt, or NULL if out of bounds
 	public mapNode containingCell(Vector3 givenPt) {
 		int zIndex = Mathf.RoundToInt((givenPt.z - transform.position.z) / cellSize);
@@ -78,12 +138,22 @@ public class MapPathfind : MonoBehaviour {
 		return empties.ToArray();
 	}
 
+	IEnumerator goToSleep(){
+		yield return new WaitForSeconds (0.1f);
+	}
+
 	//returns the empty version of the spacedDevCombatCircle
-	public mapNode[] getEmptySpacedDevCombatCircle(int stepsOut, int yourEnemyID) {
+	public mapNode[] getEmptySpacedDevCombatCircle(int stepsOut, int yourEnemyID, mapNode oldfinalDest) {
+		if(oldfinalDest!=null)
+			oldfinalDest.setEmpty ();
 		mapNode[] spacedCombatCircle = getSpacedDevCombatCircle (stepsOut);
 		mapNode[] empties =  extractEmptyNodes (spacedCombatCircle, yourEnemyID); 
+		if (oldfinalDest!=null)
+			empties = removeFromList (oldfinalDest, empties);
 		if (empties.Length == 0) {
-			return getEmptyDevCombatCircle (stepsOut, yourEnemyID);
+//			StartCoroutine(goToSleep ());
+//			return getEmptySpacedDevCombatCircle (stepsOut, yourEnemyID, oldfinalDest);
+			return null;
 		}
 		return empties;
 	}
@@ -108,8 +178,22 @@ public class MapPathfind : MonoBehaviour {
 	}
 
 
+//	public mapNode[] calculateDevCombatCircle2(int stepsOut){
+//		int max = stepsOut;
+//		int min = -stepsOut;
+//		mapNode[] combatCircle = new mapNode[8 * stepsOut];
+//
+//		int longSide = 2 * stepsOut + 1;
+//		int shortSide = 2 * stepsOut - 1;
+//
+//		for (int idx = 0; idx < longSide; ++idx) {
+//			combatCircle [idx] = grid[zmax;
+//		}
+//
+//	}
+
 	//Calculates the box-shaped list of cells that are STEPSOUT steps 
-	//out from dev's cell (only supported for 1, 2, or 3 stepsOut) 
+	//out from dev's cell (only supported for 1, 2, 3, or 4 stepsOut) 
 	public mapNode[] calculateDevCombatCircle(int stepsOut) {
 		KeyValuePair<int, int> devInd = devCell.getIndices ();
 		int z = devInd.Key;
@@ -178,9 +262,46 @@ public class MapPathfind : MonoBehaviour {
 				combatCircle [23] = grid [z+2] [x-3];
 				return combatCircle;				
 			}
+		case 4:
+			{
+				mapNode[] combatCircle = new mapNode[32];
+				combatCircle [0] = grid [z+4] [x-4];
+				combatCircle [1] = grid [z+4] [x-3];
+				combatCircle [2] = grid [z+4] [x-2];
+				combatCircle [3] = grid [z+4] [x-1];
+				combatCircle [4] = grid [z+4] [x];
+				combatCircle [5] = grid [z+4] [x+1];
+				combatCircle [6] = grid [z+4] [x+2];
+				combatCircle [7] = grid [z+4] [x+3];
+				combatCircle [8] = grid [z+4] [x+4];
+				combatCircle [9] = grid [z+3] [x+4];
+				combatCircle [10] = grid [z+2] [x+4];
+				combatCircle [11] = grid [z+1] [x+4];
+				combatCircle [12] = grid [z] [x+4];
+				combatCircle [13] = grid [z-1] [x+4];
+				combatCircle [14] = grid [z-2] [x+4];
+				combatCircle [15] = grid [z-3] [x+4];
+				combatCircle [16] = grid [z-4] [x+4];
+				combatCircle [17] = grid [z-4] [x+3];
+				combatCircle [18] = grid [z-4] [x+2];
+				combatCircle [19] = grid [z-4] [x+1];
+				combatCircle [20] = grid [z-4] [x];
+				combatCircle [21] = grid [z-4] [x-1];
+				combatCircle [22] = grid [z-4] [x-2];
+				combatCircle [23] = grid [z-4] [x-3];
+				combatCircle [24] = grid [z-4] [x-4];
+				combatCircle [25] = grid [z-3] [x-4];
+				combatCircle [26] = grid [z-2] [x-4];
+				combatCircle [27] = grid [z-1] [x-4];
+				combatCircle [28] = grid [z] [x-4];
+				combatCircle [29] = grid [z+1] [x-4];
+				combatCircle [30] = grid [z+2] [x-4];
+				combatCircle [31] = grid [z+3] [x-4];
+				return combatCircle;
+			}
 		default:
 			{
-				Debug.LogAssertion("input 'stepsOut' needs to 1, 2 or 3. You input " + stepsOut + " !");
+				Debug.LogAssertion("input 'stepsOut' needs to 1, 2, 3, or 4. You input " + stepsOut + " !");
 				return null;
 			}
 		}

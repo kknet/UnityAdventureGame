@@ -66,6 +66,14 @@ public class DevMovement : MonoBehaviour {
 			foreach (GameObject enemy in enemies) {
 				enemy.GetComponent<EnemyAI> ().plotNewPath ();
 			}
+//			foreach (GameObject enemy in enemies) {
+//				Debug.LogError (enemy.GetComponent<EnemyAI> ().finalDest.getIndices ());
+//			}
+//			GameObject overlapper = terrain.GetComponent<MapPathfind> ().overlappingAgent ();
+//			if (overlapper != null) {
+//				overlapper.GetComponent<EnemyAI> ().plotNewPath ();
+//				Debug.LogError ("Worked!");
+//			}
 		}
 	}
 

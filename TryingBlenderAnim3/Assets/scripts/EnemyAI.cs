@@ -5,6 +5,8 @@ using UnityEngine;
 public class EnemyAI : MonoBehaviour {
 
 	public int enemyID;
+	public mapNode finalDest;
+	public bool doneStarting;
 
 	private Animator enemyAnim;
 	private GameObject Dev;
@@ -17,14 +19,15 @@ public class EnemyAI : MonoBehaviour {
 	private Queue<mapNode> path;
 	private GameObject terrain;
 	private mapNode nextDest;
-	private mapNode finalDest;
 	private mapNode start;
 	private float restStartTime;
 	private bool resting;
 	private mapNode oldDevCell;
 
+
 	// Use this for initialization
 	void Start () {
+		doneStarting = false;
 		terrain = GameObject.Find ("Terrain");
 //		while (!terrain.GetComponent<MapPathfind> ().doneBuilding) {}
 		enemyAnim = GetComponent<Animator> ();
@@ -37,6 +40,8 @@ public class EnemyAI : MonoBehaviour {
 		initPathToDev ();
 		resting = false;
 		restStartTime = Time.time;
+		doneStarting = true;
+//		terrain.GetComponent<MapPathfind> ().fixAllOverlaps ();
 	}
 
 	public mapNode getDevCell(){
@@ -92,14 +97,13 @@ public class EnemyAI : MonoBehaviour {
 	public void plotNewPath(){
 		getDevCell ().setFull (0);
 
-		//finalDest = getDevCell().getClosestNeighbor (start, enemyID);
-		//finalDest = getDevCell().getEmptySurroundingSpot(enemyID);
-		//finalDest = circle [Mathf.RoundToInt (rand (0, circle.Length-1))];
-		//mapNode[] circle = terrain.GetComponent<MapPathfind>().getEmptyDevCombatCircle(3, enemyID);
-
-		mapNode[] circle = terrain.GetComponent<MapPathfind>().getEmptySpacedDevCombatCircle(3, enemyID);
+		mapNode[] circle = terrain.GetComponent<MapPathfind>().getEmptySpacedDevCombatCircle(3, enemyID, finalDest);
+		if(circle == null)
+			circle = terrain.GetComponent<MapPathfind>().getEmptySpacedDevCombatCircle(4, enemyID, finalDest);
+//		if(finalDest!=null)
+//			circle = terrain.GetComponent<MapPathfind> ().removeFromList (finalDest, circle);
 		finalDest = terrain.GetComponent<MapPathfind> ().findClosestNode (circle, start);
-			
+
 		if (finalDest == null) {
 			Debug.LogError ("finalDest = null");
 			stop ();
@@ -122,10 +126,7 @@ public class EnemyAI : MonoBehaviour {
 	void moveToDev(){
 		updateYourCell ();
 
-		//		if dev's location changed or the current path is blocked
-		//		if (finalDest == null || didDevCellChange() || (nextDest!= null && nextDest.hasOtherOwner(enemyID))) {
-		if (finalDest == null || (nextDest!= null && nextDest.hasOtherOwner(enemyID)) || finalDest!= null && finalDest.hasOtherOwner(enemyID)) {
-//		if (finalDest == null) {
+		if (finalDest == null || (nextDest!= null && nextDest.hasOtherOwner(enemyID)) || (finalDest!= null && finalDest.hasOtherOwner(enemyID))) {
 			plotNewPath ();
 		}
 
