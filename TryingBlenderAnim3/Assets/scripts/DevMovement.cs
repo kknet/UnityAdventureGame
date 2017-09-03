@@ -52,6 +52,10 @@ public class DevMovement : MonoBehaviour {
 		return GameObject.FindGameObjectsWithTag ("Enemy");
 	}
 
+	private float rand(float a, float b){
+		return UnityEngine.Random.Range (a, b);
+	}
+
 	private void setDevCell() {
 		//dev's current location
 		mapNode newDevCell = terrain.GetComponent<MapPathfind> ().containingCell (transform.position);
@@ -64,7 +68,8 @@ public class DevMovement : MonoBehaviour {
 			terrain.GetComponent<MapPathfind> ().devCell.setFull (0);
 			GameObject[] enemies = getEnemies();
 			foreach (GameObject enemy in enemies) {
-				enemy.GetComponent<EnemyAI> ().plotNewPath ();
+				if(rand(0f, 1f) > 0.8f)
+					enemy.GetComponent<EnemyAI> ().plotNewPath ();
 			}
 //			foreach (GameObject enemy in enemies) {
 //				Debug.LogError (enemy.GetComponent<EnemyAI> ().finalDest.getIndices ());
