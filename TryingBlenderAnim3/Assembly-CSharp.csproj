@@ -47,6 +47,7 @@
   </ItemGroup>
   <ItemGroup>
      <Compile Include="Assets\OBJExport\OBJExporter.cs" />
+     <Compile Include="Assets\scripts\AStarMovement.cs" />
      <Compile Include="Assets\scripts\CameraZoom.cs" />
      <Compile Include="Assets\scripts\DevCombat.cs" />
      <Compile Include="Assets\scripts\DevMovement.cs" />
@@ -57,6 +58,11 @@
      <Compile Include="Assets\scripts\MapPathfind.cs" />
      <Compile Include="Assets\scripts\MouseMovement.cs" />
      <Compile Include="Assets\scripts\PersonHit.cs" />
+     <Compile Include="Assets\scripts\Priority Queues\GenericPriorityQueue.cs" />
+     <Compile Include="Assets\scripts\Priority Queues\GenericPriorityQueueNode.cs" />
+     <Compile Include="Assets\scripts\Priority Queues\IFixedSizePriorityQueue.cs" />
+     <Compile Include="Assets\scripts\Priority Queues\IPriorityQueue.cs" />
+     <Compile Include="Assets\scripts\Priority Queues\SimplePriorityQueue.cs" />
      <Compile Include="Assets\scripts\WeaponHitsStrong.cs" />
      <Compile Include="Assets\scripts\WeaponToggle.cs" />
      <Compile Include="Assets\scripts\mapNode.cs" />

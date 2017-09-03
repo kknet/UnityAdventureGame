@@ -16,15 +16,20 @@ public class mapNode {
 	int zIndex;
 	int xIndex;
 	int owner;
+	int weight;  //cost of traversing current node
+
 
 	public mapNode(){
+		weight = 1;
+		owner = -1;
 	}
 
 	public mapNode(Vector3 ctr, int zIdx, int xIdx) {
+		weight = 1;
+		owner = -1;
 		center = ctr;
 		zIndex = zIdx;
 		xIndex = xIdx;
-		owner = -1;
 		//		points = new Vector3[4];
 		//		float halfCell = 0.5f * GameObject.Find ("Terrain").GetComponent<MapPathfind> ().cellSize;
 		//		points[0] = new Vector3(ctr.x - halfCell, ctr.y, ctr.z - halfCell);
@@ -33,9 +38,18 @@ public class mapNode {
 		//		points[3] = new Vector3(ctr.x + halfCell, ctr.y, ctr.z - halfCell);
 	}
 
+	public int Weight(){
+		return weight;
+	}
+
 	public bool hasOtherOwner (int yourEnemyID) {
 		return owner != -1 && owner != yourEnemyID;
 	}
+
+	public bool isEmpty(){
+		return owner == -1;
+	}
+
 
 	//	public bool isFull(){
 	//		return owner != -1;

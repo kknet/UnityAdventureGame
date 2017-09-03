@@ -10,12 +10,12 @@ public class MapPathfind : MonoBehaviour {
 	public Vector3 max;
 	public mapNode devCell;
 	public bool doneBuilding;
+	public int nodesPerSide;
 
 	private float len;
 	private float wid;
 	private Terrain ter;
 	private int numNodes;
-	private int nodesPerSide;
 
 	// Use this for initialization
 	public void Start () {
@@ -143,10 +143,10 @@ public class MapPathfind : MonoBehaviour {
 	}
 
 	//returns the empty version of the spacedDevCombatCircle
-	public mapNode[] getEmptySpacedDevCombatCircle(int stepsOut, int yourEnemyID, mapNode oldfinalDest) {
+	public mapNode[] getEmptySpacedDevCombatCircle(int stepsOut, int yourEnemyID, mapNode oldfinalDest, int offset) {
 		if(oldfinalDest!=null)
 			oldfinalDest.setEmpty ();
-		mapNode[] spacedCombatCircle = getSpacedDevCombatCircle (stepsOut);
+		mapNode[] spacedCombatCircle = getSpacedDevCombatCircle (stepsOut, offset);
 		mapNode[] empties =  extractEmptyNodes (spacedCombatCircle, yourEnemyID); 
 		if (oldfinalDest!=null)
 			empties = removeFromList (oldfinalDest, empties);
@@ -160,13 +160,13 @@ public class MapPathfind : MonoBehaviour {
 
 	//returns a list of nodes with the maximum spacing in between the nodes to ensure
 	//that each enemy gets its own space. The nodes may not be empty!
-	public mapNode[] getSpacedDevCombatCircle(int stepsOut){
+	public mapNode[] getSpacedDevCombatCircle(int stepsOut, int offset){
 		mapNode[] combatCircle = calculateDevCombatCircle (stepsOut);
 		GameObject[] enemies = GameObject.Find ("DevDrake").GetComponent<DevMovement> ().getEnemies ();
 		int spacing = Mathf.FloorToInt(combatCircle.Length / enemies.Length);
 		mapNode[] spacedCombatCircle = new mapNode[enemies.Length];
-		for (int idx = 0; idx < enemies.Length; ++idx) {
-			spacedCombatCircle [idx] = combatCircle [idx * spacing];
+		for (int idx = 0; idx < enemies.Length-offset; ++idx) {
+			spacedCombatCircle [idx] = combatCircle [(idx * spacing) + offset];
 		}
 		return spacedCombatCircle;
 	}

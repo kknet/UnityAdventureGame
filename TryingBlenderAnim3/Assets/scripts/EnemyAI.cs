@@ -97,9 +97,9 @@ public class EnemyAI : MonoBehaviour {
 	public void plotNewPath(){
 		getDevCell ().setFull (0);
 
-		mapNode[] circle = terrain.GetComponent<MapPathfind>().getEmptySpacedDevCombatCircle(3, enemyID, finalDest);
+		mapNode[] circle = terrain.GetComponent<MapPathfind>().getEmptySpacedDevCombatCircle(3, enemyID, finalDest, 0);
 		if(circle == null)
-			circle = terrain.GetComponent<MapPathfind>().getEmptySpacedDevCombatCircle(4, enemyID, finalDest);
+			circle = terrain.GetComponent<MapPathfind>().getEmptySpacedDevCombatCircle(4, enemyID, finalDest, 1);
 //		if(finalDest!=null)
 //			circle = terrain.GetComponent<MapPathfind> ().removeFromList (finalDest, circle);
 		finalDest = terrain.GetComponent<MapPathfind> ().findClosestNode (circle, start);
