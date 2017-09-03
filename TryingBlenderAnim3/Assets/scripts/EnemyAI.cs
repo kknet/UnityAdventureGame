@@ -55,6 +55,14 @@ public class EnemyAI : MonoBehaviour {
 
 	// Update is called once per frame
 	void Update () {
+		if (!terrain.GetComponent<MapPathfind> ().doneBuilding)
+			return;
+
+		GameObject[] enemies = GameObject.FindGameObjectsWithTag("Enemy");
+		foreach(GameObject enemy in enemies){
+			if(!enemy.GetComponent<AStarMovement>().doneStarting)
+				return;
+		}
 
 		//--------CHECKING IF DEV IS NEAR ENOUGH FOR ENEMIES TO NOTICE HIM--------//
 		//		if (!Camera.main.GetComponent<MouseMovement> ().inCombatZone) {
@@ -94,6 +102,10 @@ public class EnemyAI : MonoBehaviour {
 		start.setFull (enemyID);
 	}
 
+	void AStarPath(){
+		
+	}
+
 	public void plotNewPath(){
 		getDevCell ().setFull (0);
 
@@ -115,7 +127,9 @@ public class EnemyAI : MonoBehaviour {
 			trashNode.setEmpty ();
 		}
 
-		path = terrain.GetComponent<MapPathfind> ().findPath (start, finalDest, enemyID);
+		mapNode goal = GetComponent<AStarMovement> ().shortestPath (start, finalDest);
+		path = GetComponent<AStarMovement> ().traceBackFromGoal(start, finalDest);
+//		path = terrain.GetComponent<MapPathfind> ().findPath (start, finalDest, enemyID);
 
 		if (path.Count == 0)
 			nextDest = null;

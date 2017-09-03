@@ -30,8 +30,8 @@ public class MapPathfind : MonoBehaviour {
 		min = transform.position;
 		max = new Vector3 (transform.position.x + wid, transform.position.y, transform.position.z + len);
 		buildGridGraph ();
-		doneBuilding = true;
 		GameObject.Find ("DevDrake").GetComponent<DevMovement> ().Start ();
+		doneBuilding = true;
 	}
 
 	public mapNode[] removeFromList(mapNode trashItem, mapNode[] list){

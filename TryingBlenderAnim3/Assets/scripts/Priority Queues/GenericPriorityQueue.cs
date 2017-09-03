@@ -3,6 +3,9 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 
+//code obtained from https://github.com/BlueRaja/High-Speed-Priority-Queue-for-C-Sharp/
+//not my own work
+
 namespace Priority_Queue
 {
 	/// <summary>

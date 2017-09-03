@@ -14,19 +14,38 @@ public class AStarMovement : MonoBehaviour {
 	int numNodesPerSide;
 	int enemyID;
 	IDictionary<mapNode, mapNode> nodeParents;
-	IList<mapNode> path;
+	public IList<mapNode> path;
+	GameObject terrain;
+	public bool doneStarting;
 
 	void Start(){
-		numNodesPerSide = GetComponent<MapPathfind> ().nodesPerSide;
+		doneStarting = false;
+		terrain = GameObject.Find ("Terrain");
+		numNodesPerSide = terrain.GetComponent<MapPathfind> ().nodesPerSide;
 		enemyID = GetComponent<EnemyAI> ().enemyID;
 		nodeParents = new Dictionary<mapNode, mapNode>();
+		doneStarting = true;
+	}
+
+	public Queue<mapNode> traceBackFromGoal(mapNode start, mapNode goal) {
+		path = new List<mapNode> ();
+		mapNode curNode = goal;
+		while (!curNode.equalTo(start)) {
+			path.Add (curNode);
+			curNode = nodeParents [curNode];
+		}
+		return new Queue<mapNode> (path);
 	}
 
 	private List<mapNode> getWalkableNodes() {
 		List<mapNode> walkableNodes = new List<mapNode> ();
-		for (int z = 0; z < numNodesPerSide; ++z) {
-			for (int x = 0; x < numNodesPerSide; ++x) {
-				mapNode curNode = GetComponent<MapPathfind> ().grid [z] [x];
+//		int zMax = terrain.GetComponent<MapPathfind> ().grid.Length;
+//		int xMax = terrain.GetComponent<MapPathfind> ().grid[0].Length;
+		int zMax = numNodesPerSide;
+		int xMax = numNodesPerSide;
+		for (int z = 0; z < zMax; ++z) {
+			for (int x = 0; x < xMax; ++x) {
+				mapNode curNode = terrain.GetComponent<MapPathfind> ().grid [z] [x];
 				if (!curNode.hasOtherOwner(enemyID)) {
 					walkableNodes.Add (curNode);
 				}
@@ -74,6 +93,10 @@ public class AStarMovement : MonoBehaviour {
 			exploredNodes.Add (curNode);
 			IList<mapNode> neighbors = curNode.getNeighbors ();
 			foreach (mapNode node in neighbors) {
+				
+				if (node.hasOtherOwner (enemyID))
+					continue;
+
 				if (exploredNodes.Contains (node)) //already looked over this node, don't look over it again
 					continue;
 

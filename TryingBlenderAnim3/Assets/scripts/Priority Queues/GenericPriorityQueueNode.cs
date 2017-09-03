@@ -1,4 +1,7 @@
-﻿namespace Priority_Queue
+﻿//code obtained from https://github.com/BlueRaja/High-Speed-Priority-Queue-for-C-Sharp/
+//not my own work
+
+namespace Priority_Queue
 {
 	public class GenericPriorityQueueNode<TPriority>
 	{
