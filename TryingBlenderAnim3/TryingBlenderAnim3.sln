@@ -1,13 +1,13 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 11.00
 # Visual Studio 2010
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TryingBlenderAnim3", "Assembly-CSharp-firstpass.csproj", "{3C86E954-FC26-707A-5C5D-2A623F14041D}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TryingBlenderAnim3", "Assembly-CSharp.csproj", "{3B0F9B08-3E2C-7C9A-3F2E-0B494E0DEC84}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TryingBlenderAnim3", "Assembly-CSharp-Editor.csproj", "{7ABCC43A-3E48-A9C2-3C81-1F37BFAD7B42}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TryingBlenderAnim3", "Assembly-CSharp-firstpass.csproj", "{3C86E954-FC26-707A-5C5D-2A623F14041D}"
 EndProject
 Project("{8B0C8668-1A56-E762-F27A-F0122FFDF485}") = "TryingBlenderAnim3", "Assembly-UnityScript.unityproj", "{0BCF9F00-9862-423A-7E07-0C902D96003C}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TryingBlenderAnim3", "Assembly-CSharp-Editor.csproj", "{7ABCC43A-3E48-A9C2-3C81-1F37BFAD7B42}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -15,22 +15,22 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{3C86E954-FC26-707A-5C5D-2A623F14041D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{3C86E954-FC26-707A-5C5D-2A623F14041D}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{3C86E954-FC26-707A-5C5D-2A623F14041D}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{3C86E954-FC26-707A-5C5D-2A623F14041D}.Release|Any CPU.Build.0 = Release|Any CPU
 		{3B0F9B08-3E2C-7C9A-3F2E-0B494E0DEC84}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{3B0F9B08-3E2C-7C9A-3F2E-0B494E0DEC84}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{3B0F9B08-3E2C-7C9A-3F2E-0B494E0DEC84}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{3B0F9B08-3E2C-7C9A-3F2E-0B494E0DEC84}.Release|Any CPU.Build.0 = Release|Any CPU
-		{7ABCC43A-3E48-A9C2-3C81-1F37BFAD7B42}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{7ABCC43A-3E48-A9C2-3C81-1F37BFAD7B42}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{7ABCC43A-3E48-A9C2-3C81-1F37BFAD7B42}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{7ABCC43A-3E48-A9C2-3C81-1F37BFAD7B42}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3C86E954-FC26-707A-5C5D-2A623F14041D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3C86E954-FC26-707A-5C5D-2A623F14041D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3C86E954-FC26-707A-5C5D-2A623F14041D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3C86E954-FC26-707A-5C5D-2A623F14041D}.Release|Any CPU.Build.0 = Release|Any CPU
 		{0BCF9F00-9862-423A-7E07-0C902D96003C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{0BCF9F00-9862-423A-7E07-0C902D96003C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{0BCF9F00-9862-423A-7E07-0C902D96003C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{0BCF9F00-9862-423A-7E07-0C902D96003C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7ABCC43A-3E48-A9C2-3C81-1F37BFAD7B42}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7ABCC43A-3E48-A9C2-3C81-1F37BFAD7B42}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7ABCC43A-3E48-A9C2-3C81-1F37BFAD7B42}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7ABCC43A-3E48-A9C2-3C81-1F37BFAD7B42}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
