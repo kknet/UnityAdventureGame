@@ -65,7 +65,7 @@ public class DevMovement : MonoBehaviour {
 		else if (!newDevCell.equalTo (terrain.GetComponent<MapPathfind> ().devCell)) {
 			terrain.GetComponent<MapPathfind> ().devCell.setEmpty ();
 			terrain.GetComponent<MapPathfind> ().devCell = newDevCell;
-			terrain.GetComponent<MapPathfind> ().devCell.setFull (0);
+			terrain.GetComponent<MapPathfind> ().devCell.setFull (-3);
 			GameObject[] enemies = getEnemies();
 			foreach (GameObject enemy in enemies) {
 //				if(rand(0f, 1f) > 0.5f)
