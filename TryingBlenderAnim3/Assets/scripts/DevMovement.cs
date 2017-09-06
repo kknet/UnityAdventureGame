@@ -68,7 +68,7 @@ public class DevMovement : MonoBehaviour {
 			terrain.GetComponent<MapPathfind> ().devCell.setFull (0);
 			GameObject[] enemies = getEnemies();
 			foreach (GameObject enemy in enemies) {
-				if(rand(0f, 1f) > 0.8f)
+//				if(rand(0f, 1f) > 0.5f)
 					enemy.GetComponent<EnemyAI> ().plotNewPath ();
 			}
 //			foreach (GameObject enemy in enemies) {

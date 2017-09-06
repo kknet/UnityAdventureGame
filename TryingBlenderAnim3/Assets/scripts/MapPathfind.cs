@@ -131,7 +131,7 @@ public class MapPathfind : MonoBehaviour {
 	private mapNode[] extractEmptyNodes(mapNode[] list, int yourEnemyID){
 		List<mapNode> empties = new List<mapNode> ();
 		foreach (mapNode node in list) {
-			if (!node.hasOtherOwner (yourEnemyID)) {
+			if (node!=null && !node.hasOtherOwner (yourEnemyID)) {
 				empties.Add (node);
 			}
 		}

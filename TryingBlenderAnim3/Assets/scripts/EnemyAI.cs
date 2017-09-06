@@ -32,8 +32,8 @@ public class EnemyAI : MonoBehaviour {
 //		while (!terrain.GetComponent<MapPathfind> ().doneBuilding) {}
 		enemyAnim = GetComponent<Animator> ();
 		Dev = GameObject.Find ("DevDrake");
-		rotSpeed = 5f;
-		moveSpeed = 5f;
+		rotSpeed = 10f;
+		moveSpeed = 4f;
 		if (!GameObject.Find("Terrain").GetComponent<MapPathfind>().doneBuilding) {
 			GameObject.Find ("Terrain").GetComponent<MapPathfind> ().Start ();
 		}
@@ -60,7 +60,7 @@ public class EnemyAI : MonoBehaviour {
 
 		GameObject[] enemies = GameObject.FindGameObjectsWithTag("Enemy");
 		foreach(GameObject enemy in enemies){
-			if(!enemy.GetComponent<AStarMovement>().doneStarting)
+			if(!enemy.GetComponent<AStarMovement>().doneAStart)
 				return;
 		}
 
@@ -89,7 +89,8 @@ public class EnemyAI : MonoBehaviour {
 
 	void initPathToDev(){
 		start = terrain.GetComponent<MapPathfind> ().containingCell (transform.position);
-		plotNewPath ();
+		if(GetComponent<AStarMovement>().doneAStart)
+			plotNewPath ();
 	}
 
 	//keep track of this agent's current location
@@ -108,19 +109,10 @@ public class EnemyAI : MonoBehaviour {
 
 	public void plotNewPath(){
 		getDevCell ().setFull (0);
-
 		mapNode[] circle = terrain.GetComponent<MapPathfind>().getEmptySpacedDevCombatCircle(3, enemyID, finalDest, 0);
 		if(circle == null)
 			circle = terrain.GetComponent<MapPathfind>().getEmptySpacedDevCombatCircle(4, enemyID, finalDest, 1);
-//		if(finalDest!=null)
-//			circle = terrain.GetComponent<MapPathfind> ().removeFromList (finalDest, circle);
 		finalDest = terrain.GetComponent<MapPathfind> ().findClosestNode (circle, start);
-
-		if (finalDest == null) {
-			Debug.LogError ("finalDest = null");
-			stop ();
-			return;
-		}
 		finalDest.setFull (enemyID);
 		while (path !=null && path.Count > 0) {
 			mapNode trashNode = path.Dequeue ();
@@ -132,7 +124,7 @@ public class EnemyAI : MonoBehaviour {
 //		path = terrain.GetComponent<MapPathfind> ().findPath (start, finalDest, enemyID);
 
 		if (path.Count == 0)
-			nextDest = null;
+			plotNewPath();
 		else
 			nextDest = path.Dequeue ();
 	}
@@ -178,7 +170,7 @@ public class EnemyAI : MonoBehaviour {
 	}
 
 	void stop(){
-		enemyAnim.SetFloat ("enemySpeed", Mathf.MoveTowards (enemyAnim.GetFloat ("enemySpeed"), 0f, 5f * Time.deltaTime));
+		enemyAnim.SetFloat ("enemySpeed", Mathf.MoveTowards (enemyAnim.GetFloat ("enemySpeed"), 0f, 0.5f * Time.deltaTime));
 	}
 
 	void moveToTarget(){
