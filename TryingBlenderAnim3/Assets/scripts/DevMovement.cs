@@ -83,7 +83,7 @@ public class DevMovement : MonoBehaviour {
 		return obj;
 	}
 
-	public void regenClosestPaths () {
+	public void regenClosestPathsShort(){
 		//SHORTER, MORE EFFICIENT, MORE ESTIMATED APPROACH ---//
 
 		//calculate distances to dev for each enemy
@@ -98,13 +98,60 @@ public class DevMovement : MonoBehaviour {
 
 		//for each enemy, get closest empty surrounding neighbor
 		regenPaths(enemies);
+	}
+
+	//for each enemy calculate distance to each surroundingNeighbor
+	//return a list containing the list for each enemy
+	private List<List<KeyValuePair<mapNode, float>>> calculateEnemyDistances() {
+		List<List<KeyValuePair<mapNode, float>>> enemyNodeLists = new List<List<KeyValuePair<mapNode, float>>> ();
+		mapNode[] neighborCircle = terrain.GetComponent<MapPathfind> ().getSpacedDevCombatCircle (3, 0);
+		GameObject[] enemies = getEnemies ();
+		foreach (GameObject enemy in enemies) {
+			List<KeyValuePair<mapNode, float>> nodeList = new List<KeyValuePair<mapNode, float>> ();
+			foreach (mapNode neighbor in neighborCircle) {
+				nodeList.Add(new KeyValuePair<mapNode, float> (neighbor, Vector3.Distance(enemy.transform.position, neighbor.getCenter())));
+			}
+			enemyNodeLists.Add (nodeList);
+		}
+		return enemyNodeLists;
+	}
+
+	//sort mapNodes in accordance to their corresponding float values, using a sortedlist
+	private List<KeyValuePair<mapNode, float>> sortNodesByDistance(List<KeyValuePair<mapNode, float>> unsorted) {
+		SortedList<float, mapNode> sorter = new SortedList<float, mapNode> ();
+		foreach(KeyValuePair<mapNode, float> pair in unsorted){
+			sorter.Add (pair.Value, pair.Key);
+		}
+		unsorted.Clear ();
+		foreach (KeyValuePair<float, mapNode> pair in sorter) {
+			unsorted.Add (new KeyValuePair<mapNode, float> (pair.Value, pair.Key));
+		}
+		return unsorted;
+	}
+
+	//Sort enemies by the distance to their closest node
+	//the enemies that are closest to their respective nodes get to go first
+	//return a list of keyvalue pairs representing the 
+	private List<KeyValuePair<mapNode, float>> assignClosestNeighbors (List<List<KeyValuePair<mapNode, float>>> enemyNodeLists ){
+		SortedList<float, List<KeyValuePair<mapNode,float>>> sorted = new SortedList<float, List<KeyValuePair<mapNode, float>>> ();
+		foreach (List<KeyValuePair<mapNode, float>> nodeList in enemyNodeLists) {
+			sorted.Add (nodeList [0].Value, nodeList);
+		}
+		enemyNodeLists = (List<List<KeyValuePair<mapNode, float>>>) sorted.Values;
+	}
 
 
+	public void regenClosestPathsLong () {
 		//--- LONGER, MORE TIME-CONSUMING, MORE ACCURATE APPROACH ---//
-		//for every single enemy:
-			//figure out the distance from the enemy to each surroundingNeighbor
-			//keep distances in a list, and sort the surroundingNeighbors according to that list - parallel sorting
-			
+		//for every single enemy: figure out the distance from the enemy to each surroundingNeighbor
+		List<List<KeyValuePair<mapNode, float>>> enemyNodeLists = calculateEnemyDistances();
+		List<List<KeyValuePair<mapNode, float>>> sortedNodeLists = new List<List<KeyValuePair<mapNode, float>>>();
+
+		//for each enemy, sort its list of neighbors by the enemy's distance to those neighbors
+		foreach(List<KeyValuePair<mapNode, float>> nodeList in enemyNodeLists){
+			sortedNodeLists.Add(sortNodesByDistance (nodeList));
+		}
+
 			//then, keep the distances[0] for each enemy into an array
 			//find the enemy with the smallest distance[0], and delete this distance and this node from the rest of the enemies
 			//plot the path for this enemy

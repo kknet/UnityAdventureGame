@@ -45,7 +45,7 @@ public class MapPathfind : MonoBehaviour {
 		}
 	}
 
-	private void sortEnemiesByID(){
+	private void sortEnemiesByID() {
 		fillEnemiesList ();
 //		GameObject[] temp = getEnemies ();
 //		List<GameObject> unsorted = new List<GameObject>(temp);
@@ -157,6 +157,24 @@ public class MapPathfind : MonoBehaviour {
 		}
 		return list [closestIdx];
 	}
+
+	//Finding the node out of a list that is nearest to your node.
+	//Based on a naive computation of distance between the centers of two nodes
+	//A better computation would compute distance on the basis of 
+	//the shortest available path between the nodes.
+	public KeyValuePair<mapNode, float> findClosestNodeDist(mapNode[] list, mapNode yourNode){
+		float minDistance = Vector3.Distance (list [0].getCenter (), yourNode.getCenter ());	
+		int closestIdx = 0;
+		for (int idx = 1; idx < list.Length; ++idx) {
+			float thisDistance = Vector3.Distance (list [idx].getCenter (), yourNode.getCenter ());
+			if (thisDistance < minDistance) {
+				minDistance = thisDistance;
+				closestIdx = idx;
+			}
+		}
+		return new KeyValuePair<mapNode, float>(list [closestIdx], minDistance);
+	}
+
 
 	//Extracts all empty nodes from given list.
 	//'Empty' nodes include those nodes which are not occupied by anyone
