@@ -25,6 +25,8 @@ public class DevMovement : MonoBehaviour {
 	//	private int turnCounter;
 	//	private float turn;
 
+	public bool makingNewPaths;
+
 	// Use this for initialization
 	public void Start () {
 		terrain = GameObject.Find ("Terrain");
@@ -36,6 +38,7 @@ public class DevMovement : MonoBehaviour {
 		desiredRot = Camera.main.transform.eulerAngles.y;
 		horizRot = false;
 		initDevCell ();
+		makingNewPaths = false;
 	}
 
 	private mapNode getDevCell(){
@@ -56,7 +59,88 @@ public class DevMovement : MonoBehaviour {
 		return UnityEngine.Random.Range (a, b);
 	}
 
-	private void setDevCell() {
+	private GameObject[] sortByDistance (GameObject[] obj, float[] dist){
+		int exploredIdx = 0;
+		int minIdx = 0;
+		float min = dist [0];
+		while (exploredIdx != dist.Length) {
+			for (int idx = exploredIdx; idx < dist.Length; ++idx) {
+				if (dist [idx] < min) {
+					minIdx = idx;
+					min = dist [idx];
+				}
+			}
+			float temp = dist [exploredIdx];
+			dist [exploredIdx] = dist [minIdx];
+			dist [minIdx] = temp;
+
+			GameObject tempObj = obj [exploredIdx];
+			obj [exploredIdx] = obj [minIdx];
+			obj [minIdx] = tempObj;
+
+			++exploredIdx;
+		}
+		return obj;
+	}
+
+	public void regenClosestPaths () {
+		//SHORTER, MORE EFFICIENT, MORE ESTIMATED APPROACH ---//
+
+		//calculate distances to dev for each enemy
+		GameObject[] enemies = getEnemies ();
+		float[] distToDev = new float[enemies.Length];
+		for(int idx = 0; idx < enemies.Length; ++idx) {
+			distToDev [idx] = Vector3.Distance (enemies [idx].transform.position, transform.position);
+		}
+
+		//sort enemies by distance to dev
+		enemies = sortByDistance(enemies, distToDev);
+
+		//for each enemy, get closest empty surrounding neighbor
+		regenPaths(enemies);
+
+
+		//--- LONGER, MORE TIME-CONSUMING, MORE ACCURATE APPROACH ---//
+		//for every single enemy:
+			//figure out the distance from the enemy to each surroundingNeighbor
+			//keep distances in a list, and sort the surroundingNeighbors according to that list - parallel sorting
+			
+			//then, keep the distances[0] for each enemy into an array
+			//find the enemy with the smallest distance[0], and delete this distance and this node from the rest of the enemies
+			//plot the path for this enemy
+
+			//then continue on, find the smallest distance[0] out of all the enemies left,
+			//plot the path for this enemy
+			//and delete that distance[0] and that node from all of the other enemies
+			
+			//keep repeating until all enemies are taken care of.
+
+	}
+
+	private void clearAllNodes () {
+		int zMax = terrain.GetComponent<MapPathfind> ().grid.Length;
+		int xMax = terrain.GetComponent<MapPathfind> ().grid[0].Length;
+		for (int z = 0; z < zMax; ++z) {
+			for (int x = 0; x < xMax; ++x) {
+				terrain.GetComponent<MapPathfind> ().grid [z] [x].setEmpty ();
+			}
+		}
+	}
+
+	public void regenPaths(GameObject[] enemies){
+		foreach (GameObject enemy in enemies) {
+			terrain.GetComponent<MapPathfind> ().containingCell (enemy.transform.position).setFull(enemy.GetComponent<EnemyAI>().enemyID);
+		}
+		foreach (GameObject enemy in enemies) {
+			enemy.GetComponent<EnemyAI> ().plotNewPath ();
+		}
+//		foreach (GameObject enemy in enemies) {
+//			enemy.GetComponent<EnemyAI> ().moveToDev();
+//		}
+		makingNewPaths = false;
+	}
+
+	public void setDevCell() {
 		//dev's current location
 		mapNode newDevCell = terrain.GetComponent<MapPathfind> ().containingCell (transform.position);
 		if (newDevCell == null) {
@@ -66,19 +150,7 @@ public class DevMovement : MonoBehaviour {
 			terrain.GetComponent<MapPathfind> ().devCell.setEmpty ();
 			terrain.GetComponent<MapPathfind> ().devCell = newDevCell;
 			terrain.GetComponent<MapPathfind> ().devCell.setFull (-3);
-			GameObject[] enemies = getEnemies();
-			foreach (GameObject enemy in enemies) {
-//				if(rand(0f, 1f) > 0.5f)
-					enemy.GetComponent<EnemyAI> ().plotNewPath ();
-			}
-//			foreach (GameObject enemy in enemies) {
-//				Debug.LogError (enemy.GetComponent<EnemyAI> ().finalDest.getIndices ());
-//			}
-//			GameObject overlapper = terrain.GetComponent<MapPathfind> ().overlappingAgent ();
-//			if (overlapper != null) {
-//				overlapper.GetComponent<EnemyAI> ().plotNewPath ();
-//				Debug.LogError ("Worked!");
-//			}
+			regenPaths (getEnemies());
 		}
 	}
 

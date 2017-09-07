@@ -18,7 +18,7 @@ public class AStarMovement : MonoBehaviour {
 	GameObject terrain;
 	public bool doneAStart;
 
-	void Start(){
+	public void Start(){
 		doneAStart = false;
 		terrain = GameObject.Find ("Terrain");
 		numNodesPerSide = terrain.GetComponent<MapPathfind> ().nodesPerSide;
@@ -33,6 +33,9 @@ public class AStarMovement : MonoBehaviour {
 		while (!curNode.equalTo(start)) {
 			path.Add (curNode);
 			curNode = nodeParents [curNode];
+			if (curNode.hasOtherOwner (enemyID))
+				Debug.LogError ("Doesn't work!");
+//			curNode.setFull (enemyID);
 		}
 		return new Queue<mapNode> (path);
 	}

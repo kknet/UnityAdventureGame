@@ -32,11 +32,12 @@ public class EnemyAI : MonoBehaviour {
 //		while (!terrain.GetComponent<MapPathfind> ().doneBuilding) {}
 		enemyAnim = GetComponent<Animator> ();
 		Dev = GameObject.Find ("DevDrake");
-		rotSpeed = 10f;
-		moveSpeed = 4f;
+		rotSpeed = 5f;
+		moveSpeed = 1.5f;
 		if (!GameObject.Find("Terrain").GetComponent<MapPathfind>().doneBuilding) {
 			GameObject.Find ("Terrain").GetComponent<MapPathfind> ().Start ();
 		}
+		GetComponent<AStarMovement> ().Start ();
 		initPathToDev ();
 		resting = false;
 		restStartTime = Time.time;
@@ -64,6 +65,9 @@ public class EnemyAI : MonoBehaviour {
 				return;
 		}
 
+		if (Dev.GetComponent<DevMovement> ().makingNewPaths)
+			return;
+
 		//--------CHECKING IF DEV IS NEAR ENOUGH FOR ENEMIES TO NOTICE HIM--------//
 		//		if (!Camera.main.GetComponent<MouseMovement> ().inCombatZone) {
 		//			enemyAnim.SetFloat ("enemySpeed", Mathf.MoveTowards(enemyAnim.GetFloat ("enemySpeed"), 0f, 5f * Time.deltaTime));
@@ -89,7 +93,7 @@ public class EnemyAI : MonoBehaviour {
 
 	void initPathToDev(){
 		start = terrain.GetComponent<MapPathfind> ().containingCell (transform.position);
-		if(GetComponent<AStarMovement>().doneAStart)
+//		if(GetComponent<AStarMovement>().doneAStart)
 			plotNewPath ();
 	}
 
@@ -108,11 +112,26 @@ public class EnemyAI : MonoBehaviour {
 	}
 
 	public void plotNewPath(){
-		getDevCell ().setFull (0);
-		mapNode[] circle = terrain.GetComponent<MapPathfind>().getEmptySpacedDevCombatCircle(3, enemyID, finalDest, 0);
-		if(circle == null)
-			circle = terrain.GetComponent<MapPathfind>().getEmptySpacedDevCombatCircle(4, enemyID, finalDest, 1);
-		finalDest = terrain.GetComponent<MapPathfind> ().findClosestNode (circle, start);
+		List<mapNode> options = new List<mapNode> ();
+		mapNode[] circle1 = terrain.GetComponent<MapPathfind>().getEmptySpacedDevCombatCircle(3, enemyID, finalDest, 0);
+		if(circle1 == null)
+			circle1 = terrain.GetComponent<MapPathfind>().getEmptySpacedDevCombatCircle(4, enemyID, finalDest, 1);
+		finalDest = terrain.GetComponent<MapPathfind> ().findClosestNode (circle1, start);
+
+//		if (circle1 != null) {
+//			options.Add(terrain.GetComponent<MapPathfind> ().findClosestNode (circle1, start));
+//		}
+//		mapNode[] circle2 = terrain.GetComponent<MapPathfind>().getEmptySpacedDevCombatCircle(3, enemyID, finalDest, 1);
+//		if (circle2 != null) {
+//			options.Add(terrain.GetComponent<MapPathfind> ().findClosestNode (circle2, start));
+//		}
+////		mapNode[] circle3 = terrain.GetComponent<MapPathfind>().getEmptySpacedDevCombatCircle(4, enemyID, finalDest, 0);
+////		if (circle3 != null) {
+////			options.Add (terrain.GetComponent<MapPathfind> ().findClosestNode (circle3, start));
+////		}
+//		mapNode[] optionsArr = options.ToArray ();
+//		finalDest = optionsArr [Mathf.RoundToInt (rand (0, optionsArr.Length-1))];
+
 		finalDest.setFull (enemyID);
 		while (path !=null && path.Count > 0) {
 			mapNode trashNode = path.Dequeue ();
@@ -129,29 +148,56 @@ public class EnemyAI : MonoBehaviour {
 			nextDest = path.Dequeue ();
 	}
 
-	void moveToDev(){
+	public void moveToDev(){
 		updateYourCell ();
 
-		if (finalDest == null || (nextDest!= null && nextDest.hasOtherOwner(enemyID)) || (finalDest!= null && finalDest.hasOtherOwner(enemyID))) {
+		if (finalDest == null) {
+			stop ();
 			plotNewPath ();
 		}
 
-		if (start.equalTo (finalDest) || nextDest == null) {
-			if (Vector3.Distance (Dev.transform.position, transform.position) < 1f) {
-				rotateToTarget (Dev.transform.position);
+		if (nextDest != null && nextDest.hasOtherOwner (enemyID)) {
+//			stop ();
+			if (!Dev.GetComponent<DevMovement> ().makingNewPaths) {
+				Dev.GetComponent<DevMovement> ().makingNewPaths = true;
+				Debug.LogError ("doesn't work!");
+//				GameObject[] enemies = new GameObject[2];
+//				enemies [0] = terrain.GetComponent<MapPathfind> ().getEnemyByID (enemyID);
+//				enemies [1] = terrain.GetComponent<MapPathfind> ().getEnemyByID (nextDest.getOwnerID());
+//				Dev.GetComponent<DevMovement> ().regenPaths (enemies);
+				Dev.GetComponent<DevMovement>().regenClosestPaths();
 			}
-			//rotate towards player
+		} else if (finalDest != null && finalDest.hasOtherOwner (enemyID)) {
+//			stop ();
+			if (!Dev.GetComponent<DevMovement> ().makingNewPaths) {
+				Dev.GetComponent<DevMovement> ().makingNewPaths = true;
+				Debug.LogError ("doesn't work!");
+//				GameObject[] enemies = new GameObject[2];
+//				enemies [0] = terrain.GetComponent<MapPathfind> ().getEnemyByID (enemyID);
+//				enemies [1] = terrain.GetComponent<MapPathfind> ().getEnemyByID (finalDest.getOwnerID());
+//				Dev.GetComponent<DevMovement> ().regenPaths (enemies);
+				Dev.GetComponent<DevMovement>().regenClosestPaths();
+			}		
+		}
+
+		if (start.equalTo (finalDest) || nextDest == null) {
+			stop ();
 			rotateToTarget (Dev.transform.position);
-			//attack
-			attack ();
+			if (Vector3.Distance (Dev.transform.position, transform.position) < 1f) {
+				attack ();
+			}
 			return;
 		} else {
-			stopEnemyAttack ();
+//			stopEnemyAttack ();
 		}
 
 		//reached intermediate destination
 		if (nextDest == null || start.equalTo(nextDest)) {
 			nextDest = path.Dequeue ();
+
+			if (nextDest.hasOtherOwner (enemyID)) {
+				Debug.LogError ("didn't work!");
+			}
 			if (nextDest == null || nextDest.getCenter () == null) {
 				Debug.LogAssertion ("nextDest is messed up");
 				return;
@@ -170,7 +216,7 @@ public class EnemyAI : MonoBehaviour {
 	}
 
 	void stop(){
-		enemyAnim.SetFloat ("enemySpeed", Mathf.MoveTowards (enemyAnim.GetFloat ("enemySpeed"), 0f, 0.5f * Time.deltaTime));
+		enemyAnim.SetFloat ("enemySpeed", Mathf.MoveTowards (enemyAnim.GetFloat ("enemySpeed"), 0f, 2f * Time.deltaTime));
 	}
 
 	void moveToTarget(){

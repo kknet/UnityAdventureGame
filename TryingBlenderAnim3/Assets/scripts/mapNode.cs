@@ -38,6 +38,10 @@ public class mapNode {
 		//		points[3] = new Vector3(ctr.x + halfCell, ctr.y, ctr.z - halfCell);
 	}
 
+	public int getOwnerID() {
+		return owner;
+	}
+
 	public int Weight(){
 		return weight;
 	}

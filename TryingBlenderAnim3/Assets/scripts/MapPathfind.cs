@@ -17,6 +17,8 @@ public class MapPathfind : MonoBehaviour {
 	private Terrain ter;
 	private int numNodes;
 
+	public SortedList<int, GameObject> enemies;
+
 	// Use this for initialization
 	public void Start () {
 		doneBuilding = false;
@@ -31,7 +33,39 @@ public class MapPathfind : MonoBehaviour {
 		max = new Vector3 (transform.position.x + wid, transform.position.y, transform.position.z + len);
 		buildGridGraph ();
 		GameObject.Find ("DevDrake").GetComponent<DevMovement> ().Start ();
+		sortEnemiesByID ();
 		doneBuilding = true;
+	}
+
+	private void fillEnemiesList(){
+		enemies = new SortedList<int, GameObject> ();
+		GameObject[] unsorted = getEnemies ();
+		foreach (GameObject enemy in unsorted) {
+			enemies.Add (enemy.GetComponent<EnemyAI> ().enemyID, enemy);
+		}
+	}
+
+	private void sortEnemiesByID(){
+		fillEnemiesList ();
+//		GameObject[] temp = getEnemies ();
+//		List<GameObject> unsorted = new List<GameObject>(temp);
+//		GameObject[] sorted = new GameObject[temp.Length];
+//		int curID = 1;
+//		while(curID!=temp.Length+1) {
+//			foreach (GameObject enemy in unsorted) {
+//				if (enemy.GetComponent<EnemyAI> ().enemyID==curID) {
+//					sorted [curID - 1] = enemy;
+//					break;
+//				}
+//			}
+//			++curID;
+//			unsorted.Remove (sorted[curID-2]);
+//		}
+//		enemies = sorted;
+	}
+
+	public GameObject getEnemyByID(int enemyID){
+		return enemies [enemyID - 1];
 	}
 
 	public mapNode[] removeFromList(mapNode trashItem, mapNode[] list){
@@ -308,157 +342,157 @@ public class MapPathfind : MonoBehaviour {
 	}
 
 	//finds a path from START to DEST with no 'empty' nodes in between
-	public Queue<mapNode> findPath(mapNode start, mapNode dest, int enemyID)
-	{
-		Queue<mapNode> path = new Queue<mapNode>();
-		KeyValuePair<int,int> startCoords = start.getIndices ();
-		KeyValuePair<int,int> destCoords = dest.getIndices ();
-
-		//reached destination (current node = destination node)
-		if (startCoords.Key == destCoords.Key && startCoords.Value == destCoords.Value) {
-			return path;
-		}
-
-		bool goRight = startCoords.Value < destCoords.Value;
-		bool goUp = startCoords.Key < destCoords.Key;
-
-		//z coords match
-		if (startCoords.Key == destCoords.Key) {
-
-			//go to the right
-			if (goRight) {
-				path.Enqueue (grid [startCoords.Key] [startCoords.Value + 1]);
-				Queue<mapNode> continuation = findPath (grid [startCoords.Key] [startCoords.Value + 1], dest, enemyID);
-				while (continuation.Count != 0) {
-					path.Enqueue (continuation.Dequeue());
-				}
-				return path;
-			}
-
-			//go to the left
-			else {
-				path.Enqueue (grid [startCoords.Key] [startCoords.Value - 1]);
-				Queue<mapNode> continuation = findPath (grid [startCoords.Key] [startCoords.Value - 1], dest, enemyID);
-				while (continuation.Count != 0) {
-					path.Enqueue (continuation.Dequeue());
-				}
-				return path;
-			}
-		} 
-
-		//x coords match
-		else if (startCoords.Value == destCoords.Value) {
-
-			//go up
-			if (goUp) {
-				path.Enqueue (grid [startCoords.Key + 1] [startCoords.Value]);
-				Queue<mapNode> continuation = findPath (grid [startCoords.Key + 1] [startCoords.Value], dest, enemyID);
-				while (continuation.Count != 0) {
-					path.Enqueue (continuation.Dequeue());
-				}
-				return path;
-			}
-
-			//go down
-			else {
-				path.Enqueue (grid [startCoords.Key - 1] [startCoords.Value]);
-				Queue<mapNode> continuation = findPath (grid [startCoords.Key - 1] [startCoords.Value], dest, enemyID);
-				while (continuation.Count != 0) {
-					path.Enqueue (continuation.Dequeue ());
-				}
-				return path;
-			}
-
-		} else {
-			if (goUp) {
-
-				//go diagonal up and right
-				if (goRight) {
-					mapNode curNode = grid [startCoords.Key + 1] [startCoords.Value + 1];
-					if (curNode.hasOtherOwner(enemyID)) {
-						if (!grid [startCoords.Key] [startCoords.Value + 1].hasOtherOwner(enemyID)) {
-							curNode = grid [startCoords.Key] [startCoords.Value + 1];
-						} else if (!grid [startCoords.Key + 1] [startCoords.Value].hasOtherOwner(enemyID)) {
-							curNode = grid [startCoords.Key + 1] [startCoords.Value];
-						}
-					} else {
-						curNode.setFull (enemyID);
-					}
-
-					path.Enqueue (curNode);
-					Queue<mapNode> continuation = findPath (curNode, dest, enemyID);
-					while (continuation.Count != 0) {
-						path.Enqueue (continuation.Dequeue ());
-					}
-					return path;
-				} 
-
-				//go diagonal up and left
-				else {
-					mapNode curNode = grid [startCoords.Key + 1] [startCoords.Value - 1];
-					if (curNode.hasOtherOwner(enemyID)) {
-						if (!grid [startCoords.Key] [startCoords.Value - 1].hasOtherOwner(enemyID)) {
-							curNode = grid [startCoords.Key] [startCoords.Value - 1];
-						} else if (!grid [startCoords.Key + 1] [startCoords.Value].hasOtherOwner(enemyID)) {
-							curNode = grid [startCoords.Key + 1] [startCoords.Value];
-						}
-					} else {
-						curNode.setFull (enemyID);
-					}
-
-					path.Enqueue (curNode);
-					Queue<mapNode> continuation = findPath (curNode, dest, enemyID);
-					while (continuation.Count != 0) {
-						path.Enqueue (continuation.Dequeue ());
-					}
-					return path;
-				}
-			} else {
-
-				//go diagonal down and right
-				if (goRight) {
-					mapNode curNode = grid [startCoords.Key - 1] [startCoords.Value + 1];
-					if (curNode.hasOtherOwner(enemyID)) {
-						if (!grid [startCoords.Key] [startCoords.Value + 1].hasOtherOwner(enemyID)) {
-							curNode = grid [startCoords.Key] [startCoords.Value + 1];
-						} else if (!grid [startCoords.Key - 1] [startCoords.Value].hasOtherOwner(enemyID)) {
-							curNode = grid [startCoords.Key - 1] [startCoords.Value];
-						}
-					} else {
-						curNode.setFull (enemyID);
-					}
-
-					path.Enqueue (curNode);
-					Queue<mapNode> continuation = findPath (curNode, dest, enemyID);
-					while (continuation.Count != 0) {
-						path.Enqueue (continuation.Dequeue ());
-					}
-					return path;
-				} 
-
-				//go diagonal down and left
-				else {
-					mapNode curNode = grid [startCoords.Key - 1] [startCoords.Value - 1];
-					if (curNode.hasOtherOwner(enemyID)) {
-						if (!grid [startCoords.Key] [startCoords.Value - 1].hasOtherOwner(enemyID)) {
-							curNode = grid [startCoords.Key] [startCoords.Value - 1];
-						} else if (!grid [startCoords.Key - 1] [startCoords.Value].hasOtherOwner(enemyID)) {
-							curNode = grid [startCoords.Key - 1] [startCoords.Value];
-						}
-					} else {
-						curNode.setFull (enemyID);
-					}
-
-					path.Enqueue (curNode);
-					Queue<mapNode> continuation = findPath (curNode, dest, enemyID);
-					while (continuation.Count != 0) {
-						path.Enqueue (continuation.Dequeue ());
-					}
-					return path;
-				}
-			}
-		}
-	}
+//	public Queue<mapNode> findPath(mapNode start, mapNode dest, int enemyID)
+//	{
+//		Queue<mapNode> path = new Queue<mapNode>();
+//		KeyValuePair<int,int> startCoords = start.getIndices ();
+//		KeyValuePair<int,int> destCoords = dest.getIndices ();
+//
+//		//reached destination (current node = destination node)
+//		if (startCoords.Key == destCoords.Key && startCoords.Value == destCoords.Value) {
+//			return path;
+//		}
+//
+//		bool goRight = startCoords.Value < destCoords.Value;
+//		bool goUp = startCoords.Key < destCoords.Key;
+//
+//		//z coords match
+//		if (startCoords.Key == destCoords.Key) {
+//
+//			//go to the right
+//			if (goRight) {
+//				path.Enqueue (grid [startCoords.Key] [startCoords.Value + 1]);
+//				Queue<mapNode> continuation = findPath (grid [startCoords.Key] [startCoords.Value + 1], dest, enemyID);
+//				while (continuation.Count != 0) {
+//					path.Enqueue (continuation.Dequeue());
+//				}
+//				return path;
+//			}
+//
+//			//go to the left
+//			else {
+//				path.Enqueue (grid [startCoords.Key] [startCoords.Value - 1]);
+//				Queue<mapNode> continuation = findPath (grid [startCoords.Key] [startCoords.Value - 1], dest, enemyID);
+//				while (continuation.Count != 0) {
+//					path.Enqueue (continuation.Dequeue());
+//				}
+//				return path;
+//			}
+//		} 
+//
+//		//x coords match
+//		else if (startCoords.Value == destCoords.Value) {
+//
+//			//go up
+//			if (goUp) {
+//				path.Enqueue (grid [startCoords.Key + 1] [startCoords.Value]);
+//				Queue<mapNode> continuation = findPath (grid [startCoords.Key + 1] [startCoords.Value], dest, enemyID);
+//				while (continuation.Count != 0) {
+//					path.Enqueue (continuation.Dequeue());
+//				}
+//				return path;
+//			}
+//
+//			//go down
+//			else {
+//				path.Enqueue (grid [startCoords.Key - 1] [startCoords.Value]);
+//				Queue<mapNode> continuation = findPath (grid [startCoords.Key - 1] [startCoords.Value], dest, enemyID);
+//				while (continuation.Count != 0) {
+//					path.Enqueue (continuation.Dequeue ());
+//				}
+//				return path;
+//			}
+//
+//		} else {
+//			if (goUp) {
+//
+//				//go diagonal up and right
+//				if (goRight) {
+//					mapNode curNode = grid [startCoords.Key + 1] [startCoords.Value + 1];
+//					if (curNode.hasOtherOwner(enemyID)) {
+//						if (!grid [startCoords.Key] [startCoords.Value + 1].hasOtherOwner(enemyID)) {
+//							curNode = grid [startCoords.Key] [startCoords.Value + 1];
+//						} else if (!grid [startCoords.Key + 1] [startCoords.Value].hasOtherOwner(enemyID)) {
+//							curNode = grid [startCoords.Key + 1] [startCoords.Value];
+//						}
+//					} else {
+//						curNode.setFull (enemyID);
+//					}
+//
+//					path.Enqueue (curNode);
+//					Queue<mapNode> continuation = findPath (curNode, dest, enemyID);
+//					while (continuation.Count != 0) {
+//						path.Enqueue (continuation.Dequeue ());
+//					}
+//					return path;
+//				} 
+//
+//				//go diagonal up and left
+//				else {
+//					mapNode curNode = grid [startCoords.Key + 1] [startCoords.Value - 1];
+//					if (curNode.hasOtherOwner(enemyID)) {
+//						if (!grid [startCoords.Key] [startCoords.Value - 1].hasOtherOwner(enemyID)) {
+//							curNode = grid [startCoords.Key] [startCoords.Value - 1];
+//						} else if (!grid [startCoords.Key + 1] [startCoords.Value].hasOtherOwner(enemyID)) {
+//							curNode = grid [startCoords.Key + 1] [startCoords.Value];
+//						}
+//					} else {
+//						curNode.setFull (enemyID);
+//					}
+//
+//					path.Enqueue (curNode);
+//					Queue<mapNode> continuation = findPath (curNode, dest, enemyID);
+//					while (continuation.Count != 0) {
+//						path.Enqueue (continuation.Dequeue ());
+//					}
+//					return path;
+//				}
+//			} else {
+//
+//				//go diagonal down and right
+//				if (goRight) {
+//					mapNode curNode = grid [startCoords.Key - 1] [startCoords.Value + 1];
+//					if (curNode.hasOtherOwner(enemyID)) {
+//						if (!grid [startCoords.Key] [startCoords.Value + 1].hasOtherOwner(enemyID)) {
+//							curNode = grid [startCoords.Key] [startCoords.Value + 1];
+//						} else if (!grid [startCoords.Key - 1] [startCoords.Value].hasOtherOwner(enemyID)) {
+//							curNode = grid [startCoords.Key - 1] [startCoords.Value];
+//						}
+//					} else {
+//						curNode.setFull (enemyID);
+//					}
+//
+//					path.Enqueue (curNode);
+//					Queue<mapNode> continuation = findPath (curNode, dest, enemyID);
+//					while (continuation.Count != 0) {
+//						path.Enqueue (continuation.Dequeue ());
+//					}
+//					return path;
+//				} 
+//
+//				//go diagonal down and left
+//				else {
+//					mapNode curNode = grid [startCoords.Key - 1] [startCoords.Value - 1];
+//					if (curNode.hasOtherOwner(enemyID)) {
+//						if (!grid [startCoords.Key] [startCoords.Value - 1].hasOtherOwner(enemyID)) {
+//							curNode = grid [startCoords.Key] [startCoords.Value - 1];
+//						} else if (!grid [startCoords.Key - 1] [startCoords.Value].hasOtherOwner(enemyID)) {
+//							curNode = grid [startCoords.Key - 1] [startCoords.Value];
+//						}
+//					} else {
+//						curNode.setFull (enemyID);
+//					}
+//
+//					path.Enqueue (curNode);
+//					Queue<mapNode> continuation = findPath (curNode, dest, enemyID);
+//					while (continuation.Count != 0) {
+//						path.Enqueue (continuation.Dequeue ());
+//					}
+//					return path;
+//				}
+//			}
+//		}
+//	}
 
 	void buildGridGraph(){
 		//set up the dimensions of the 2d array
