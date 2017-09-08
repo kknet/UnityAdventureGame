@@ -7,12 +7,13 @@ public class ClosestNodes : MonoBehaviour {
 	GameObject terrain;
 	GameObject Dev;
 
-	public bool makingNewPaths;
+	public bool makingNewPaths = false;
+	public bool doneStarting = false;
 
-	void Start(){
-		makingNewPaths = false;
+	public void Start(){
 		terrain = GameObject.Find ("Terrain");
 		Dev = GameObject.Find ("DevDrake");
+		doneStarting = true;
 	}
 
 
@@ -24,45 +25,45 @@ public class ClosestNodes : MonoBehaviour {
 		return UnityEngine.Random.Range (a, b);
 	}
 
-	private void clearAllNodes () {
-		int zMax = terrain.GetComponent<MapPathfind> ().grid.Length;
-		int xMax = terrain.GetComponent<MapPathfind> ().grid[0].Length;
-		for (int z = 0; z < zMax; ++z) {
-			for (int x = 0; x < xMax; ++x) {
-				terrain.GetComponent<MapPathfind> ().grid [z] [x].setEmpty ();
-			}
-		}
-	}
-
-	public void regenPaths(GameObject[] enemies){
-		foreach (GameObject enemy in enemies) {
-			terrain.GetComponent<MapPathfind> ().containingCell (enemy.transform.position).setFull(enemy.GetComponent<EnemyAI>().enemyID);
-		}
-		foreach (GameObject enemy in enemies) {
-			enemy.GetComponent<EnemyAI> ().plotNewPath ();
-		}
-		//		foreach (GameObject enemy in enemies) {
-		//			enemy.GetComponent<EnemyAI> ().moveToDev();
-		//		}
-		makingNewPaths = false;
-	}
-
-	public void regenClosestPathsShort(){
-		//SHORTER, MORE EFFICIENT, MORE ESTIMATED APPROACH ---//
-
-		//calculate distances to dev for each enemy
-		GameObject[] enemies = getEnemies ();
-		float[] distToDev = new float[enemies.Length];
-		for(int idx = 0; idx < enemies.Length; ++idx) {
-			distToDev [idx] = Vector3.Distance (enemies [idx].transform.position, transform.position);
-		}
-
-		//sort enemies by distance to dev
-		enemies = sortByDistance(enemies, distToDev);
-
-		//for each enemy, get closest empty surrounding neighbor
-		regenPaths(enemies);
-	}
+//	private void clearAllNodes () {
+//		int zMax = terrain.GetComponent<MapPathfind> ().grid.Length;
+//		int xMax = terrain.GetComponent<MapPathfind> ().grid[0].Length;
+//		for (int z = 0; z < zMax; ++z) {
+//			for (int x = 0; x < xMax; ++x) {
+//				terrain.GetComponent<MapPathfind> ().grid [z] [x].setEmpty ();
+//			}
+//		}
+//	}
+//
+//	public void regenPaths(GameObject[] enemies){
+//		foreach (GameObject enemy in enemies) {
+//			terrain.GetComponent<MapPathfind> ().containingCell (enemy.transform.position).setFull(enemy.GetComponent<EnemyAI>().enemyID);
+//		}
+//		foreach (GameObject enemy in enemies) {
+//			enemy.GetComponent<EnemyAI> ().plotNewPath ();
+//		}
+//		//		foreach (GameObject enemy in enemies) {
+//		//			enemy.GetComponent<EnemyAI> ().moveToDev();
+//		//		}
+//		makingNewPaths = false;
+//	}
+//
+//	public void regenClosestPathsShort(){
+//		//SHORTER, MORE EFFICIENT, MORE ESTIMATED APPROACH ---//
+//
+//		//calculate distances to dev for each enemy
+//		GameObject[] enemies = getEnemies ();
+//		float[] distToDev = new float[enemies.Length];
+//		for(int idx = 0; idx < enemies.Length; ++idx) {
+//			distToDev [idx] = Vector3.Distance (enemies [idx].transform.position, transform.position);
+//		}
+//
+//		//sort enemies by distance to dev
+//		enemies = sortByDistance(enemies, distToDev);
+//
+//		//for each enemy, get closest empty surrounding neighbor
+//		regenPaths(enemies);
+//	}
 
 	private GameObject[] sortByDistance (GameObject[] obj, float[] dist) {
 		int exploredIdx = 0;
@@ -125,20 +126,28 @@ public class ClosestNodes : MonoBehaviour {
 
 	//Sort enemies by the distance to their closest node
 	//the enemies that are closest to their respective nodes get to go first
-	//return a list of enemyID & mapNode pairs; representing which enemy goes to which grid node
+	//return a list of enemyID & mapNode pairs, representing which enemy goes to which grid node
 	private List<KeyValuePair<int, mapNode>> assignClosestNeighbors (List<nodeList> enemyNodeLists){
 		List<KeyValuePair<int, mapNode>> finalDests = new List<KeyValuePair<int, mapNode>> ();
+		int numEnemies = enemyNodeLists.Count;
+		while (finalDests.Count < numEnemies) {
 
-		while (finalDests.Count < enemyNodeLists.Count) {
-
-			//sort enemies by their distance to their closest node
+			//sort remaining enemies by their distance to their closest node
 			SortedList<float, nodeList> sorted = new SortedList<float, nodeList> ();
 			foreach (nodeList list in enemyNodeLists) {
 				sorted.Add (list.at (0).Value, list);
-			}		
-			KeyValuePair<mapNode, float> curPair = sorted [0].at (0);
-			finalDests.Add(new KeyValuePair<int, mapNode>(sorted[0].getID(), curPair.Key));
-			sorted.RemoveAt (0);
+			}
+
+			//the enemy at sorted[0] is the enemy closest to its closest node
+			//assign this enemy a finalDest
+			//and remove this enemy from enemyNodeLists since it has been assigned a finalDest
+			float minKey = sorted.Keys[0];
+			KeyValuePair<mapNode, float> curPair =  sorted [minKey].at (0);
+			finalDests.Add(new KeyValuePair<int, mapNode>(sorted [minKey].getID(), curPair.Key));
+			enemyNodeLists.Remove(sorted[minKey]);
+
+			//also remove all occurrences of the finalDest node which was just assigned
+			//from lists in enemyNodeLists, so that no other enemy can be assigned this node
 			foreach (nodeList list in enemyNodeLists) {
 				list.remove (curPair);
 			}
@@ -149,7 +158,6 @@ public class ClosestNodes : MonoBehaviour {
 
 
 	public void regenClosestPathsLong () {
-		//--- LONGER, MORE TIME-CONSUMING, MORE ACCURATE APPROACH ---//
 		//for every single enemy: figure out the distance from the enemy to each surroundingNeighbor
 		List<nodeList> enemyNodeLists = calculateEnemyDistances();
 		List<nodeList> sortedNodeLists = new List<nodeList>();
@@ -161,8 +169,12 @@ public class ClosestNodes : MonoBehaviour {
 
 		//assign neighbors to enemies, prioritizing enemies that are closest to their chosen neighbors
 		List<KeyValuePair<int, mapNode>> finalDests = assignClosestNeighbors (sortedNodeLists);
-
-
+		foreach (KeyValuePair<int, mapNode> enemyNodePair in finalDests) {
+			GameObject thisEnemy = terrain.GetComponent<MapPathfind> ().getEnemyByID (enemyNodePair.Key);
+			thisEnemy.GetComponent<EnemyAI> ().cleanOldPath ();
+			thisEnemy.GetComponent<EnemyAI> ().finalDest = enemyNodePair.Value;
+			thisEnemy.GetComponent<EnemyAI> ().setNewPath ();
+		}
 	}
 }
 
@@ -177,6 +189,7 @@ class nodeList {
 
 	public nodeList (int _enemyID){
 		enemyID = _enemyID;
+		distList = new List<KeyValuePair<mapNode, float>>();
 	}
 
 	public void Add (mapNode node, float dist){

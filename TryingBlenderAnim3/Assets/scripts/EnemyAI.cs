@@ -7,6 +7,8 @@ public class EnemyAI : MonoBehaviour {
 	public int enemyID;
 	public mapNode finalDest;
 	public bool doneStarting;
+	public bool inPosition;
+	public GameObject terrain;
 
 	private Animator enemyAnim;
 	private GameObject Dev;
@@ -17,7 +19,6 @@ public class EnemyAI : MonoBehaviour {
 	//	private Vector3 target;
 	//	private Vector3 devTarget;
 	private Queue<mapNode> path;
-	private GameObject terrain;
 	private mapNode nextDest;
 	private mapNode start;
 	private float restStartTime;
@@ -29,20 +30,35 @@ public class EnemyAI : MonoBehaviour {
 	void Start () {
 		doneStarting = false;
 		terrain = GameObject.Find ("Terrain");
-//		while (!terrain.GetComponent<MapPathfind> ().doneBuilding) {}
+		inPosition = false;
 		enemyAnim = GetComponent<Animator> ();
 		Dev = GameObject.Find ("DevDrake");
 		rotSpeed = 5f;
 		moveSpeed = 1.5f;
-		if (!GameObject.Find("Terrain").GetComponent<MapPathfind>().doneBuilding) {
-			GameObject.Find ("Terrain").GetComponent<MapPathfind> ().Start ();
+		if (!terrain.GetComponent<MapPathfind>().doneBuilding) {
+			terrain.GetComponent<MapPathfind> ().Start ();
+		}
+		if (!terrain.GetComponent<ClosestNodes>().doneStarting) {
+			terrain.GetComponent<ClosestNodes>().Start ();
 		}
 		GetComponent<AStarMovement> ().Start ();
-		initPathToDev ();
+		start = terrain.GetComponent<MapPathfind> ().containingCell (transform.position);
 		resting = false;
 		restStartTime = Time.time;
+		GameObject[] enemies = GameObject.FindGameObjectsWithTag("Enemy");
+		bool allDone = true;
+		foreach(GameObject enemy in enemies){
+			if(!enemy.Equals(this)){
+				if(!enemy.GetComponent<EnemyAI>().doneStarting){
+					allDone = false;
+					break;
+				}
+			}
+		}
+		if(allDone)
+			GameObject.Find ("DevDrake").GetComponent<DevMovement> ().Start ();
+
 		doneStarting = true;
-//		terrain.GetComponent<MapPathfind> ().fixAllOverlaps ();
 	}
 
 	public mapNode getDevCell(){
@@ -56,12 +72,9 @@ public class EnemyAI : MonoBehaviour {
 
 	// Update is called once per frame
 	void Update () {
-		if (!terrain.GetComponent<MapPathfind> ().doneBuilding)
-			return;
-
 		GameObject[] enemies = GameObject.FindGameObjectsWithTag("Enemy");
 		foreach(GameObject enemy in enemies){
-			if(!enemy.GetComponent<AStarMovement>().doneAStart)
+			if(!enemy.GetComponent<EnemyAI>().doneStarting)
 				return;
 		}
 
@@ -90,13 +103,7 @@ public class EnemyAI : MonoBehaviour {
 		//		}
 		//		Debug.Log (s + "nextDest: " + nextDest.getIndices() + "start: " + start.getIndices() + "dev: " + finalDest.getIndices());
 	}
-
-	void initPathToDev(){
-		start = terrain.GetComponent<MapPathfind> ().containingCell (transform.position);
-//		if(GetComponent<AStarMovement>().doneAStart)
-			plotNewPath ();
-	}
-
+		
 	//keep track of this agent's current location
 	void updateYourCell() {
 		mapNode oldStart = start;
@@ -111,84 +118,59 @@ public class EnemyAI : MonoBehaviour {
 		
 	}
 
-	public void plotNewPath(){
-		List<mapNode> options = new List<mapNode> ();
-		mapNode[] circle1 = terrain.GetComponent<MapPathfind>().getEmptySpacedDevCombatCircle(3, enemyID, finalDest, 0);
-		if(circle1 == null)
-			circle1 = terrain.GetComponent<MapPathfind>().getEmptySpacedDevCombatCircle(4, enemyID, finalDest, 1);
-		finalDest = terrain.GetComponent<MapPathfind> ().findClosestNode (circle1, start);
-
-//		if (circle1 != null) {
-//			options.Add(terrain.GetComponent<MapPathfind> ().findClosestNode (circle1, start));
-//		}
-//		mapNode[] circle2 = terrain.GetComponent<MapPathfind>().getEmptySpacedDevCombatCircle(3, enemyID, finalDest, 1);
-//		if (circle2 != null) {
-//			options.Add(terrain.GetComponent<MapPathfind> ().findClosestNode (circle2, start));
-//		}
-////		mapNode[] circle3 = terrain.GetComponent<MapPathfind>().getEmptySpacedDevCombatCircle(4, enemyID, finalDest, 0);
-////		if (circle3 != null) {
-////			options.Add (terrain.GetComponent<MapPathfind> ().findClosestNode (circle3, start));
-////		}
-//		mapNode[] optionsArr = options.ToArray ();
-//		finalDest = optionsArr [Mathf.RoundToInt (rand (0, optionsArr.Length-1))];
-
-		finalDest.setFull (enemyID);
+	public void cleanOldPath(){
 		while (path !=null && path.Count > 0) {
 			mapNode trashNode = path.Dequeue ();
 			trashNode.setEmpty ();
 		}
-
-		mapNode goal = GetComponent<AStarMovement> ().shortestPath (start, finalDest);
-		path = GetComponent<AStarMovement> ().traceBackFromGoal(start, finalDest);
-//		path = terrain.GetComponent<MapPathfind> ().findPath (start, finalDest, enemyID);
-
-		if (path.Count == 0)
-			plotNewPath();
-		else
-			nextDest = path.Dequeue ();
 	}
 
-	public void moveToDev(){
+	public void setNewPath(){
+		mapNode goal = GetComponent<AStarMovement> ().shortestPath (start, finalDest);
+		path = GetComponent<AStarMovement> ().traceBackFromGoal(start, finalDest);
+
+		if (path.Count == 0)
+			repathAll();
+		else
+			nextDest = path.Dequeue ();	
+	}
+
+	public void repathAll(){
+		if (!terrain.GetComponent<ClosestNodes> ().makingNewPaths) {
+			terrain.GetComponent<ClosestNodes> ().makingNewPaths = true;
+			terrain.GetComponent<ClosestNodes> ().regenClosestPathsLong ();
+		} 
+	}
+
+	public void moveToDev() {
 		updateYourCell ();
 
 		if (finalDest == null) {
 			stop ();
-			plotNewPath ();
+			repathAll ();
 		}
 
 		if (nextDest != null && nextDest.hasOtherOwner (enemyID)) {
 //			stop ();
-			if (!terrain.GetComponent<ClosestNodes> ().makingNewPaths) {
-				terrain.GetComponent<ClosestNodes> ().makingNewPaths = true;
-				Debug.LogError ("doesn't work!");
-//				GameObject[] enemies = new GameObject[2];
-//				enemies [0] = terrain.GetComponent<MapPathfind> ().getEnemyByID (enemyID);
-//				enemies [1] = terrain.GetComponent<MapPathfind> ().getEnemyByID (nextDest.getOwnerID());
-//				Dev.GetComponent<DevMovement> ().regenPaths (enemies);
-				terrain.GetComponent<ClosestNodes>().regenClosestPathsLong();
-			}
+			repathAll();
 		} else if (finalDest != null && finalDest.hasOtherOwner (enemyID)) {
 //			stop ();
-			if (!terrain.GetComponent<ClosestNodes> ().makingNewPaths) {
-				terrain.GetComponent<ClosestNodes> ().makingNewPaths = true;
-				Debug.LogError ("doesn't work!");
-//				GameObject[] enemies = new GameObject[2];
-//				enemies [0] = terrain.GetComponent<MapPathfind> ().getEnemyByID (enemyID);
-//				enemies [1] = terrain.GetComponent<MapPathfind> ().getEnemyByID (finalDest.getOwnerID());
-//				Dev.GetComponent<DevMovement> ().regenPaths (enemies);
-				terrain.GetComponent<ClosestNodes>().regenClosestPathsLong();
-			}		
-		}
+			repathAll();
+		}		
 
 		if (start.equalTo (finalDest) || nextDest == null) {
+			inPosition = true;
 			stop ();
 			rotateToTarget (Dev.transform.position);
-			if (Vector3.Distance (Dev.transform.position, transform.position) < 1f) {
-				attack ();
-			}
+			
+//			if (Vector3.Distance (Dev.transform.position, transform.position) < 1f) {
+//				attack ();
+//			}
 			return;
 		} else {
+			inPosition = false;
 //			stopEnemyAttack ();
+
 		}
 
 		//reached intermediate destination

@@ -32,7 +32,6 @@ public class MapPathfind : MonoBehaviour {
 		min = transform.position;
 		max = new Vector3 (transform.position.x + wid, transform.position.y, transform.position.z + len);
 		buildGridGraph ();
-		GameObject.Find ("DevDrake").GetComponent<DevMovement> ().Start ();
 		sortEnemiesByID ();
 		doneBuilding = true;
 	}
@@ -83,50 +82,50 @@ public class MapPathfind : MonoBehaviour {
 		return GameObject.FindGameObjectsWithTag ("Enemy");
 	}
 
-	public void fixAllOverlaps(){
-		GameObject[] enemies = getEnemies();
-
-		foreach (GameObject enemy in enemies) {
-			if (!enemy.GetComponent<EnemyAI> ().doneStarting)
-				return;
-		}
-
-		foreach (GameObject enemy in enemies) {
-			Debug.LogError (enemy.GetComponent<EnemyAI> ().finalDest.getIndices () + " " + enemy.GetComponent<EnemyAI> ().enemyID);
-		}
-
-
-		GameObject overlapper = overlappingAgent ();
-		if (overlapper != null) {
-			Debug.Log ("overlapper: " + overlapper.GetComponent<EnemyAI> ().enemyID);
-			overlapper.GetComponent<EnemyAI> ().plotNewPath ();
-			Debug.LogError ("Worked!");
-		}
-	}
-
-	public GameObject overlappingAgent(){
-		//find out what cells the enemies' finalDests are
-		GameObject[] enemies = GameObject.FindGameObjectsWithTag ("Enemy");
-		mapNode[] locs = new mapNode[enemies.Length];
-		for (int idx = 0; idx < enemies.Length; ++idx) {
-			locs [idx] = containingCell (enemies [idx].GetComponent<EnemyAI> ().finalDest.getCenter());
-		}
-			
-		//if there is an enemy that shares a finalDest with another enemy, return that enemy
-		for(int checkIdx = 0; checkIdx < enemies.Length; ++checkIdx) {
-			mapNode checkNode = locs [checkIdx];
-			for (int idx = 0; idx < enemies.Length; ++idx) {
-				if (idx == checkIdx)
-					continue;
-
-				if (checkNode == locs [idx])
-					return enemies [idx];
-			}
-		}
-
-		//if no two enemies are in the same finalDest, return null
-		return null;
-	}
+//	public void fixAllOverlaps(){
+//		GameObject[] enemies = getEnemies();
+//
+//		foreach (GameObject enemy in enemies) {
+//			if (!enemy.GetComponent<EnemyAI> ().doneStarting)
+//				return;
+//		}
+//
+//		foreach (GameObject enemy in enemies) {
+//			Debug.LogError (enemy.GetComponent<EnemyAI> ().finalDest.getIndices () + " " + enemy.GetComponent<EnemyAI> ().enemyID);
+//		}
+//
+//
+//		GameObject overlapper = overlappingAgent ();
+//		if (overlapper != null) {
+//			Debug.Log ("overlapper: " + overlapper.GetComponent<EnemyAI> ().enemyID);
+//			overlapper.GetComponent<EnemyAI> ().plotNewPath ();
+//			Debug.LogError ("Worked!");
+//		}
+//	}
+//
+//	public GameObject overlappingAgent(){
+//		//find out what cells the enemies' finalDests are
+//		GameObject[] enemies = GameObject.FindGameObjectsWithTag ("Enemy");
+//		mapNode[] locs = new mapNode[enemies.Length];
+//		for (int idx = 0; idx < enemies.Length; ++idx) {
+//			locs [idx] = containingCell (enemies [idx].GetComponent<EnemyAI> ().finalDest.getCenter());
+//		}
+//			
+//		//if there is an enemy that shares a finalDest with another enemy, return that enemy
+//		for(int checkIdx = 0; checkIdx < enemies.Length; ++checkIdx) {
+//			mapNode checkNode = locs [checkIdx];
+//			for (int idx = 0; idx < enemies.Length; ++idx) {
+//				if (idx == checkIdx)
+//					continue;
+//
+//				if (checkNode == locs [idx])
+//					return enemies [idx];
+//			}
+//		}
+//
+//		//if no two enemies are in the same finalDest, return null
+//		return null;
+//	}
 
 	//return the mapNode cell in the grid that contains the given pt, or NULL if out of bounds
 	public mapNode containingCell(Vector3 givenPt) {

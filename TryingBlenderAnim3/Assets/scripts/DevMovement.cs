@@ -15,16 +15,12 @@ public class DevMovement : MonoBehaviour {
 	public AudioSource land;
 	public AudioSource flipJump;
 	public bool horizRot;
-//	public bool devCellChanged;
 
 	private GameObject terrain;
 	private float desiredRot;
 	private bool applyJumpTrans;
 	private float needToRot;
 	private int runCounter;
-	//	private int turnCounter;
-	//	private float turn;
-
 
 	// Use this for initialization
 	public void Start () {
@@ -37,6 +33,7 @@ public class DevMovement : MonoBehaviour {
 		desiredRot = Camera.main.transform.eulerAngles.y;
 		horizRot = false;
 		initDevCell ();
+		terrain.GetComponent<ClosestNodes> ().regenClosestPathsLong ();
 	}
 
 	private mapNode getDevCell(){
@@ -68,7 +65,7 @@ public class DevMovement : MonoBehaviour {
 			terrain.GetComponent<MapPathfind> ().devCell.setEmpty ();
 			terrain.GetComponent<MapPathfind> ().devCell = newDevCell;
 			terrain.GetComponent<MapPathfind> ().devCell.setFull (-3);
-			terrain.GetComponent<ClosestNodes>().regenPaths (getEnemies());
+			terrain.GetComponent<ClosestNodes>().regenClosestPathsLong ();
 		}
 	}
 

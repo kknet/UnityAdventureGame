@@ -16,15 +16,14 @@ public class AStarMovement : MonoBehaviour {
 	IDictionary<mapNode, mapNode> nodeParents;
 	public IList<mapNode> path;
 	GameObject terrain;
-	public bool doneAStart;
+	public bool doneStarting = false;
 
 	public void Start(){
-		doneAStart = false;
 		terrain = GameObject.Find ("Terrain");
 		numNodesPerSide = terrain.GetComponent<MapPathfind> ().nodesPerSide;
 		enemyID = GetComponent<EnemyAI> ().enemyID;
 		nodeParents = new Dictionary<mapNode, mapNode>();
-		doneAStart = true;
+		doneStarting = true;
 	}
 
 	public Queue<mapNode> traceBackFromGoal(mapNode start, mapNode goal) {
@@ -42,15 +41,15 @@ public class AStarMovement : MonoBehaviour {
 
 	private List<mapNode> getWalkableNodes() {
 		List<mapNode> walkableNodes = new List<mapNode> ();
-//		if (terrain == null)
-//			Debug.LogError ("terrain is null");
+		if (terrain == null)
+			Start ();
 //		else if (terrain.GetComponent<MapPathfind> () == null)
 //			Debug.LogError ("mapPathfind is null");
 //		else if (terrain.GetComponent<MapPathfind>().grid == null)
 //			Debug.LogError ("grid is null");
 //		else
 //			Debug.LogError ("NOTHING WRONG");
-		int zMax = terrain.GetComponent<MapPathfind> ().grid.Length;
+		int zMax = terrain.GetComponent<MapPathfind> ().grid.Length;	
 		int xMax = terrain.GetComponent<MapPathfind> ().grid[0].Length;
 //		int zMax = numNodesPerSide;
 //		int xMax = numNodesPerSide;
