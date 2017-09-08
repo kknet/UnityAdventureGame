@@ -65,7 +65,7 @@ public class EnemyAI : MonoBehaviour {
 				return;
 		}
 
-		if (Dev.GetComponent<DevMovement> ().makingNewPaths)
+		if (terrain.GetComponent<ClosestNodes>().makingNewPaths)
 			return;
 
 		//--------CHECKING IF DEV IS NEAR ENOUGH FOR ENEMIES TO NOTICE HIM--------//
@@ -158,25 +158,25 @@ public class EnemyAI : MonoBehaviour {
 
 		if (nextDest != null && nextDest.hasOtherOwner (enemyID)) {
 //			stop ();
-			if (!Dev.GetComponent<DevMovement> ().makingNewPaths) {
-				Dev.GetComponent<DevMovement> ().makingNewPaths = true;
+			if (!terrain.GetComponent<ClosestNodes> ().makingNewPaths) {
+				terrain.GetComponent<ClosestNodes> ().makingNewPaths = true;
 				Debug.LogError ("doesn't work!");
 //				GameObject[] enemies = new GameObject[2];
 //				enemies [0] = terrain.GetComponent<MapPathfind> ().getEnemyByID (enemyID);
 //				enemies [1] = terrain.GetComponent<MapPathfind> ().getEnemyByID (nextDest.getOwnerID());
 //				Dev.GetComponent<DevMovement> ().regenPaths (enemies);
-				Dev.GetComponent<DevMovement>().regenClosestPaths();
+				terrain.GetComponent<ClosestNodes>().regenClosestPathsLong();
 			}
 		} else if (finalDest != null && finalDest.hasOtherOwner (enemyID)) {
 //			stop ();
-			if (!Dev.GetComponent<DevMovement> ().makingNewPaths) {
-				Dev.GetComponent<DevMovement> ().makingNewPaths = true;
+			if (!terrain.GetComponent<ClosestNodes> ().makingNewPaths) {
+				terrain.GetComponent<ClosestNodes> ().makingNewPaths = true;
 				Debug.LogError ("doesn't work!");
 //				GameObject[] enemies = new GameObject[2];
 //				enemies [0] = terrain.GetComponent<MapPathfind> ().getEnemyByID (enemyID);
 //				enemies [1] = terrain.GetComponent<MapPathfind> ().getEnemyByID (finalDest.getOwnerID());
 //				Dev.GetComponent<DevMovement> ().regenPaths (enemies);
-				Dev.GetComponent<DevMovement>().regenClosestPaths();
+				terrain.GetComponent<ClosestNodes>().regenClosestPathsLong();
 			}		
 		}
 

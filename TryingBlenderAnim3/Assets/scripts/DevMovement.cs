@@ -25,7 +25,6 @@ public class DevMovement : MonoBehaviour {
 	//	private int turnCounter;
 	//	private float turn;
 
-	public bool makingNewPaths;
 
 	// Use this for initialization
 	public void Start () {
@@ -38,7 +37,6 @@ public class DevMovement : MonoBehaviour {
 		desiredRot = Camera.main.transform.eulerAngles.y;
 		horizRot = false;
 		initDevCell ();
-		makingNewPaths = false;
 	}
 
 	private mapNode getDevCell(){
@@ -59,134 +57,7 @@ public class DevMovement : MonoBehaviour {
 		return UnityEngine.Random.Range (a, b);
 	}
 
-	private GameObject[] sortByDistance (GameObject[] obj, float[] dist){
-		int exploredIdx = 0;
-		int minIdx = 0;
-		float min = dist [0];
-		while (exploredIdx != dist.Length) {
-			for (int idx = exploredIdx; idx < dist.Length; ++idx) {
-				if (dist [idx] < min) {
-					minIdx = idx;
-					min = dist [idx];
-				}
-			}
-			float temp = dist [exploredIdx];
-			dist [exploredIdx] = dist [minIdx];
-			dist [minIdx] = temp;
-
-			GameObject tempObj = obj [exploredIdx];
-			obj [exploredIdx] = obj [minIdx];
-			obj [minIdx] = tempObj;
-
-			++exploredIdx;
-		}
-		return obj;
-	}
-
-	public void regenClosestPathsShort(){
-		//SHORTER, MORE EFFICIENT, MORE ESTIMATED APPROACH ---//
-
-		//calculate distances to dev for each enemy
-		GameObject[] enemies = getEnemies ();
-		float[] distToDev = new float[enemies.Length];
-		for(int idx = 0; idx < enemies.Length; ++idx) {
-			distToDev [idx] = Vector3.Distance (enemies [idx].transform.position, transform.position);
-		}
-
-		//sort enemies by distance to dev
-		enemies = sortByDistance(enemies, distToDev);
-
-		//for each enemy, get closest empty surrounding neighbor
-		regenPaths(enemies);
-	}
-
-	//for each enemy calculate distance to each surroundingNeighbor
-	//return a list containing the list for each enemy
-	private List<List<KeyValuePair<mapNode, float>>> calculateEnemyDistances() {
-		List<List<KeyValuePair<mapNode, float>>> enemyNodeLists = new List<List<KeyValuePair<mapNode, float>>> ();
-		mapNode[] neighborCircle = terrain.GetComponent<MapPathfind> ().getSpacedDevCombatCircle (3, 0);
-		GameObject[] enemies = getEnemies ();
-		foreach (GameObject enemy in enemies) {
-			List<KeyValuePair<mapNode, float>> nodeList = new List<KeyValuePair<mapNode, float>> ();
-			foreach (mapNode neighbor in neighborCircle) {
-				nodeList.Add(new KeyValuePair<mapNode, float> (neighbor, Vector3.Distance(enemy.transform.position, neighbor.getCenter())));
-			}
-			enemyNodeLists.Add (nodeList);
-		}
-		return enemyNodeLists;
-	}
-
-	//sort mapNodes in accordance to their corresponding float values, using a sortedlist
-	private List<KeyValuePair<mapNode, float>> sortNodesByDistance(List<KeyValuePair<mapNode, float>> unsorted) {
-		SortedList<float, mapNode> sorter = new SortedList<float, mapNode> ();
-		foreach(KeyValuePair<mapNode, float> pair in unsorted){
-			sorter.Add (pair.Value, pair.Key);
-		}
-		unsorted.Clear ();
-		foreach (KeyValuePair<float, mapNode> pair in sorter) {
-			unsorted.Add (new KeyValuePair<mapNode, float> (pair.Value, pair.Key));
-		}
-		return unsorted;
-	}
-
-	//Sort enemies by the distance to their closest node
-	//the enemies that are closest to their respective nodes get to go first
-	//return a list of keyvalue pairs representing the 
-	private List<KeyValuePair<mapNode, float>> assignClosestNeighbors (List<List<KeyValuePair<mapNode, float>>> enemyNodeLists ){
-		SortedList<float, List<KeyValuePair<mapNode,float>>> sorted = new SortedList<float, List<KeyValuePair<mapNode, float>>> ();
-		foreach (List<KeyValuePair<mapNode, float>> nodeList in enemyNodeLists) {
-			sorted.Add (nodeList [0].Value, nodeList);
-		}
-		enemyNodeLists = (List<List<KeyValuePair<mapNode, float>>>) sorted.Values;
-	}
-
-
-	public void regenClosestPathsLong () {
-		//--- LONGER, MORE TIME-CONSUMING, MORE ACCURATE APPROACH ---//
-		//for every single enemy: figure out the distance from the enemy to each surroundingNeighbor
-		List<List<KeyValuePair<mapNode, float>>> enemyNodeLists = calculateEnemyDistances();
-		List<List<KeyValuePair<mapNode, float>>> sortedNodeLists = new List<List<KeyValuePair<mapNode, float>>>();
-
-		//for each enemy, sort its list of neighbors by the enemy's distance to those neighbors
-		foreach(List<KeyValuePair<mapNode, float>> nodeList in enemyNodeLists){
-			sortedNodeLists.Add(sortNodesByDistance (nodeList));
-		}
-
-			//then, keep the distances[0] for each enemy into an array
-			//find the enemy with the smallest distance[0], and delete this distance and this node from the rest of the enemies
-			//plot the path for this enemy
-
-			//then continue on, find the smallest distance[0] out of all the enemies left,
-			//plot the path for this enemy
-			//and delete that distance[0] and that node from all of the other enemies
-			
-			//keep repeating until all enemies are taken care of.
-
-	}
-
-	private void clearAllNodes () {
-		int zMax = terrain.GetComponent<MapPathfind> ().grid.Length;
-		int xMax = terrain.GetComponent<MapPathfind> ().grid[0].Length;
-		for (int z = 0; z < zMax; ++z) {
-			for (int x = 0; x < xMax; ++x) {
-				terrain.GetComponent<MapPathfind> ().grid [z] [x].setEmpty ();
-			}
-		}
-	}
-
-	public void regenPaths(GameObject[] enemies){
-		foreach (GameObject enemy in enemies) {
-			terrain.GetComponent<MapPathfind> ().containingCell (enemy.transform.position).setFull(enemy.GetComponent<EnemyAI>().enemyID);
-		}
-		foreach (GameObject enemy in enemies) {
-			enemy.GetComponent<EnemyAI> ().plotNewPath ();
-		}
-//		foreach (GameObject enemy in enemies) {
-//			enemy.GetComponent<EnemyAI> ().moveToDev();
-//		}
-		makingNewPaths = false;
-	}
-
+		
 	public void setDevCell() {
 		//dev's current location
 		mapNode newDevCell = terrain.GetComponent<MapPathfind> ().containingCell (transform.position);
@@ -197,7 +68,7 @@ public class DevMovement : MonoBehaviour {
 			terrain.GetComponent<MapPathfind> ().devCell.setEmpty ();
 			terrain.GetComponent<MapPathfind> ().devCell = newDevCell;
 			terrain.GetComponent<MapPathfind> ().devCell.setFull (-3);
-			regenPaths (getEnemies());
+			terrain.GetComponent<ClosestNodes>().regenPaths (getEnemies());
 		}
 	}
 

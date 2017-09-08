@@ -137,6 +137,7 @@
      <Compile Include="Assets\PostProcessing\Utilities\CustomMotionTexture\ExampleWheelController.cs" />
      <Compile Include="Assets\scripts\AStarMovement.cs" />
      <Compile Include="Assets\scripts\CameraZoom.cs" />
+     <Compile Include="Assets\scripts\ClosestNodes.cs" />
      <Compile Include="Assets\scripts\DevCombat.cs" />
      <Compile Include="Assets\scripts\DevMovement.cs" />
      <Compile Include="Assets\scripts\EmptyClass.cs" />
