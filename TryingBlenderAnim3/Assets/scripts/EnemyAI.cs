@@ -9,6 +9,7 @@ public class EnemyAI : MonoBehaviour {
 	public bool doneStarting;
 	public bool inPosition;
 	public GameObject terrain;
+	public mapNode start;
 
 	private Animator enemyAnim;
 	private GameObject Dev;
@@ -20,7 +21,6 @@ public class EnemyAI : MonoBehaviour {
 	//	private Vector3 devTarget;
 	private Queue<mapNode> path;
 	private mapNode nextDest;
-	private mapNode start;
 	private float restStartTime;
 	private bool resting;
 	private mapNode oldDevCell;
@@ -56,7 +56,7 @@ public class EnemyAI : MonoBehaviour {
 			}
 		}
 		if(allDone)
-			GameObject.Find ("DevDrake").GetComponent<DevMovement> ().Start ();
+			terrain.GetComponent<ClosestNodes> ().regenClosestPathsLong ();
 
 		doneStarting = true;
 	}
@@ -78,8 +78,8 @@ public class EnemyAI : MonoBehaviour {
 				return;
 		}
 
-		if (terrain.GetComponent<ClosestNodes>().makingNewPaths)
-			return;
+//		if (terrain.GetComponent<ClosestNodes>().makingNewPaths)
+//			return;
 
 		//--------CHECKING IF DEV IS NEAR ENOUGH FOR ENEMIES TO NOTICE HIM--------//
 		//		if (!Camera.main.GetComponent<MouseMovement> ().inCombatZone) {

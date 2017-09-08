@@ -98,7 +98,7 @@ public class ClosestNodes : MonoBehaviour {
 	//return a list containing the list for each enemy
 	private List<nodeList> calculateEnemyDistances() {
 		List<nodeList> enemyNodeLists = new List<nodeList> ();
-		mapNode[] neighborCircle = terrain.GetComponent<MapPathfind> ().getSpacedDevCombatCircle (3, 0);
+		mapNode[] neighborCircle = terrain.GetComponent<MapPathfind> ().getSpacedDevCombatCircle (4, 0);
 		SortedList<int, GameObject> enemies = terrain.GetComponent<MapPathfind> ().enemies;
 		foreach (KeyValuePair<int, GameObject> pair in enemies) {
 			GameObject enemy = pair.Value;
@@ -142,14 +142,20 @@ public class ClosestNodes : MonoBehaviour {
 			//assign this enemy a finalDest
 			//and remove this enemy from enemyNodeLists since it has been assigned a finalDest
 			float minKey = sorted.Keys[0];
-			KeyValuePair<mapNode, float> curPair =  sorted [minKey].at (0);
-			finalDests.Add(new KeyValuePair<int, mapNode>(sorted [minKey].getID(), curPair.Key));
+			mapNode thisNode = sorted [minKey].at (0).Key;
+			finalDests.Add(new KeyValuePair<int, mapNode>(sorted [minKey].getID(), sorted [minKey].at (0).Key));
 			enemyNodeLists.Remove(sorted[minKey]);
 
 			//also remove all occurrences of the finalDest node which was just assigned
 			//from lists in enemyNodeLists, so that no other enemy can be assigned this node
-			foreach (nodeList list in enemyNodeLists) {
-				list.remove (curPair);
+			foreach (nodeList nodelist in enemyNodeLists) {
+				List<KeyValuePair<mapNode, float>> list = nodelist.getList (); 
+				for(int idx = 0; idx < list.Count; ++idx) {
+					KeyValuePair<mapNode, float> pair = list [idx];
+					if(pair.Key.equalTo(thisNode)) {
+						nodelist.remove (pair);
+					}
+				}
 			}
 		}
 
@@ -158,6 +164,13 @@ public class ClosestNodes : MonoBehaviour {
 
 
 	public void regenClosestPathsLong () {
+
+		GameObject[] enemies = getEnemies ();
+		foreach (GameObject enemy in enemies) {
+			enemy.GetComponent<EnemyAI> ().start.setEmpty ();
+			enemy.GetComponent<EnemyAI> ().cleanOldPath ();
+		}
+
 		//for every single enemy: figure out the distance from the enemy to each surroundingNeighbor
 		List<nodeList> enemyNodeLists = calculateEnemyDistances();
 		List<nodeList> sortedNodeLists = new List<nodeList>();
@@ -171,7 +184,6 @@ public class ClosestNodes : MonoBehaviour {
 		List<KeyValuePair<int, mapNode>> finalDests = assignClosestNeighbors (sortedNodeLists);
 		foreach (KeyValuePair<int, mapNode> enemyNodePair in finalDests) {
 			GameObject thisEnemy = terrain.GetComponent<MapPathfind> ().getEnemyByID (enemyNodePair.Key);
-			thisEnemy.GetComponent<EnemyAI> ().cleanOldPath ();
 			thisEnemy.GetComponent<EnemyAI> ().finalDest = enemyNodePair.Value;
 			thisEnemy.GetComponent<EnemyAI> ().setNewPath ();
 		}

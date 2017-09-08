@@ -33,7 +33,6 @@ public class DevMovement : MonoBehaviour {
 		desiredRot = Camera.main.transform.eulerAngles.y;
 		horizRot = false;
 		initDevCell ();
-		terrain.GetComponent<ClosestNodes> ().regenClosestPathsLong ();
 	}
 
 	private mapNode getDevCell(){

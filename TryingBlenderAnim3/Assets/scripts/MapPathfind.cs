@@ -64,7 +64,7 @@ public class MapPathfind : MonoBehaviour {
 	}
 
 	public GameObject getEnemyByID(int enemyID){
-		return enemies [enemyID - 1];
+		return enemies [enemyID];
 	}
 
 	public mapNode[] removeFromList(mapNode trashItem, mapNode[] list){
