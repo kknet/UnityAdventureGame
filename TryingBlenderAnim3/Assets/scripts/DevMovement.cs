@@ -21,6 +21,7 @@ public class DevMovement : MonoBehaviour {
 	private bool applyJumpTrans;
 	private float needToRot;
 	private int runCounter;
+	private mapNode lastRegenNode;
 
 	// Use this for initialization
 	public void Start () {
@@ -65,8 +66,10 @@ public class DevMovement : MonoBehaviour {
 			terrain.GetComponent<MapPathfind> ().devCell.setEmpty ();
 			terrain.GetComponent<MapPathfind> ().devCell = newDevCell;
 			terrain.GetComponent<MapPathfind> ().devCell.setFull (-3);
-			if(rand (0f, 1f) > 0.7f)
+			if (lastRegenNode == null || lastRegenNode.distance (newDevCell) >= 20f) {
 				terrain.GetComponent<ClosestNodes> ().regenClosestPathsLong ();
+				lastRegenNode = newDevCell;
+			}
 		}
 	}
 
