@@ -179,7 +179,7 @@ public class MapPathfind : MonoBehaviour {
 	//'Empty' nodes include those nodes which are not occupied by anyone
 	//and those nodes which are occupied by the caller itself. 
 	//The caller is described by 'yourEnemyID'
-	private mapNode[] extractEmptyNodes(mapNode[] list, int yourEnemyID){
+	public mapNode[] extractEmptyNodes(mapNode[] list, int yourEnemyID){
 		List<mapNode> empties = new List<mapNode> ();
 		foreach (mapNode node in list) {
 			if (node!=null && !node.hasOtherOwner (yourEnemyID)) {
@@ -188,6 +188,21 @@ public class MapPathfind : MonoBehaviour {
 		}
 		return empties.ToArray();
 	}
+
+	//Extracts all empty nodes from given list.
+	//'Empty' nodes include those nodes which are not occupied by anyone
+	//and those nodes which are occupied by the caller itself. 
+	//The caller is described by 'yourEnemyID'
+	public List<mapNode> extractEmptyNodes(List<mapNode> list, int yourEnemyID){
+		List<mapNode> empties = new List<mapNode> ();
+		foreach (mapNode node in list) {
+			if (node!=null && !node.hasOtherOwner (yourEnemyID)) {
+				empties.Add (node);
+			}
+		}
+		return empties;
+	}
+
 
 	IEnumerator goToSleep(){
 		yield return new WaitForSeconds (0.1f);

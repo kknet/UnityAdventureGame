@@ -55,8 +55,8 @@ public class EnemyAI : MonoBehaviour {
 				}
 			}
 		}
-		if(allDone)
-			terrain.GetComponent<ClosestNodes> ().regenClosestPathsLong ();
+		if (allDone)
+			repathAll ();
 
 		doneStarting = true;
 	}
@@ -78,8 +78,8 @@ public class EnemyAI : MonoBehaviour {
 				return;
 		}
 
-//		if (terrain.GetComponent<ClosestNodes>().makingNewPaths)
-//			return;
+		if (finalDest==null)
+			return;
 
 		//--------CHECKING IF DEV IS NEAR ENOUGH FOR ENEMIES TO NOTICE HIM--------//
 		//		if (!Camera.main.GetComponent<MouseMovement> ().inCombatZone) {
@@ -136,24 +136,23 @@ public class EnemyAI : MonoBehaviour {
 	}
 
 	public void repathAll(){
-		terrain.GetComponent<ClosestNodes> ().regenClosestPathsLong ();
+		terrain.GetComponent<ClosestNodes> ().regenPathsLongQuick ();
 	}
 
 	public void moveToDev() {
 		updateYourCell ();
 
-		if (finalDest == null) {
-			stop ();
-			repathAll ();
-		}
+//		if (finalDest == null) {
+//			stop ();
+//		}
 
-		if (nextDest != null && nextDest.hasOtherOwner (enemyID)) {
+//		if (nextDest != null && nextDest.hasOtherOwner (enemyID)) {
 //			stop ();
-			repathAll();
-		} else if (finalDest != null && finalDest.hasOtherOwner (enemyID)) {
+////			repathAll();
+//		} else if (finalDest != null && finalDest.hasOtherOwner (enemyID)) {
 //			stop ();
-			repathAll();
-		}		
+////			repathAll();
+//		}		
 
 		if (start.equalTo (finalDest) || nextDest == null) {
 			inPosition = true;
@@ -164,11 +163,9 @@ public class EnemyAI : MonoBehaviour {
 //				attack ();
 //			}
 			return;
-		} else {
-			inPosition = false;
-//			stopEnemyAttack ();
-
 		}
+		inPosition = false;
+//		stopEnemyAttack ();
 
 		//reached intermediate destination
 		if (nextDest == null || start.equalTo(nextDest)) {

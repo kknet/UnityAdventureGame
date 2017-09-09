@@ -25,16 +25,16 @@ public class ClosestNodes : MonoBehaviour {
 		return UnityEngine.Random.Range (a, b);
 	}
 
-//	private void clearAllNodes () {
-//		int zMax = terrain.GetComponent<MapPathfind> ().grid.Length;
-//		int xMax = terrain.GetComponent<MapPathfind> ().grid[0].Length;
-//		for (int z = 0; z < zMax; ++z) {
-//			for (int x = 0; x < xMax; ++x) {
-//				terrain.GetComponent<MapPathfind> ().grid [z] [x].setEmpty ();
-//			}
-//		}
-//	}
-//
+	private void clearAllNodes () {
+		int zMax = terrain.GetComponent<MapPathfind> ().grid.Length;
+		int xMax = terrain.GetComponent<MapPathfind> ().grid[0].Length;
+		for (int z = 0; z < zMax; ++z) {
+			for (int x = 0; x < xMax; ++x) {
+				terrain.GetComponent<MapPathfind> ().grid [z] [x].setEmpty ();
+			}
+		}
+	}
+
 //	public void regenPaths(GameObject[] enemies){
 //		foreach (GameObject enemy in enemies) {
 //			terrain.GetComponent<MapPathfind> ().containingCell (enemy.transform.position).setFull(enemy.GetComponent<EnemyAI>().enemyID);
@@ -89,11 +89,6 @@ public class ClosestNodes : MonoBehaviour {
 		return obj;
 	}
 
-
-
-
-
-
 	//for each enemy calculate distance to each surroundingNeighbor
 	//return a list containing the list for each enemy
 	private List<nodeList> calculateEnemyDistances() {
@@ -123,7 +118,6 @@ public class ClosestNodes : MonoBehaviour {
 		return min;
 	}
 
-
 	//sort mapNodes in accordance to their corresponding float values, using a sortedlist
 	private nodeList sortNodesByDistance(nodeList unsorted) {
 		SortedList<float, mapNode> sorter = new SortedList<float, mapNode> ();
@@ -136,9 +130,6 @@ public class ClosestNodes : MonoBehaviour {
 		}
 		return unsorted;
 	}
-		
-//	private List<KeyValuePair<int, mapNode>> assignDestsQuick (List<nodeList> enemyNodeLists){		
-//	}
 
 	//Sort enemies by the distance to their closest node
 	//the enemies that are closest to their respective nodes get to go first
@@ -195,13 +186,7 @@ public class ClosestNodes : MonoBehaviour {
 		for (int idx = 0; idx < enemyNodeLists.Count; ++idx) {
 			enemyNodeLists [idx].sort ();
 		}
-
-//		//find closest node to each enemy
-//		List<KeyValuePair<mapNode, float>> closestNodes = new List<KeyValuePair<mapNode, float>>();
-//		foreach(nodeList list in enemyNodeLists){
-//			closestNodes.Add(findClosestNode(list));
-//		}
-
+			
 		//assign neighbors to enemies, prioritizing enemies that are closest to their chosen neighbors
 		List<KeyValuePair<int, mapNode>> finalDests = assignClosestNeighbors (enemyNodeLists);
 
@@ -211,7 +196,48 @@ public class ClosestNodes : MonoBehaviour {
 			thisEnemy.GetComponent<EnemyAI> ().setNewPath ();
 		}
 	}
+
+	public void regenPathsLongQuick()
+	{
+		if (makingNewPaths)
+			return;
+
+		makingNewPaths = true;
+
+		List<mapNode> neighborCircle = new List<mapNode>(terrain.GetComponent<MapPathfind> ().getSpacedDevCombatCircle (4, 0));
+		List<GameObject> enemies = new List<GameObject>(terrain.GetComponent<MapPathfind> ().enemies.Values);
+//		Debug.LogAssertion ("num nodes: " + neighborCircle.Count + " num enemies: " + enemies.Count);
+		for(int nodeIdx = 0; nodeIdx < neighborCircle.Count; ++nodeIdx){
+			mapNode destNode = neighborCircle[nodeIdx];
+			float minDist = float.MaxValue;
+			GameObject chosenEnemy = null;
+			for (int enemyIdx = 0; enemyIdx < enemies.Count; ++enemyIdx) {
+				GameObject thisEnemy = enemies [enemyIdx];
+				float thisDist = thisEnemy.GetComponent<EnemyAI> ().start.distance (destNode);
+				if (thisDist < minDist) {
+					minDist = thisDist;
+					chosenEnemy = thisEnemy;
+				}
+			}
+			assignDest (chosenEnemy, destNode);
+			enemies.Remove (chosenEnemy);
+			neighborCircle.Remove (destNode);
+		}
+
+		makingNewPaths = false;
+	}
+
+	public void assignDest(GameObject enemy, mapNode dest){
+		enemy.GetComponent<EnemyAI> ().finalDest = dest;
+		enemy.GetComponent<EnemyAI> ().setNewPath ();
+	}
+
+
+
 }
+
+
+
 
 public class nodeList {
 	int enemyID;

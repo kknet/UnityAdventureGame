@@ -81,7 +81,7 @@ public class AStarMovement : MonoBehaviour {
 
 		//initialize the g and f scores for start
 		gScores [start] = 0; //the distance from start to start is 0, obviously
-		fScores [start] = 0 + euclideanHeuristicCost(start, goal); //the estimated distance from start to goal
+		fScores [start] = 0 + heuristicWeight(start, goal); //the estimated distance from start to goal
 
 		//set of exploredNodes
 		HashSet<mapNode> exploredNodes = new HashSet<mapNode>();
@@ -101,9 +101,14 @@ public class AStarMovement : MonoBehaviour {
 			}
 
 			exploredNodes.Add (curNode);
-			IList<mapNode> neighbors = curNode.getNeighbors ();
+
+			List<mapNode> neighbors = new List<mapNode>(curNode.getNeighbors ());
+			neighbors = terrain.GetComponent<MapPathfind> ().extractEmptyNodes (neighbors, enemyID);
 			foreach (mapNode node in neighbors) {
-				
+
+				if (!fScores.ContainsKey (node))
+					continue;
+
 				if (node.hasOtherOwner (enemyID))
 					continue;
 
@@ -114,8 +119,12 @@ public class AStarMovement : MonoBehaviour {
 				int curScore = gScores [curNode] + node.Weight ();
 
 				//we haven't explored this node, so add it to the queue
-				if (!nodeQueue.Contains (node))
-					nodeQueue.Enqueue (node, fScores [node]);
+				if (!nodeQueue.Contains (node)){
+					if (!fScores.ContainsKey (node))
+						Debug.LogAssertion ("fscores doesn't have node as KEY!");
+					else
+						nodeQueue.Enqueue (node, fScores [node]);
+				}
 
 				//its current score is greater than the shortest path to it
 				//we have already calculated, so don't consider it
@@ -126,21 +135,14 @@ public class AStarMovement : MonoBehaviour {
 				//and record the node's parent
 				nodeParents [node] = curNode;
 				gScores [node] = curScore;
-				fScores [node] = gScores [node] + euclideanHeuristicCost (node, goal);
+				fScores [node] = gScores [node] + heuristicWeight (node, goal);
 			}
 		}
 
 		return start;
 	}
 
-	//Naive estimate because doesn't take into account diagonals
-	int manhattanHeuristicCost(mapNode curNode, mapNode goalNode) {
-		KeyValuePair<int, int> curIndices = curNode.getIndices ();
-		KeyValuePair<int, int> goalIndices = goalNode.getIndices ();
-		return Mathf.Abs (curIndices.Key - goalIndices.Key) + Mathf.Abs (curIndices.Value - goalIndices.Value);
-	}
-
-	int euclideanHeuristicCost(mapNode curNode, mapNode goalNode) {
+	int heuristicWeight(mapNode curNode, mapNode goalNode) {
 		KeyValuePair<int, int> curIndices = curNode.getIndices ();
 		KeyValuePair<int, int> goalIndices = goalNode.getIndices ();
 		return Mathf.RoundToInt(Mathf.Sqrt(Mathf.Pow (curIndices.Key - goalIndices.Key, 2f) + Mathf.Pow (curIndices.Value - goalIndices.Value, 2f)));

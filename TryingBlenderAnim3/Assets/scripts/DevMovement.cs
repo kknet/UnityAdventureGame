@@ -66,10 +66,10 @@ public class DevMovement : MonoBehaviour {
 			terrain.GetComponent<MapPathfind> ().devCell.setEmpty ();
 			terrain.GetComponent<MapPathfind> ().devCell = newDevCell;
 			terrain.GetComponent<MapPathfind> ().devCell.setFull (-3);
-			if (lastRegenNode == null || lastRegenNode.distance (newDevCell) >= 20f) {
-				terrain.GetComponent<ClosestNodes> ().regenClosestPathsLong ();
-				lastRegenNode = newDevCell;
-			}
+//			if (lastRegenNode == null || lastRegenNode.distance (newDevCell) >= 5f) {
+				terrain.GetComponent<ClosestNodes> ().regenPathsLongQuick();
+//				lastRegenNode = newDevCell;
+//			}
 		}
 	}
 
@@ -167,11 +167,11 @@ public class DevMovement : MonoBehaviour {
 
 	void Update () {
 		setDevCell ();
-		mapNode ourCell = GameObject.Find ("Terrain").GetComponent<MapPathfind> ().containingCell (transform.position);
-		if (ourCell!=null) {
-			KeyValuePair<int, int> coords = ourCell.getIndices ();
-			Debug.Log (coords.Key + ", " + coords.Value);
-		}
+//		mapNode ourCell = GameObject.Find ("Terrain").GetComponent<MapPathfind> ().containingCell (transform.position);
+//		if (ourCell!=null) {
+//			KeyValuePair<int, int> coords = ourCell.getIndices ();
+//			Debug.Log (coords.Key + ", " + coords.Value);
+//		}
 		AnimatorStateInfo anim = myAnimator.GetCurrentAnimatorStateInfo (0);
 		bool inCombatZone = Camera.main.GetComponent<MouseMovement> ().inCombatZone;
 		bool weaponDrawn = myAnimator.GetBool ("WeaponDrawn");
