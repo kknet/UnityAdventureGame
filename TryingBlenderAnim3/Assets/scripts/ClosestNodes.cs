@@ -202,27 +202,39 @@ public class ClosestNodes : MonoBehaviour {
 		if (makingNewPaths)
 			return;
 
+//		clearAllNodes ();
+
 		makingNewPaths = true;
 
+		List<KeyValuePair<GameObject, mapNode>> enemyDests = new List<KeyValuePair<GameObject, mapNode>> ();
 		List<mapNode> neighborCircle = new List<mapNode>(terrain.GetComponent<MapPathfind> ().getSpacedDevCombatCircle (4, 0));
 		List<GameObject> enemies = new List<GameObject>(terrain.GetComponent<MapPathfind> ().enemies.Values);
-//		Debug.LogAssertion ("num nodes: " + neighborCircle.Count + " num enemies: " + enemies.Count);
-		for(int nodeIdx = 0; nodeIdx < neighborCircle.Count; ++nodeIdx){
-			mapNode destNode = neighborCircle[nodeIdx];
-			float minDist = float.MaxValue;
-			GameObject chosenEnemy = null;
-			for (int enemyIdx = 0; enemyIdx < enemies.Count; ++enemyIdx) {
-				GameObject thisEnemy = enemies [enemyIdx];
-				float thisDist = thisEnemy.GetComponent<EnemyAI> ().start.distance (destNode);
-				if (thisDist < minDist) {
-					minDist = thisDist;
-					chosenEnemy = thisEnemy;
+		Debug.Log("num nodes: " + neighborCircle.Count + " num enemies: " + enemies.Count);
+
+		while (neighborCircle.Count > 0) {
+			for (int nodeIdx = 0; nodeIdx < neighborCircle.Count; ++nodeIdx) {
+				mapNode destNode = neighborCircle [nodeIdx];
+				float minDist = float.MaxValue;
+				GameObject chosenEnemy = null;
+				for (int enemyIdx = 0; enemyIdx < enemies.Count; ++enemyIdx) {
+					GameObject thisEnemy = enemies [enemyIdx];
+					float thisDist = thisEnemy.GetComponent<EnemyAI> ().start.distance (destNode);
+					if (thisDist < minDist) {
+						minDist = thisDist;
+						chosenEnemy = thisEnemy;
+					}
 				}
+				enemyDests.Add (new KeyValuePair<GameObject, mapNode> (chosenEnemy, destNode));
+				enemies.Remove (chosenEnemy);
+				neighborCircle.Remove (destNode);
 			}
-			assignDest (chosenEnemy, destNode);
-			enemies.Remove (chosenEnemy);
-			neighborCircle.Remove (destNode);
 		}
+
+		foreach (KeyValuePair<GameObject, mapNode> pair in enemyDests) {
+			assignDest (pair.Key, pair.Value);
+		}
+
+//		Debug.LogError ("Done!");
 
 		makingNewPaths = false;
 	}

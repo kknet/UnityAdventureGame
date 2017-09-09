@@ -33,8 +33,8 @@ public class EnemyAI : MonoBehaviour {
 		inPosition = false;
 		enemyAnim = GetComponent<Animator> ();
 		Dev = GameObject.Find ("DevDrake");
-		rotSpeed = 7f;
-		moveSpeed = 2f;
+		rotSpeed = 10f;
+		moveSpeed = 5f;
 		if (!terrain.GetComponent<MapPathfind>().doneBuilding) {
 			terrain.GetComponent<MapPathfind> ().Start ();
 		}
@@ -77,8 +77,16 @@ public class EnemyAI : MonoBehaviour {
 			if(!enemy.GetComponent<EnemyAI>().doneStarting)
 				return;
 		}
+		updateYourCell ();
 
-		if (finalDest==null)
+		if (finalDest == null) {
+			repathAll ();
+			return;
+		}
+
+//		Debug.Log (finalDest.getIndices());
+
+		if (terrain.GetComponent<ClosestNodes> ().makingNewPaths)
 			return;
 
 		//--------CHECKING IF DEV IS NEAR ENOUGH FOR ENEMIES TO NOTICE HIM--------//
@@ -90,7 +98,6 @@ public class EnemyAI : MonoBehaviour {
 		//--------CHECKING IF THIS ENEMY IS DEAD--------------//
 		//		if (GetComponent<ManageHealth> ().isDead ())
 		//			this.gameObject.SetActive (false);
-
 		moveToDev ();
 
 		//-------------- ALL FOR DEBUGGING-------------//
@@ -140,19 +147,17 @@ public class EnemyAI : MonoBehaviour {
 	}
 
 	public void moveToDev() {
-		updateYourCell ();
+		if (finalDest == null) {
+			stop ();
+		}
 
-//		if (finalDest == null) {
+		if (nextDest != null && nextDest.hasOtherOwner (enemyID)) {
 //			stop ();
-//		}
-
-//		if (nextDest != null && nextDest.hasOtherOwner (enemyID)) {
+			repathAll();
+		} else if (finalDest != null && finalDest.hasOtherOwner (enemyID)) {
 //			stop ();
-////			repathAll();
-//		} else if (finalDest != null && finalDest.hasOtherOwner (enemyID)) {
-//			stop ();
-////			repathAll();
-//		}		
+			repathAll();
+		}		
 
 		if (start.equalTo (finalDest) || nextDest == null) {
 			inPosition = true;
