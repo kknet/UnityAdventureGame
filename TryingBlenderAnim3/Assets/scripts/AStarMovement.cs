@@ -34,7 +34,7 @@ public class AStarMovement : MonoBehaviour {
 			curNode = nodeParents [curNode];
 			if (curNode.hasOtherOwner (enemyID))
 				Debug.LogError ("Doesn't work!");
-//			curNode.setFull (enemyID);
+			curNode.setFull (enemyID);
 		}
 		return new Queue<mapNode> (path);
 	}
@@ -103,7 +103,7 @@ public class AStarMovement : MonoBehaviour {
 			exploredNodes.Add (curNode);
 
 			List<mapNode> neighbors = new List<mapNode>(curNode.getNeighbors ());
-			neighbors = terrain.GetComponent<MapPathfind> ().extractEmptyNodes (neighbors, enemyID);
+//			neighbors = terrain.GetComponent<MapPathfind> ().extractEmptyNodes (neighbors, enemyID);
 			foreach (mapNode node in neighbors) {
 
 				if (!fScores.ContainsKey (node))

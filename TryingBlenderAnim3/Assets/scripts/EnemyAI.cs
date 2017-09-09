@@ -33,8 +33,9 @@ public class EnemyAI : MonoBehaviour {
 		inPosition = false;
 		enemyAnim = GetComponent<Animator> ();
 		Dev = GameObject.Find ("DevDrake");
-		rotSpeed = 10f;
-		moveSpeed = 5f;
+		rotSpeed = 7f;
+		moveSpeed = 4f;
+
 		if (!terrain.GetComponent<MapPathfind>().doneBuilding) {
 			terrain.GetComponent<MapPathfind> ().Start ();
 		}
@@ -184,6 +185,11 @@ public class EnemyAI : MonoBehaviour {
 				return;
 			}
 		}
+
+		if (Mathf.Approximately (enemyAnim.GetFloat ("enemySpeed"), 0f)) {
+			if (rand (0f, 1f) < 0.97f)
+				return;
+		}
 		//rotate towards nextDest
 		rotateToTarget(nextDest.getCenter());
 
@@ -199,6 +205,7 @@ public class EnemyAI : MonoBehaviour {
 	void stop(){
 		enemyAnim.SetFloat ("enemySpeed", Mathf.MoveTowards (enemyAnim.GetFloat ("enemySpeed"), 0f, 2f * Time.deltaTime));
 	}
+		
 
 	void moveToTarget(){
 		if (finalDest == null || start.equalTo(finalDest) || !isEnemyRunning()) {
@@ -209,8 +216,18 @@ public class EnemyAI : MonoBehaviour {
 		}
 	}
 
+	float clampAngle(float orig){
+		while (orig > 180f)
+			orig -= 360f;
+		while (orig < -180f)
+			orig += 360f;
+		return orig;
+	}
+
 	void rotateToTarget(Vector3 targ){
 		dif = targ - transform.position;
+		dif.x = clampAngle (dif.x);
+		dif.z = clampAngle (dif.z);
 		dif = new Vector3 (dif.x, 0f, dif.z);
 		transform.forward = Vector3.RotateTowards (transform.forward, dif, rotSpeed * Time.deltaTime, 0.0f); 
 	}
