@@ -78,8 +78,8 @@ public class EnemyAI : MonoBehaviour {
 				return;
 		}
 
-//		if (terrain.GetComponent<ClosestNodes>().makingNewPaths)
-//			return;
+		if (terrain.GetComponent<ClosestNodes>().makingNewPaths)
+			return;
 
 		//--------CHECKING IF DEV IS NEAR ENOUGH FOR ENEMIES TO NOTICE HIM--------//
 		//		if (!Camera.main.GetComponent<MouseMovement> ().inCombatZone) {
@@ -155,7 +155,7 @@ public class EnemyAI : MonoBehaviour {
 			repathAll();
 		}		
 
-		if (start.equalTo (finalDest) || nextDest == null) {
+		if (start.equalTo (finalDest) || nextDest == null)  {
 			inPosition = true;
 			stop ();
 			rotateToTarget (Dev.transform.position);
