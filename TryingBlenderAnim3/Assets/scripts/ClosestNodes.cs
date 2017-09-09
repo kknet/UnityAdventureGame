@@ -98,13 +98,14 @@ public class ClosestNodes : MonoBehaviour {
 	//return a list containing the list for each enemy
 	private List<nodeList> calculateEnemyDistances() {
 		List<nodeList> enemyNodeLists = new List<nodeList> ();
-		mapNode[] neighborCircle = terrain.GetComponent<MapPathfind> ().getSpacedDevCombatCircle (4, 0);
+		mapNode[] neighborCircle = terrain.GetComponent<MapPathfind> ().getSpacedDevCombatCircle (3, 0);
 		SortedList<int, GameObject> enemies = terrain.GetComponent<MapPathfind> ().enemies;
 		foreach (KeyValuePair<int, GameObject> pair in enemies) {
 			GameObject enemy = pair.Value;
 			nodeList list = new nodeList (enemy.GetComponent<EnemyAI>().enemyID);
 			foreach (mapNode neighbor in neighborCircle) {
-				list.Add(neighbor, Vector3.Distance(enemy.transform.position, neighbor.getCenter()));
+				mapNode enemyNode = enemy.GetComponent<EnemyAI> ().start;
+				list.Add(neighbor, enemyNode.distance(neighbor));
 			}
 			enemyNodeLists.Add (list);
 		}
@@ -164,7 +165,9 @@ public class ClosestNodes : MonoBehaviour {
 
 
 	public void regenClosestPathsLong () {
-
+		if (makingNewPaths)
+			return;
+		
 		GameObject[] enemies = getEnemies ();
 		foreach (GameObject enemy in enemies) {
 			enemy.GetComponent<EnemyAI> ().start.setEmpty ();

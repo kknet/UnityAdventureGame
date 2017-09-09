@@ -60,11 +60,13 @@ public class DevMovement : MonoBehaviour {
 		if (newDevCell == null) {
 			Debug.LogAssertion ("bad");
 		}
+//			if (GameObject.Find ("Enemy") != null && !newDevCell.equalTo (terrain.GetComponent<MapPathfind> ().devCell)) {
 		else if (!newDevCell.equalTo (terrain.GetComponent<MapPathfind> ().devCell)) {
 			terrain.GetComponent<MapPathfind> ().devCell.setEmpty ();
 			terrain.GetComponent<MapPathfind> ().devCell = newDevCell;
 			terrain.GetComponent<MapPathfind> ().devCell.setFull (-3);
-			terrain.GetComponent<ClosestNodes>().regenClosestPathsLong ();
+			if(rand (0f, 1f) > 0.7f)
+				terrain.GetComponent<ClosestNodes> ().regenClosestPathsLong ();
 		}
 	}
 

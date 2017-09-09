@@ -33,8 +33,8 @@ public class EnemyAI : MonoBehaviour {
 		inPosition = false;
 		enemyAnim = GetComponent<Animator> ();
 		Dev = GameObject.Find ("DevDrake");
-		rotSpeed = 5f;
-		moveSpeed = 1.5f;
+		rotSpeed = 7f;
+		moveSpeed = 2f;
 		if (!terrain.GetComponent<MapPathfind>().doneBuilding) {
 			terrain.GetComponent<MapPathfind> ().Start ();
 		}
@@ -136,10 +136,7 @@ public class EnemyAI : MonoBehaviour {
 	}
 
 	public void repathAll(){
-		if (!terrain.GetComponent<ClosestNodes> ().makingNewPaths) {
-			terrain.GetComponent<ClosestNodes> ().makingNewPaths = true;
-			terrain.GetComponent<ClosestNodes> ().regenClosestPathsLong ();
-		} 
+		terrain.GetComponent<ClosestNodes> ().regenClosestPathsLong ();
 	}
 
 	public void moveToDev() {

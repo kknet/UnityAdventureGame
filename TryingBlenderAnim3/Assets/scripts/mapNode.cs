@@ -42,6 +42,10 @@ public class mapNode {
 		return owner;
 	}
 
+	public float distance(mapNode other){
+		return Mathf.Sqrt (Mathf.Pow (other.zIndex - zIndex, 2f) + Mathf.Pow (other.xIndex - xIndex, 2f));
+	}
+
 	public int Weight(){
 		return weight;
 	}
