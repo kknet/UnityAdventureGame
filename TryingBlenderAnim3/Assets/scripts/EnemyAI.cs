@@ -33,7 +33,7 @@ public class EnemyAI : MonoBehaviour {
 		inPosition = false;
 		enemyAnim = GetComponent<Animator> ();
 		Dev = GameObject.Find ("DevDrake");
-		rotSpeed = 7f;
+		rotSpeed = 10f;
 		moveSpeed = 4f;
 
 		if (!terrain.GetComponent<MapPathfind>().doneBuilding) {
@@ -158,10 +158,11 @@ public class EnemyAI : MonoBehaviour {
 				repathAll ();
 			} else {
 //				stop ();
-				if (rand (0f, 1f) > 0.9f) {
+				if (rand (0f, 1f) > 0.92f) {
 					setNewPath ();
 				} 
 				else {
+					stop ();
 					return;
 				}
 			}
@@ -169,7 +170,7 @@ public class EnemyAI : MonoBehaviour {
 
 		if ((nextDest != null && nextDest.hasOtherOwner (enemyID)) || (finalDest != null && finalDest.hasOtherOwner (enemyID))) {
 			stop ();
-//			repathAll();
+			return;
 		}		
 
 		if (start.equalTo (finalDest) || nextDest == null) {
@@ -187,11 +188,16 @@ public class EnemyAI : MonoBehaviour {
 
 			if (nextDest.hasOtherOwner (enemyID)) {
 				stop ();
-				cleanOldPath ();
-				setNewPath ();
+				return;
 			}
 			if (nextDest == null || nextDest.getCenter () == null) {
 				Debug.LogAssertion ("nextDest is messed up");
+				return;
+			}
+		}
+
+		if (Mathf.Approximately (enemyAnim.GetFloat ("enemySpeed"), 0f)) {
+			if (rand (0f, 1f) < 0.8f) {
 				return;
 			}
 		}

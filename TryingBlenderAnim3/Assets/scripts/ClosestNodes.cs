@@ -207,7 +207,7 @@ public class ClosestNodes : MonoBehaviour {
 		makingNewPaths = true;
 
 		List<KeyValuePair<GameObject, mapNode>> enemyDests = new List<KeyValuePair<GameObject, mapNode>> ();
-		List<mapNode> neighborCircle = new List<mapNode>(terrain.GetComponent<MapPathfind> ().getSpacedDevCombatCircle (4, 0));
+		List<mapNode> neighborCircle = new List<mapNode>(terrain.GetComponent<MapPathfind> ().getSpacedDevCombatCircle (3, 0));
 		List<GameObject> enemies = new List<GameObject>(terrain.GetComponent<MapPathfind> ().enemies.Values);
 		Debug.Log("num nodes: " + neighborCircle.Count + " num enemies: " + enemies.Count);
 

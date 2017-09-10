@@ -8,7 +8,7 @@ public class TrackObstacles : MonoBehaviour {
 		TerrainData data = ter.terrainData;
 		TreeInstance[] allTrees = data.treeInstances;
 		foreach(TreeInstance tree in allTrees){
-			GetComponent<MapPathfind> ().containingCell (tree.position).setFull (-2);
+			GetComponent<MapPathfind> ().containingCell (tree.position+transform.position).setFull (-2);
 		}
 	}
 }

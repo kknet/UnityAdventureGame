@@ -67,10 +67,10 @@ public class DevMovement : MonoBehaviour {
 			terrain.GetComponent<MapPathfind> ().devCell.setEmpty ();
 			terrain.GetComponent<MapPathfind> ().devCell = newDevCell;
 			terrain.GetComponent<MapPathfind> ().devCell.setFull (-3);
-//			if (lastRegenNode == null || lastRegenNode.distance (newDevCell) >= 5f) {
+			if (lastRegenNode == null || lastRegenNode.distance (newDevCell) >= 4f) {
 			terrain.GetComponent<ClosestNodes> ().regenPathsLongQuick();
-//				lastRegenNode = newDevCell;
-//			}
+				lastRegenNode = newDevCell;
+			}
 		}
 	}
 

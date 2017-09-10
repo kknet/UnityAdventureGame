@@ -18,12 +18,13 @@ public class MapPathfind : MonoBehaviour {
 	private float wid;
 	private Terrain ter;
 	private int numNodes;
-
+	private GameObject Dev;
 	public SortedList<int, GameObject> enemies;
 
 	// Use this for initialization
 	public void Start () {
 		doneBuilding = false;
+		Dev = GameObject.Find ("DevDrake");
 		ter = this.GetComponent<Terrain> ();
 		Vector3 dimensions = ter.terrainData.size;
 		len = dimensions [2];
@@ -35,7 +36,20 @@ public class MapPathfind : MonoBehaviour {
 		max = new Vector3 (transform.position.x + wid, transform.position.y, transform.position.z + len);
 		buildGridGraph ();
 		sortEnemiesByID ();
+		GetComponent<TrackObstacles> ().markTreesAsFull ();
 		doneBuilding = true;
+	}
+
+	void Update(){
+		markSpots ();
+	}
+
+	public void markSpots(){
+		GameObject[] enemies = getEnemies ();
+		foreach (GameObject enemy in enemies) {
+			containingCell (enemy.transform.position).setFull (enemy.GetComponent<EnemyAI> ().enemyID);
+		}
+		containingCell (Dev.transform.position).setFull (-3);
 	}
 
 	private void fillEnemiesList(){

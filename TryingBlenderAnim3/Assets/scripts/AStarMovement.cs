@@ -15,6 +15,7 @@ public class AStarMovement : MonoBehaviour {
 	int enemyID;
 	IDictionary<mapNode, mapNode> nodeParents;
 	public IList<mapNode> path;
+	GameObject Dev;
 	GameObject terrain;
 	public bool doneStarting = false;
 
@@ -23,6 +24,7 @@ public class AStarMovement : MonoBehaviour {
 		numNodesPerSide = terrain.GetComponent<MapPathfind> ().nodesPerSide;
 		enemyID = GetComponent<EnemyAI> ().enemyID;
 		nodeParents = new Dictionary<mapNode, mapNode>();
+		Dev = GameObject.Find ("DevDrake");
 		doneStarting = true;
 	}
 
@@ -34,12 +36,14 @@ public class AStarMovement : MonoBehaviour {
 			curNode = nodeParents [curNode];
 			if (curNode.hasOtherOwner (enemyID))
 				Debug.LogError ("Doesn't work!");
-//			curNode.setFull (enemyID);
+			curNode.setFull (enemyID);
 		}
 		return new Queue<mapNode> (path);
 	}
 
 	private List<mapNode> getWalkableNodes() {
+		terrain.GetComponent<MapPathfind> ().markSpots ();
+
 		List<mapNode> walkableNodes = new List<mapNode> ();
 		if (terrain == null)
 			Start ();
