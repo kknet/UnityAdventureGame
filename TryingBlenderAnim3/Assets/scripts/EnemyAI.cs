@@ -10,6 +10,8 @@ public class EnemyAI : MonoBehaviour {
 	public bool inPosition;
 	public GameObject terrain;
 	public mapNode start;
+	public mapNode nextDest;
+	public Queue<mapNode> path;
 
 	private Animator enemyAnim;
 	private GameObject Dev;
@@ -19,8 +21,6 @@ public class EnemyAI : MonoBehaviour {
 	private Vector3 oldDev;
 	//	private Vector3 target;
 	//	private Vector3 devTarget;
-	private Queue<mapNode> path;
-	private mapNode nextDest;
 	private float restStartTime;
 	private bool resting;
 	private mapNode oldDevCell;
@@ -80,15 +80,15 @@ public class EnemyAI : MonoBehaviour {
 		}
 		updateYourCell ();
 
-		if (finalDest == null) {
-			repathAll ();
-			return;
-		}
+//		if (finalDest == null) {
+//			repathAll ();
+//			return;
+//		}
 
 //		Debug.Log (finalDest.getIndices());
 
-		if (terrain.GetComponent<ClosestNodes> ().makingNewPaths)
-			return;
+//		if (terrain.GetComponent<ClosestNodes> ().makingNewPaths)
+//			return;
 
 		//--------CHECKING IF DEV IS NEAR ENOUGH FOR ENEMIES TO NOTICE HIM--------//
 		//		if (!Camera.main.GetComponent<MouseMovement> ().inCombatZone) {
@@ -131,6 +131,9 @@ public class EnemyAI : MonoBehaviour {
 			mapNode trashNode = path.Dequeue ();
 			trashNode.setEmpty ();
 		}
+		finalDest = null;
+		nextDest = null;
+		path = null;
 	}
 
 	public void setNewPath(){
@@ -148,37 +151,44 @@ public class EnemyAI : MonoBehaviour {
 	}
 
 	public void moveToDev() {
-		if (finalDest == null) {
-			stop ();
+
+		if (path == null && nextDest == null) {
+			if (finalDest == null) {
+//				stop ();
+				repathAll ();
+			} else {
+//				stop ();
+				if (rand (0f, 1f) > 0.9f) {
+					setNewPath ();
+				} 
+				else {
+					return;
+				}
+			}
 		}
 
-		if (nextDest != null && nextDest.hasOtherOwner (enemyID)) {
-//			stop ();
-			repathAll();
-		} else if (finalDest != null && finalDest.hasOtherOwner (enemyID)) {
-//			stop ();
-			repathAll();
+		if ((nextDest != null && nextDest.hasOtherOwner (enemyID)) || (finalDest != null && finalDest.hasOtherOwner (enemyID))) {
+			stop ();
+//			repathAll();
 		}		
 
 		if (start.equalTo (finalDest) || nextDest == null) {
 			inPosition = true;
 			stop ();
 			rotateToTarget (Dev.transform.position);
-			
-//			if (Vector3.Distance (Dev.transform.position, transform.position) < 1f) {
-//				attack ();
-//			}
 			return;
 		}
+
 		inPosition = false;
-//		stopEnemyAttack ();
 
 		//reached intermediate destination
 		if (nextDest == null || start.equalTo(nextDest)) {
 			nextDest = path.Dequeue ();
 
 			if (nextDest.hasOtherOwner (enemyID)) {
-				Debug.LogError ("didn't work!");
+				stop ();
+				cleanOldPath ();
+				setNewPath ();
 			}
 			if (nextDest == null || nextDest.getCenter () == null) {
 				Debug.LogAssertion ("nextDest is messed up");
@@ -186,10 +196,6 @@ public class EnemyAI : MonoBehaviour {
 			}
 		}
 
-		if (Mathf.Approximately (enemyAnim.GetFloat ("enemySpeed"), 0f)) {
-			if (rand (0f, 1f) < 0.97f)
-				return;
-		}
 		//rotate towards nextDest
 		rotateToTarget(nextDest.getCenter());
 

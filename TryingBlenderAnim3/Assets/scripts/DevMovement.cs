@@ -26,7 +26,7 @@ public class DevMovement : MonoBehaviour {
 	// Use this for initialization
 	public void Start () {
 		terrain = GameObject.Find ("Terrain");
-		myAnimator = GetComponent<Animator>();
+		myAnimator = GetComponent<Animator> ();
 		needToRot = 0;
 		adjustCounter = 0;
 		runCounter = 0;
@@ -35,6 +35,7 @@ public class DevMovement : MonoBehaviour {
 		horizRot = false;
 		initDevCell ();
 	}
+
 
 	private mapNode getDevCell(){
 		return terrain.GetComponent<MapPathfind> ().devCell;

@@ -11,6 +11,8 @@ public class MapPathfind : MonoBehaviour {
 	public mapNode devCell;
 	public bool doneBuilding;
 	public int nodesPerSide;
+//	public IDictionary<KeyValuePair<mapNode, mapNode>, Queue<mapNode>>
+
 
 	private float len;
 	private float wid;

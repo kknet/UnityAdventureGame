@@ -240,8 +240,8 @@ public class ClosestNodes : MonoBehaviour {
 	}
 
 	public void assignDest(GameObject enemy, mapNode dest){
+		enemy.GetComponent<EnemyAI> ().cleanOldPath ();
 		enemy.GetComponent<EnemyAI> ().finalDest = dest;
-		enemy.GetComponent<EnemyAI> ().setNewPath ();
 	}
 
 
