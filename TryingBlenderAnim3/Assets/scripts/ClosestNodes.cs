@@ -212,21 +212,21 @@ public class ClosestNodes : MonoBehaviour {
 		Debug.Log("num nodes: " + neighborCircle.Count + " num enemies: " + enemies.Count);
 
 		while (neighborCircle.Count > 0) {
-			for (int nodeIdx = 0; nodeIdx < neighborCircle.Count; ++nodeIdx) {
-				mapNode destNode = neighborCircle [nodeIdx];
+			for (int enemyIdx = 0; enemyIdx < enemies.Count; ++enemyIdx) {
+				mapNode chosenNode = null;
 				float minDist = float.MaxValue;
-				GameObject chosenEnemy = null;
-				for (int enemyIdx = 0; enemyIdx < enemies.Count; ++enemyIdx) {
-					GameObject thisEnemy = enemies [enemyIdx];
-					float thisDist = thisEnemy.GetComponent<EnemyAI> ().start.distance (destNode);
+				GameObject thisEnemy = enemies [enemyIdx];
+				for (int nodeIdx = 0; nodeIdx < neighborCircle.Count; ++nodeIdx) {
+					mapNode thisNode = neighborCircle [nodeIdx];
+					float thisDist = thisEnemy.GetComponent<EnemyAI> ().start.distance (thisNode);
 					if (thisDist < minDist) {
 						minDist = thisDist;
-						chosenEnemy = thisEnemy;
+						chosenNode = thisNode;
 					}
 				}
-				enemyDests.Add (new KeyValuePair<GameObject, mapNode> (chosenEnemy, destNode));
-				enemies.Remove (chosenEnemy);
-				neighborCircle.Remove (destNode);
+				enemyDests.Add (new KeyValuePair<GameObject, mapNode> (thisEnemy, chosenNode));
+				enemies.Remove (thisEnemy);
+				neighborCircle.Remove (chosenNode);
 			}
 		}
 
