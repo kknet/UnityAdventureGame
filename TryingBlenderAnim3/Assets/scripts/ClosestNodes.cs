@@ -16,6 +16,36 @@ public class ClosestNodes : MonoBehaviour {
 		doneStarting = true;
 	}
 
+	public GameObject[] enemiesClosestToDev() {
+		GameObject[] enemies = getEnemies ();
+		List<KeyValuePair<GameObject, float>> enemiesByDistance = new List<KeyValuePair<GameObject, float>> (enemies.Length);
+		int idx = 0;
+		for(; idx < enemies.Length; ++idx) {
+			GameObject enemy = enemies [idx];
+			float distance = GetComponent<MapPathfind> ().devCell.distance (enemy.GetComponent<EnemyAI> ().start);
+			enemiesByDistance[idx] = new KeyValuePair<GameObject, float> (enemy, distance);
+		}
+
+		enemyDistComparer comparer = new enemyDistComparer ();
+
+		//sort enemies by distance to dev
+		enemiesByDistance.Sort(comparer);
+		idx = 0;
+		foreach (KeyValuePair<GameObject, float> pair in enemiesByDistance) {
+			enemies[idx++] = pair.Key;
+		}
+		return enemies;
+	}
+
+	public void assignTimes(){
+		GameObject[] enemies = getEnemies ();
+		for(int idx = 0; idx < enemies.Length; ++idx){ 
+			GameObject enemy = enemies [idx];
+			enemy.GetComponent<EnemyAI> ().pathGenTime = Time.realtimeSinceStartup + (0.3f * idx);
+			enemy.GetComponent<EnemyAI> ().moveTime = Time.realtimeSinceStartup + (0.3f * idx);
+
+		}
+	}
 
 	public GameObject[] getEnemies(){
 		return GameObject.FindGameObjectsWithTag ("Enemy");
@@ -209,7 +239,12 @@ public class ClosestNodes : MonoBehaviour {
 		List<KeyValuePair<GameObject, mapNode>> enemyDests = new List<KeyValuePair<GameObject, mapNode>> ();
 		List<mapNode> neighborCircle = new List<mapNode>(terrain.GetComponent<MapPathfind> ().getSpacedDevCombatCircle (3, 0));
 		List<GameObject> enemies = new List<GameObject>(terrain.GetComponent<MapPathfind> ().enemies.Values);
-		Debug.Log("num nodes: " + neighborCircle.Count + " num enemies: " + enemies.Count);
+
+		foreach (GameObject enemy in enemies) {
+			enemy.GetComponent<EnemyAI> ().cleanOldPath ();
+		}
+
+//		Debug.Log("num nodes: " + neighborCircle.Count + " num enemies: " + enemies.Count);
 
 		while (neighborCircle.Count > 0) {
 			for (int enemyIdx = 0; enemyIdx < enemies.Count; ++enemyIdx) {
@@ -230,8 +265,9 @@ public class ClosestNodes : MonoBehaviour {
 			}
 		}
 
-		foreach (KeyValuePair<GameObject, mapNode> pair in enemyDests) {
-			assignDest (pair.Key, pair.Value);
+		for(int idx = 0; idx < enemyDests.Count; ++idx){
+			KeyValuePair<GameObject, mapNode> pair = enemyDests [idx];
+			assignDest (pair.Key, pair.Value, idx+1f);
 		}
 
 //		Debug.LogError ("Done!");
@@ -239,9 +275,10 @@ public class ClosestNodes : MonoBehaviour {
 		makingNewPaths = false;
 	}
 
-	public void assignDest(GameObject enemy, mapNode dest){
-		enemy.GetComponent<EnemyAI> ().cleanOldPath ();
+	public void assignDest(GameObject enemy, mapNode dest, float timeIncrement){
 		enemy.GetComponent<EnemyAI> ().finalDest = dest;
+		enemy.GetComponent<EnemyAI> ().pathGenTime = Time.realtimeSinceStartup + (0.3f * timeIncrement);
+		enemy.GetComponent<EnemyAI> ().moveTime = Time.realtimeSinceStartup + (0.3f * timeIncrement);
 	}
 
 
@@ -315,6 +352,16 @@ public class nodeListComparer: IComparer<nodeList>
 		if (a.at (0).Value > b.at (0).Value)
 			return 1;
 		if (a.at (0).Value < b.at (0).Value)
+			return -1;
+		return 0;
+	}
+}
+
+public class enemyDistComparer: IComparer<KeyValuePair<GameObject, float>>{
+	public int Compare(KeyValuePair<GameObject, float> a, KeyValuePair<GameObject, float> b){
+		if (a.Value > b.Value)
+			return 1;
+		if (a.Value < b.Value)
 			return -1;
 		return 0;
 	}

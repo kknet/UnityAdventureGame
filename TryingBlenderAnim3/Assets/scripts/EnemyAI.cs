@@ -10,8 +10,11 @@ public class EnemyAI : MonoBehaviour {
 	public bool inPosition;
 	public GameObject terrain;
 	public mapNode start;
-	public mapNode nextDest;
-	public Queue<mapNode> path;
+	public mapNode nextDest = null;
+	public Queue<mapNode> path = null;
+	public bool inPathGen = false;
+	public float pathGenTime = 0f;
+	public float moveTime = 0f;
 
 	private Animator enemyAnim;
 	private GameObject Dev;
@@ -24,7 +27,8 @@ public class EnemyAI : MonoBehaviour {
 	private float restStartTime;
 	private bool resting;
 	private mapNode oldDevCell;
-
+	private GameObject[] enemies;
+	private bool allReady = false;
 
 	// Use this for initialization
 	void Start () {
@@ -46,7 +50,7 @@ public class EnemyAI : MonoBehaviour {
 		start = terrain.GetComponent<MapPathfind> ().containingCell (transform.position);
 		resting = false;
 		restStartTime = Time.time;
-		GameObject[] enemies = GameObject.FindGameObjectsWithTag("Enemy");
+		enemies = GameObject.FindGameObjectsWithTag("Enemy");
 		bool allDone = true;
 		foreach(GameObject enemy in enemies){
 			if(!enemy.Equals(this)){
@@ -71,24 +75,30 @@ public class EnemyAI : MonoBehaviour {
 		return ret;
 	}
 
-	// Update is called once per frame
-	void Update () {
-		GameObject[] enemies = GameObject.FindGameObjectsWithTag("Enemy");
+	public bool canPathGen(){
+		foreach (GameObject enemy in enemies) {
+			if (enemy.GetComponent<EnemyAI>().inPathGen){
+					return false;
+			}
+		}
+		return true;
+	}
+
+	private bool checkIfAllReady(){
+		if (allReady)
+			return true;
 		foreach(GameObject enemy in enemies){
 			if(!enemy.GetComponent<EnemyAI>().doneStarting)
-				return;
+				return false;
 		}
+		allReady = true;
+		return true;
+	}
+
+	// Update is called once per frame
+	void Update () {
+		checkIfAllReady ();
 		updateYourCell ();
-
-//		if (finalDest == null) {
-//			repathAll ();
-//			return;
-//		}
-
-//		Debug.Log (finalDest.getIndices());
-
-//		if (terrain.GetComponent<ClosestNodes> ().makingNewPaths)
-//			return;
 
 		//--------CHECKING IF DEV IS NEAR ENOUGH FOR ENEMIES TO NOTICE HIM--------//
 		//		if (!Camera.main.GetComponent<MouseMovement> ().inCombatZone) {
@@ -101,15 +111,6 @@ public class EnemyAI : MonoBehaviour {
 		//			this.gameObject.SetActive (false);
 		moveToDev ();
 
-		//-------------- ALL FOR DEBUGGING-------------//
-		//		mapNode[] arr = path.ToArray ();
-		//		string s = "";
-		//		foreach(mapNode node in arr){
-		//			KeyValuePair<int, int> coords = node.getIndices ();
-		//			s += (coords.Key + "_" + coords.Value + ", " );
-		//			s += (node.getCenter() + " ");
-		//		}
-		//		Debug.Log (s + "nextDest: " + nextDest.getIndices() + "start: " + start.getIndices() + "dev: " + finalDest.getIndices());
 	}
 		
 	//keep track of this agent's current location
@@ -122,10 +123,6 @@ public class EnemyAI : MonoBehaviour {
 		start.setFull (enemyID);
 	}
 
-	void AStarPath(){
-		
-	}
-
 	public void cleanOldPath(){
 		while (path !=null && path.Count > 0) {
 			mapNode trashNode = path.Dequeue ();
@@ -136,14 +133,32 @@ public class EnemyAI : MonoBehaviour {
 		path = null;
 	}
 
-	public void setNewPath(){
-		mapNode goal = GetComponent<AStarMovement> ().shortestPath (start, finalDest);
-		path = GetComponent<AStarMovement> ().traceBackFromGoal(start, finalDest);
+	public bool setNewPath(){
+		if (!canPathGen ()) {//only one enemy can generate a path at a time, to reduce lag in game
+			inPathGen = false;
+			return false;
+		}
 
-		if (path.Count == 0)
-			repathAll();
-		else
-			nextDest = path.Dequeue ();	
+		inPathGen = true;
+//		float oldTime = Time.realtimeSinceStartup;
+		mapNode goal = GetComponent<AStarMovement> ().shortestPath (start, finalDest);
+		if (goal == null || !goal.equalTo (finalDest)) {//means that the path gen failed!
+			inPathGen = false;
+			return false;
+		}
+		path = GetComponent<AStarMovement> ().traceBackFromGoal(start, finalDest);
+		inPathGen = false;
+
+		if (path == null || path.Count == null)
+			return false;
+
+//		float newTime = Time.realtimeSinceStartup;
+//		Debug.Log ((newTime - oldTime));
+//		if (path.Count == 0)
+//			repathAll();
+//		else
+		nextDest = path.Dequeue ();
+		return true;
 	}
 
 	public void repathAll(){
@@ -158,8 +173,13 @@ public class EnemyAI : MonoBehaviour {
 				repathAll ();
 			} else {
 //				stop ();
-				if (rand (0f, 1f) > 0.92f) {
-					setNewPath ();
+//				if (rand (0f, 1f) > 0.5f) {
+				if(Time.realtimeSinceStartup >= pathGenTime){
+					bool success = setNewPath ();
+					if (!success){
+						terrain.GetComponent<ClosestNodes> ().assignTimes ();
+						return;
+					}
 				} 
 				else {
 					stop ();
@@ -196,11 +216,11 @@ public class EnemyAI : MonoBehaviour {
 			}
 		}
 
-		if (Mathf.Approximately (enemyAnim.GetFloat ("enemySpeed"), 0f)) {
-			if (rand (0f, 1f) < 0.8f) {
-				return;
-			}
-		}
+//		if (Mathf.Approximately (enemyAnim.GetFloat ("enemySpeed"), 0f)) {
+//			if(Time.realtimeSinceStartup < moveTime){
+//				return;
+//			}
+//		}
 
 		//rotate towards nextDest
 		rotateToTarget(nextDest.getCenter());

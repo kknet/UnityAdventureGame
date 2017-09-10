@@ -45,6 +45,7 @@ public class DevMovement : MonoBehaviour {
 		if(terrain==null)
 			terrain = GameObject.Find ("Terrain");
 		terrain.GetComponent<MapPathfind> ().devCell = terrain.GetComponent<MapPathfind> ().containingCell (transform.position);
+		markNeighbors ();
 	}
 
 	public GameObject[] getEnemies(){
@@ -55,6 +56,33 @@ public class DevMovement : MonoBehaviour {
 		return UnityEngine.Random.Range (a, b);
 	}
 
+	private void clearNeighbors(){
+		mapNode[] neighbors = terrain.GetComponent<MapPathfind> ().devCell.getNeighbors ();
+		foreach (mapNode node in neighbors)
+			node.setEmpty ();
+	}
+
+	private void markNeighbors(){
+		mapNode[] neighbors = terrain.GetComponent<MapPathfind> ().devCell.getNeighbors ();
+		foreach (mapNode node in neighbors)
+			node.setFull (-3);		
+	}
+
+	public void setDevCellNoRepath(){
+		//dev's current location
+		mapNode newDevCell = terrain.GetComponent<MapPathfind> ().containingCell (transform.position);
+		if (newDevCell == null) {
+			Debug.LogAssertion ("bad");
+		}
+		else if (!newDevCell.equalTo (terrain.GetComponent<MapPathfind> ().devCell)) {
+
+			clearNeighbors ();
+			terrain.GetComponent<MapPathfind> ().devCell.setEmpty ();
+			terrain.GetComponent<MapPathfind> ().devCell = newDevCell;
+			terrain.GetComponent<MapPathfind> ().devCell.setFull (-3);
+			markNeighbors ();		
+		}
+	}
 		
 	public void setDevCell() {
 		//dev's current location
@@ -64,9 +92,12 @@ public class DevMovement : MonoBehaviour {
 		}
 //			if (GameObject.Find ("Enemy") != null && !newDevCell.equalTo (terrain.GetComponent<MapPathfind> ().devCell)) {
 		else if (!newDevCell.equalTo (terrain.GetComponent<MapPathfind> ().devCell)) {
+
+//			clearNeighbors ();
 			terrain.GetComponent<MapPathfind> ().devCell.setEmpty ();
 			terrain.GetComponent<MapPathfind> ().devCell = newDevCell;
 			terrain.GetComponent<MapPathfind> ().devCell.setFull (-3);
+//			markNeighbors ();
 			if (lastRegenNode == null || lastRegenNode.distance (newDevCell) >= 4f) {
 			terrain.GetComponent<ClosestNodes> ().regenPathsLongQuick();
 				lastRegenNode = newDevCell;

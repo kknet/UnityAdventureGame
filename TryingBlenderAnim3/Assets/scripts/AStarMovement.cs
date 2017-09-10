@@ -42,7 +42,7 @@ public class AStarMovement : MonoBehaviour {
 	}
 
 	private List<mapNode> getWalkableNodes() {
-		terrain.GetComponent<MapPathfind> ().markSpots ();
+//		terrain.GetComponent<MapPathfind> ().markSpots ();
 
 		List<mapNode> walkableNodes = new List<mapNode> ();
 		if (terrain == null)
@@ -69,7 +69,6 @@ public class AStarMovement : MonoBehaviour {
 	}
 
 	public mapNode shortestPath (mapNode start, mapNode goal) {
-	
 		//list of nodes that are walkable (nodes that are empty or have this owner)
 		List<mapNode> walkables = getWalkableNodes();
 

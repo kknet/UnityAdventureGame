@@ -40,17 +40,17 @@ public class MapPathfind : MonoBehaviour {
 		doneBuilding = true;
 	}
 
-	void Update(){
-		markSpots ();
-	}
+//	void Update(){
+//		markSpots ();
+//	}
 
-	public void markSpots(){
-		GameObject[] enemies = getEnemies ();
-		foreach (GameObject enemy in enemies) {
-			containingCell (enemy.transform.position).setFull (enemy.GetComponent<EnemyAI> ().enemyID);
-		}
-		containingCell (Dev.transform.position).setFull (-3);
-	}
+//	public void markSpots(){
+//		GameObject[] enemies = getEnemies ();
+//		foreach (GameObject enemy in enemies) {
+//			containingCell (enemy.transform.position).setFull (enemy.GetComponent<EnemyAI> ().enemyID);
+//		}
+//		Dev.GetComponent<DevMovement> ().setDevCellNoRepath ();
+//	}
 
 	private void fillEnemiesList(){
 		enemies = new SortedList<int, GameObject> ();
