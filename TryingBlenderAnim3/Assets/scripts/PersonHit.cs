@@ -25,7 +25,7 @@ public class PersonHit : MonoBehaviour {
 		bool isThisDev = gameObject.name.Equals("DevDrake");
 
 		//if this is Dev, check if the enemy whose weapon hit dev was executing an attack move at the time
-		if (isThisDev && root.GetComponent<EnemyAI> ()!=null &&  root.GetComponent<EnemyAI> ().isEnemyAttacking ())
+		if (isThisDev && root.GetComponent<EnemyAI> ()!=null && !root.GetComponent<EnemyAI> ().isEnemyAttacking ())
 			return;
 
 		//if this is an enemy, check if Dev, whose weapon hit this enemy, was executing an attack move at the time
@@ -43,7 +43,7 @@ public class PersonHit : MonoBehaviour {
 		if (gotHitByOther && notHitAlready) {
 			myAnim.SetBool ("hitStrong", true);
 			Debug.Log ("got hit");
-			strongHit.Play ();
+//			strongHit.Play ();
 			decreaseHealth (100f);
 			Invoke ("stopStrong", 0.3f);
 //			col.gameObject.transform.root.gameObject.GetComponent<PersonHit> ().pauseAnim ();

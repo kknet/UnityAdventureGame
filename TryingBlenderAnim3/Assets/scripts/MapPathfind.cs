@@ -29,7 +29,7 @@ public class MapPathfind : MonoBehaviour {
 		Vector3 dimensions = ter.terrainData.size;
 		len = dimensions [2];
 		wid = dimensions [0];
-		cellSize = 1f;
+		cellSize = 1.3f;
 		numNodes = ((int)(len * wid/cellSize));
 		nodesPerSide = (int) Mathf.Sqrt (numNodes);
 		min = transform.position;
@@ -44,13 +44,13 @@ public class MapPathfind : MonoBehaviour {
 //		markSpots ();
 //	}
 
-//	public void markSpots(){
-//		GameObject[] enemies = getEnemies ();
-//		foreach (GameObject enemy in enemies) {
-//			containingCell (enemy.transform.position).setFull (enemy.GetComponent<EnemyAI> ().enemyID);
-//		}
-//		Dev.GetComponent<DevMovement> ().setDevCellNoRepath ();
-//	}
+	public void markSpots(){
+		GameObject[] enemies = getEnemies ();
+		foreach (GameObject enemy in enemies) {
+			enemy.GetComponent<EnemyAI> ().updateYourCell ();
+		}
+		containingCell (Dev.transform.position).setFull (-3);
+	}
 
 	private void fillEnemiesList(){
 		enemies = new SortedList<int, GameObject> ();

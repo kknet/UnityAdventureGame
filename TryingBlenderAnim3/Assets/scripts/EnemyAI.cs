@@ -7,7 +7,7 @@ public class EnemyAI : MonoBehaviour {
 	public int enemyID;
 	public mapNode finalDest;
 	public bool doneStarting;
-	public bool inPosition;
+	public bool inPosition = false;
 	public GameObject terrain;
 	public mapNode start;
 	public mapNode nextDest = null;
@@ -15,7 +15,10 @@ public class EnemyAI : MonoBehaviour {
 	public bool inPathGen = false;
 	public float pathGenTime = 0f;
 	public float moveTime = 0f;
+	public bool gotPath = false;
 
+	private float nextDestWaitTime = 0f;
+	private float finalDestWaitTime = 0f;
 	private Animator enemyAnim;
 	private GameObject Dev;
 	private float rotSpeed;
@@ -37,7 +40,7 @@ public class EnemyAI : MonoBehaviour {
 		inPosition = false;
 		enemyAnim = GetComponent<Animator> ();
 		Dev = GameObject.Find ("DevDrake");
-		rotSpeed = 10f;
+		rotSpeed = 12f;
 		moveSpeed = 4f;
 
 		if (!terrain.GetComponent<MapPathfind>().doneBuilding) {
@@ -76,6 +79,7 @@ public class EnemyAI : MonoBehaviour {
 	}
 
 	public bool canPathGen(){
+		inPathGen = false;
 		foreach (GameObject enemy in enemies) {
 			if (enemy.GetComponent<EnemyAI>().inPathGen){
 					return false;
@@ -114,7 +118,7 @@ public class EnemyAI : MonoBehaviour {
 	}
 		
 	//keep track of this agent's current location
-	void updateYourCell() {
+	public void updateYourCell() {
 		mapNode oldStart = start;
 		start = terrain.GetComponent<MapPathfind> ().containingCell (transform.position);
 		if (!oldStart.equalTo (start)) {
@@ -124,23 +128,27 @@ public class EnemyAI : MonoBehaviour {
 	}
 
 	public void cleanOldPath(){
+		updateYourCell ();
 		while (path !=null && path.Count > 0) {
 			mapNode trashNode = path.Dequeue ();
 			trashNode.setEmpty ();
 		}
+		inPosition = false;
 		finalDest = null;
 		nextDest = null;
 		path = null;
 	}
 
 	public bool setNewPath(){
+//		path = null;
+//		nextDest = null;
+//		inPosition = false;
 		if (!canPathGen ()) {//only one enemy can generate a path at a time, to reduce lag in game
 			inPathGen = false;
 			return false;
 		}
 
 		inPathGen = true;
-//		float oldTime = Time.realtimeSinceStartup;
 		mapNode goal = GetComponent<AStarMovement> ().shortestPath (start, finalDest);
 		if (goal == null || !goal.equalTo (finalDest)) {//means that the path gen failed!
 			inPathGen = false;
@@ -149,14 +157,13 @@ public class EnemyAI : MonoBehaviour {
 		path = GetComponent<AStarMovement> ().traceBackFromGoal(start, finalDest);
 		inPathGen = false;
 
-		if (path == null || path.Count == null)
+		if (path == null) {
 			return false;
-
-//		float newTime = Time.realtimeSinceStartup;
-//		Debug.Log ((newTime - oldTime));
-//		if (path.Count == 0)
-//			repathAll();
-//		else
+		}
+		if (path.Count == 0) {
+			path = null;
+			return false;
+		}
 		nextDest = path.Dequeue ();
 		return true;
 	}
@@ -167,43 +174,74 @@ public class EnemyAI : MonoBehaviour {
 
 	public void moveToDev() {
 
-		if (path == null && nextDest == null) {
-			if (finalDest == null) {
-//				stop ();
-				repathAll ();
-			} else {
-//				stop ();
-//				if (rand (0f, 1f) > 0.5f) {
-				if(Time.realtimeSinceStartup >= pathGenTime){
-					bool success = setNewPath ();
-					if (!success){
-						terrain.GetComponent<ClosestNodes> ().assignTimes ();
-						return;
-					}
-				} 
-				else {
-					stop ();
+		if (finalDest != null && (path == null || nextDest == null)) {
+			if (Time.realtimeSinceStartup >= pathGenTime) {
+				gotPath = setNewPath ();
+				if (!gotPath) {
+					terrain.GetComponent<ClosestNodes> ().assignTimes ();
 					return;
 				}
+			} else {
+				stop ();
+				return;
 			}
+		} else if (finalDest == null) {
+			repathAll ();
+			return;
+		}
+			
+
+		if (nextDest != null && nextDest.hasOtherOwner (enemyID)) {
+			stop ();
+			if (nextDestWaitTime == 0f)
+				nextDestWaitTime = Time.realtimeSinceStartup;
+			else if (Time.realtimeSinceStartup - nextDestWaitTime >= 1f) {
+				gotPath = false;
+				terrain.GetComponent<ClosestNodes> ().assignTimes ();
+				nextDestWaitTime = 0f;
+				nextDest = null;
+			}
+			return;
+		} else if(nextDest!=null && nextDestWaitTime > 0f){
+			nextDestWaitTime = 0f;
 		}
 
-		if ((nextDest != null && nextDest.hasOtherOwner (enemyID)) || (finalDest != null && finalDest.hasOtherOwner (enemyID))) {
-			stop ();
-			return;
-		}		
+		if (finalDest != null && finalDest.hasOtherOwner (enemyID)) {
+			if (finalDestWaitTime == 0f)
+				finalDestWaitTime = Time.realtimeSinceStartup;
+			else if (Time.realtimeSinceStartup - finalDestWaitTime >= 3f) {
+				gotPath = false;
+				finalDestWaitTime = 0f;
+				mapNode[] options = terrain.GetComponent<MapPathfind> ().getEmptySpacedDevCombatCircle (3, enemyID, finalDest, 0);
+				finalDest = terrain.GetComponent<MapPathfind> ().findClosestNode (options, start);
+				path = null;
+				terrain.GetComponent<ClosestNodes> ().assignTimes ();
+				return;
+			}
+		} 
+//		else if(finalDest!=null && finalDestWaitTime > 0f){
+//				finalDestWaitTime = 0f;
+//		}
 
-		if (start.equalTo (finalDest) || nextDest == null) {
+
+//		if (enemyID == 6) {
+//			if (nextDest != null) {
+//				Debug.Log (nextDest.getIndices ());
+//				if (path != null)
+//					Debug.Log (path.Count);
+//			}
+//		}
+
+			
+		if (gotPath && (start.equalTo (finalDest) || nextDest == null)) {
 			inPosition = true;
 			stop ();
 			rotateToTarget (Dev.transform.position);
 			return;
 		}
 
-		inPosition = false;
-
 		//reached intermediate destination
-		if (nextDest == null || start.equalTo(nextDest)) {
+		if (path!= null && (nextDest == null || start.equalTo(nextDest))) {
 			nextDest = path.Dequeue ();
 
 			if (nextDest.hasOtherOwner (enemyID)) {
@@ -215,13 +253,6 @@ public class EnemyAI : MonoBehaviour {
 				return;
 			}
 		}
-
-//		if (Mathf.Approximately (enemyAnim.GetFloat ("enemySpeed"), 0f)) {
-//			if(Time.realtimeSinceStartup < moveTime){
-//				return;
-//			}
-//		}
-
 		//rotate towards nextDest
 		rotateToTarget(nextDest.getCenter());
 
@@ -243,6 +274,7 @@ public class EnemyAI : MonoBehaviour {
 		if (finalDest == null || start.equalTo(finalDest) || !isEnemyRunning()) {
 			stop ();
 		} else {
+
 			enemyAnim.SetFloat ("enemySpeed", Mathf.MoveTowards(enemyAnim.GetFloat ("enemySpeed"), 1f, 5f * Time.deltaTime));
 			transform.Translate(Vector3.forward * enemyAnim.GetFloat("enemySpeed") * Time.deltaTime * moveSpeed);
 		}

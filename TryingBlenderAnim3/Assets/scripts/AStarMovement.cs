@@ -36,13 +36,13 @@ public class AStarMovement : MonoBehaviour {
 			curNode = nodeParents [curNode];
 			if (curNode.hasOtherOwner (enemyID))
 				Debug.LogError ("Doesn't work!");
-			curNode.setFull (enemyID);
+//			curNode.setFull (enemyID);
 		}
 		return new Queue<mapNode> (path);
 	}
 
 	private List<mapNode> getWalkableNodes() {
-//		terrain.GetComponent<MapPathfind> ().markSpots ();
+		terrain.GetComponent<MapPathfind> ().markSpots ();
 
 		List<mapNode> walkableNodes = new List<mapNode> ();
 		if (terrain == null)
