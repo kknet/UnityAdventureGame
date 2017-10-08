@@ -32,6 +32,7 @@ public class EnemyAI : MonoBehaviour {
 	private mapNode oldDevCell;
 	private GameObject[] enemies;
 	private bool allReady = false;
+	public bool moving = false;
 
 	// Use this for initialization
 	void Start () {
@@ -172,10 +173,23 @@ public class EnemyAI : MonoBehaviour {
 		terrain.GetComponent<ClosestNodes> ().regenPathsLongQuick ();
 	}
 
+	private bool hasGoalNode(){
+		return finalDest != null;
+	}
+
+	private bool nextSpotIsFull(){
+		return nextDest != null && nextDest.hasOtherOwner (enemyID);
+	}
+
+	private bool goalNodeIsFull(){
+		return finalDest != null && finalDest.hasOtherOwner (enemyID);
+	}
+
 	public void moveToDev() {
 
-		if (finalDest != null && (path == null || nextDest == null)) {
+		if (hasGoalNode() && (path == null || nextDest == null)) {
 			if (Time.realtimeSinceStartup >= pathGenTime) {
+				terrain.GetComponent<ClosestNodes> ().markAllPositionedEnemies ();
 				gotPath = setNewPath ();
 				if (!gotPath) {
 					terrain.GetComponent<ClosestNodes> ().assignTimes ();
@@ -185,14 +199,16 @@ public class EnemyAI : MonoBehaviour {
 				stop ();
 				return;
 			}
-		} else if (finalDest == null) {
+		} else if (!hasGoalNode()) {
 			repathAll ();
 			return;
 		}
 			
 
-		if (nextDest != null && nextDest.hasOtherOwner (enemyID)) {
+		if (nextSpotIsFull()) {
 			stop ();
+			inPosition = false;
+			moving = false;
 			if (nextDestWaitTime == 0f)
 				nextDestWaitTime = Time.realtimeSinceStartup;
 			else if (Time.realtimeSinceStartup - nextDestWaitTime >= 1f) {
@@ -206,7 +222,7 @@ public class EnemyAI : MonoBehaviour {
 			nextDestWaitTime = 0f;
 		}
 
-		if (finalDest != null && finalDest.hasOtherOwner (enemyID)) {
+		if (goalNodeIsFull()) {
 			if (finalDestWaitTime == 0f)
 				finalDestWaitTime = Time.realtimeSinceStartup;
 			else if (Time.realtimeSinceStartup - finalDestWaitTime >= 3f) {
@@ -216,25 +232,15 @@ public class EnemyAI : MonoBehaviour {
 				finalDest = terrain.GetComponent<MapPathfind> ().findClosestNode (options, start);
 				path = null;
 				terrain.GetComponent<ClosestNodes> ().assignTimes ();
+				moving = false;
+				inPosition = false;
 				return;
 			}
 		} 
-//		else if(finalDest!=null && finalDestWaitTime > 0f){
-//				finalDestWaitTime = 0f;
-//		}
 
-
-//		if (enemyID == 6) {
-//			if (nextDest != null) {
-//				Debug.Log (nextDest.getIndices ());
-//				if (path != null)
-//					Debug.Log (path.Count);
-//			}
-//		}
-
-			
 		if (gotPath && (start.equalTo (finalDest) || nextDest == null)) {
 			inPosition = true;
+			moving = false;
 			stop ();
 			rotateToTarget (Dev.transform.position);
 			return;
@@ -246,6 +252,7 @@ public class EnemyAI : MonoBehaviour {
 
 			if (nextDest.hasOtherOwner (enemyID)) {
 				stop ();
+				moving = false;
 				return;
 			}
 			if (nextDest == null || nextDest.getCenter () == null) {
@@ -258,6 +265,7 @@ public class EnemyAI : MonoBehaviour {
 
 		//move towards nextDest
 		moveToTarget();
+		moving = true;
 	}
 
 	void moveBack(){

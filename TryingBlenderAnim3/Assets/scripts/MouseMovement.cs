@@ -123,7 +123,7 @@ public class MouseMovement : MonoBehaviour {
 		Vector3 perpenDif = Vector3.Normalize (Vector3.Cross (displacement, -1.0f * displacement)) * rand (1f, 0f);
 		Vector3 target = closestEnemy + perpenDif;
 		displacement = target - player.transform.position;
-		displacement = new Vector3 (displacement.x, 0f, displacement.z);
+		displacement = new Vector3 (displacement.x + 5f, 0f, displacement.z);
 		oldEnemy = closestEnemy;
 
 		if (player.gameObject.GetComponent<DevMovement> ().rolling ()) {
@@ -167,7 +167,7 @@ public class MouseMovement : MonoBehaviour {
 		if (player.gameObject.GetComponent<DevMovement> ().rolling ())
 			return;
 		Vector3 oldForward = player.transform.forward;
-		player.transform.forward = Vector3.RotateTowards (player.transform.forward, displacement, 20f * Time.deltaTime, 0.0f); 
+		player.transform.forward = Vector3.RotateTowards (player.transform.forward + (Vector3.right * 0f), displacement, 20f * Time.deltaTime, 0.0f); 
 //		if ((oldForward-player.transform.forward).magnitude > 0.05f) {
 //			myAnimator.SetFloat ("VSpeed", Mathf.MoveTowards (myAnimator.GetFloat ("VSpeed"), 1f, Time.deltaTime*2f));
 //			player.transform.Translate (player.transform.forward * Time.deltaTime * 2f);

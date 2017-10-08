@@ -121,7 +121,7 @@ public class DevMovement : MonoBehaviour {
 				myAnimator.SetFloat ("VSpeed", Mathf.MoveTowards (myAnimator.GetFloat ("VSpeed"), Input.GetAxisRaw ("Horizontal"), 0.1f));
 			}  else {
 				if(!horizRot)
-					myAnimator.SetFloat ("VSpeed", Mathf.MoveTowards (myAnimator.GetFloat ("VSpeed"), Input.GetAxisRaw ("Vertical"), 0.05f)); 
+					myAnimator.SetFloat ("VSpeed", Mathf.MoveTowards (myAnimator.GetFloat ("VSpeed"), Input.GetAxisRaw ("Vertical"), 0.1f)); 
 				doIt = 0f;
 			}
 			transform.Translate (Vector3.forward * Time.deltaTime * 5f * myAnimator.GetFloat ("VSpeed") * doIt);
@@ -196,7 +196,7 @@ public class DevMovement : MonoBehaviour {
 	}
 
 	void Update () {
-//		setDevCell ();
+		setDevCell ();
 //		mapNode ourCell = GameObject.Find ("Terrain").GetComponent<MapPathfind> ().containingCell (transform.position);
 //		if (ourCell!=null) {
 //			KeyValuePair<int, int> coords = ourCell.getIndices ();

@@ -29,7 +29,7 @@ public class MapPathfind : MonoBehaviour {
 		Vector3 dimensions = ter.terrainData.size;
 		len = dimensions [2];
 		wid = dimensions [0];
-		cellSize = 1.3f;
+		cellSize = 2f;
 		numNodes = ((int)(len * wid/cellSize));
 		nodesPerSide = (int) Mathf.Sqrt (numNodes);
 		min = transform.position;

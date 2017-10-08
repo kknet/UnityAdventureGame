@@ -122,6 +122,14 @@ public class ClosestNodes : MonoBehaviour {
 		return obj;
 	}
 
+	public void markAllPositionedEnemies(){
+		GameObject[] enemies = getEnemies ();
+		foreach (GameObject enemy in enemies) {
+			if (enemy.GetComponent<EnemyAI> ().inPosition && !enemy.GetComponent<EnemyAI> ().moving)
+				enemy.GetComponent<EnemyAI> ().updateYourCell ();
+		}
+	}
+
 	//for each enemy calculate distance to each surroundingNeighbor
 	//return a list containing the list for each enemy
 	private List<nodeList> calculateEnemyDistances() {
@@ -241,7 +249,7 @@ public class ClosestNodes : MonoBehaviour {
 		makingNewPaths = true;
 
 		List<KeyValuePair<GameObject, mapNode>> enemyDests = new List<KeyValuePair<GameObject, mapNode>> ();
-		List<mapNode> neighborCircle = new List<mapNode>(terrain.GetComponent<MapPathfind> ().getSpacedDevCombatCircle (3, 0));
+		List<mapNode> neighborCircle = new List<mapNode>(terrain.GetComponent<MapPathfind> ().getSpacedDevCombatCircle (2, 0));
 		List<GameObject> enemies = new List<GameObject>(terrain.GetComponent<MapPathfind> ().enemies.Values);
 
 //		foreach (GameObject enemy in enemies) {

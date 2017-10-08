@@ -43,7 +43,7 @@ public class PersonHit : MonoBehaviour {
 		if (gotHitByOther && notHitAlready) {
 			myAnim.SetBool ("hitStrong", true);
 			Debug.Log ("got hit");
-//			strongHit.Play ();
+			strongHit.Play ();
 			decreaseHealth (100f);
 			Invoke ("stopStrong", 0.3f);
 //			col.gameObject.transform.root.gameObject.GetComponent<PersonHit> ().pauseAnim ();
