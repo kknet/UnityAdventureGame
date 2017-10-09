@@ -34,6 +34,8 @@ public class EnemyAI : MonoBehaviour {
 	private bool allReady = false;
 	public bool moving = false;
 
+	public bool doPathfinding;
+
 	// Use this for initialization
 	void Start () {
 		doneStarting = false;
@@ -102,6 +104,10 @@ public class EnemyAI : MonoBehaviour {
 
 	// Update is called once per frame
 	void Update () {
+		if (!doPathfinding)
+			return;
+
+
 		checkIfAllReady ();
 		updateYourCell ();
 

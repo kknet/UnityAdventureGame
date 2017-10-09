@@ -23,6 +23,8 @@ public class DevMovement : MonoBehaviour {
 	private int runCounter;
 	private mapNode lastRegenNode;
 
+	public bool doPathfinding;
+
 	// Use this for initialization
 	public void Start () {
 		terrain = GameObject.Find ("Terrain");
@@ -189,14 +191,12 @@ public class DevMovement : MonoBehaviour {
 		myAnimator.SetFloat ("VSpeed", Mathf.MoveTowards (myAnimator.GetFloat ("VSpeed"), X * 1f, 4f * Time.deltaTime));
 		myAnimator.SetFloat ("HorizSpeed", Mathf.MoveTowards (myAnimator.GetFloat ("HorizSpeed"), Y * 1f, 4f * Time.deltaTime));
 
-		if(S && !D && !A)
-			transform.Translate (((Vector3.forward * X) + (Vector3.right * Y)) * Time.deltaTime * 2f);
-		else
-			transform.Translate (((Vector3.forward * X) + (Vector3.right * Y)) * Time.deltaTime * 3f);
+		transform.Translate (((Vector3.forward * X) + (Vector3.right * Y)) * Time.deltaTime * 2f);
 	}
 
 	void Update () {
-		setDevCell ();
+		if(doPathfinding)
+			setDevCell ();
 //		mapNode ourCell = GameObject.Find ("Terrain").GetComponent<MapPathfind> ().containingCell (transform.position);
 //		if (ourCell!=null) {
 //			KeyValuePair<int, int> coords = ourCell.getIndices ();

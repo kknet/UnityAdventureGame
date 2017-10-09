@@ -4,14 +4,23 @@ using UnityEngine;
 
 public class EnemyCombatAI : MonoBehaviour {
 
+	private Animator enemyAnim;
+	private GameObject dev;
+
 	// Use this for initialization
 	void Start () {
-		
+		enemyAnim = this.gameObject.GetComponent<Animator> ();
+		dev = GameObject.Find ("DevDrake");
 	}
 	
 	// Update is called once per frame
 	void Update () {
-		bool collision = Physics.Raycast (transform.position + transform.up + (transform.forward * 0.3f), transform.forward, 0.5f);
+//		bool collision = Physics.Raycast (transform.position + transform.up + (transform.forward * 0.3f), transform.forward, 0.5f);
+	}
+		
+	public void playReactAnimation(){
+		Debug.Log(Vector3.Distance(transform.position, dev.transform.position));
+		enemyAnim.CrossFade ("standing_react_large_from_right", 0.2f);
 	}
 
 //	void OnDrawGizmos(){

@@ -18,40 +18,40 @@ public class PersonHit : MonoBehaviour {
 		return GameObject.Find (charName + "/Audio Sources/" + audioName).GetComponent<AudioSource>();
 	}
 
-	void OnTriggerEnter(Collider col){
-		AnimatorStateInfo anim = myAnim.GetCurrentAnimatorStateInfo (0);
-		GameObject root = col.gameObject.transform.root.gameObject;
-		bool isThisAnEnemy = gameObject.CompareTag ("Enemy");
-		bool isThisDev = gameObject.name.Equals("DevDrake");
-
-		//if this is Dev, check if the enemy whose weapon hit dev was executing an attack move at the time
-		if (isThisDev && root.GetComponent<EnemyAI> ()!=null && !root.GetComponent<EnemyAI> ().isEnemyAttacking ())
-			return;
-
-		//if this is an enemy, check if Dev, whose weapon hit this enemy, was executing an attack move at the time
-		else if (isThisAnEnemy && root.GetComponent<DevCombat> ()!=null && !root.GetComponent<DevCombat> ().isAttacking ())
-			return;
-
-		bool gotHitByOther = false;
-		if (isThisAnEnemy)
-			gotHitByOther = col.gameObject.CompareTag ("OurWeapons");
-		else
-			gotHitByOther = col.gameObject.CompareTag ("EnemyWeapons");
-
-		bool notHitAlready = !strongHit.isPlaying && !anim.IsTag("impact");
-
-		if (gotHitByOther && notHitAlready) {
-			myAnim.SetBool ("hitStrong", true);
-			Debug.Log ("got hit");
-			strongHit.Play ();
-			decreaseHealth (100f);
-			Invoke ("stopStrong", 0.3f);
-//			col.gameObject.transform.root.gameObject.GetComponent<PersonHit> ().pauseAnim ();
-//			while (!anim.IsTag ("impact")) {
-//			}
-//			col.gameObject.transform.root.gameObject.GetComponent<PersonHit> ().playAnim ();
-		}
-	}
+//	void OnTriggerEnter(Collider col){
+//		AnimatorStateInfo anim = myAnim.GetCurrentAnimatorStateInfo (0);
+//		GameObject root = col.gameObject.transform.root.gameObject;
+//		bool isThisAnEnemy = gameObject.CompareTag ("Enemy");
+//		bool isThisDev = gameObject.name.Equals("DevDrake");
+//
+//		//if this is Dev, check if the enemy whose weapon hit dev was executing an attack move at the time
+//		if (isThisDev && root.GetComponent<EnemyAI> ()!=null && !root.GetComponent<EnemyAI> ().isEnemyAttacking ())
+//			return;
+//
+//		//if this is an enemy, check if Dev, whose weapon hit this enemy, was executing an attack move at the time
+//		else if (isThisAnEnemy && root.GetComponent<DevCombat> ()!=null && !root.GetComponent<DevCombat> ().isAttacking ())
+//			return;
+//
+//		bool gotHitByOther = false;
+//		if (isThisAnEnemy)
+//			gotHitByOther = col.gameObject.CompareTag ("OurWeapons");
+//		else
+//			gotHitByOther = col.gameObject.CompareTag ("EnemyWeapons");
+//
+//		bool notHitAlready = !strongHit.isPlaying && !anim.IsTag("impact");
+//
+//		if (gotHitByOther && notHitAlready) {
+//			myAnim.SetBool ("hitStrong", true);
+//			Debug.Log ("got hit");
+//			strongHit.Play ();
+//			decreaseHealth (100f);
+//			Invoke ("stopStrong", 0.3f);
+////			col.gameObject.transform.root.gameObject.GetComponent<PersonHit> ().pauseAnim ();
+////			while (!anim.IsTag ("impact")) {
+////			}
+////			col.gameObject.transform.root.gameObject.GetComponent<PersonHit> ().playAnim ();
+//		}
+//	}
 
 	void stopStrong(){
 		myAnim.SetBool ("hitStrong", false);

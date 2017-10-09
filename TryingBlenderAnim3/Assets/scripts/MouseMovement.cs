@@ -12,6 +12,7 @@ public class MouseMovement : MonoBehaviour {
 	public bool wepIsOut;
 	public bool oldInCombatZone;
 	public float combatExitTime;
+	public Vector3 closestEnemy;
 
 	private bool firstTimeAdjust;
 	private float dif;
@@ -123,7 +124,7 @@ public class MouseMovement : MonoBehaviour {
 		Vector3 perpenDif = Vector3.Normalize (Vector3.Cross (displacement, -1.0f * displacement)) * rand (1f, 0f);
 		Vector3 target = closestEnemy + perpenDif;
 		displacement = target - player.transform.position;
-		displacement = new Vector3 (displacement.x + 5f, 0f, displacement.z);
+		displacement = new Vector3 (displacement.x, 0f, displacement.z);
 		oldEnemy = closestEnemy;
 
 		if (player.gameObject.GetComponent<DevMovement> ().rolling ()) {
@@ -167,7 +168,7 @@ public class MouseMovement : MonoBehaviour {
 		if (player.gameObject.GetComponent<DevMovement> ().rolling ())
 			return;
 		Vector3 oldForward = player.transform.forward;
-		player.transform.forward = Vector3.RotateTowards (player.transform.forward + (Vector3.right * 0f), displacement, 20f * Time.deltaTime, 0.0f); 
+		player.transform.forward = Vector3.RotateTowards (player.transform.forward, displacement + (player.transform.right * 1f), 20f * Time.deltaTime, 0.0f); 
 //		if ((oldForward-player.transform.forward).magnitude > 0.05f) {
 //			myAnimator.SetFloat ("VSpeed", Mathf.MoveTowards (myAnimator.GetFloat ("VSpeed"), 1f, Time.deltaTime*2f));
 //			player.transform.Translate (player.transform.forward * Time.deltaTime * 2f);
@@ -272,7 +273,7 @@ public class MouseMovement : MonoBehaviour {
 			return Vector3.zero;
 
 		bool enemyChanged = false;
-		Vector3 closestEnemy = Vector3.zero;
+		closestEnemy = Vector3.zero;
 		float dist = 0f;
 		foreach(Collider col in hits)
 		{
@@ -286,7 +287,8 @@ public class MouseMovement : MonoBehaviour {
 					dist = t.second ();
 					closestEnemy = t.first ();
 				}					
-			}
+			} else
+				closestEnemy = Vector3.zero;
 		}
 		if (enemyChanged)
 			enemyLockOnStart = Time.time;
@@ -338,14 +340,14 @@ public class MouseMovement : MonoBehaviour {
 			VerticalCombatRotation ();
 			lastCombatTime = Time.time;
 		} else {
-			if ((Time.time - lastCombatTime)< 2f && myAnimator.GetBool ("WeaponDrawn")) {
-				player.GetComponent<WeaponToggle> ().StartSheath ();
-				combatExitTime = Time.time;
-			}
-			else {
+//			if ((Time.time - lastCombatTime)< 2f && myAnimator.GetBool ("WeaponDrawn")) {
+//				player.GetComponent<WeaponToggle> ().StartSheath ();
+//				combatExitTime = Time.time;
+//			}
+//			else {
 				VerticalRotation ();
 				HorizontalRotation ();		
-			}
+//			}
 		}
 		currentOffset = (transform.position - player.transform.position).normalized * distance;
 	}
