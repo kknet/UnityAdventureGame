@@ -32,6 +32,8 @@ public class DevCombat : MonoBehaviour {
 	void Update () {
 		if (needToAttack) {
 			if (doneLerping) {
+				myAnimator.SetBool ("roll", false);
+				myAnimator.speed = 1f;
 				triggerAttack ();
 				needToAttack = false;
 			}
@@ -115,7 +117,7 @@ public class DevCombat : MonoBehaviour {
 		Vector3 totalVectorOffset = cam.GetComponent<MouseMovement> ().closestEnemy - transform.position;
 		totalVectorOffset = new Vector3 (totalVectorOffset.x, 0f, totalVectorOffset.z);
 		float totalOffset = totalVectorOffset.magnitude;
-		if (totalOffset > 10f)
+		if (totalOffset > 40f)
 			return false;		
 		return true;
 	}
@@ -123,7 +125,10 @@ public class DevCombat : MonoBehaviour {
 	void startGettingIntoPosition(){
 		needToAttack = true;
 		lerpT = 0f;
-		return;
+		if(Vector3.Distance(cam.GetComponent<MouseMovement> ().closestEnemy, transform.position) > 10f){
+			myAnimator.SetBool ("roll", true);
+			myAnimator.speed = 2f;
+		}
 	}
 
 	void getIntoPosition(){
@@ -139,7 +144,7 @@ public class DevCombat : MonoBehaviour {
 		}
 		else {
 			Vector3 deltaPos = totalVectorOffset.normalized * remaining;
-			transform.position = Vector3.Lerp (transform.position, transform.position + deltaPos, lerpT * 2.0f);
+			transform.position = Vector3.Lerp (transform.position, transform.position + deltaPos, lerpT * 0.5f);
 //			myAnimator.SetFloat ("VSpeed", remaining); 
 		}
 	}
