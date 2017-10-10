@@ -20,7 +20,7 @@ public class EnemyCombatAI : MonoBehaviour {
 		
 	public void playReactAnimation(){
 		Debug.Log(Vector3.Distance(transform.position, dev.transform.position));
-		enemyAnim.CrossFade ("standing_react_large_from_right", 0.2f);
+		enemyAnim.CrossFade ("standing_react_large_from_right", 0.1f);
 	}
 
 //	void OnDrawGizmos(){

@@ -36,9 +36,9 @@ public class DevCombat : MonoBehaviour {
 				needToAttack = false;
 			}
 			else {
-				lerpT += Time.deltaTime * 1;
+				lerpT += Time.deltaTime * 1f;
 				getIntoPosition ();
-				if (lerpT >= 0.5f) {
+				if (lerpT >= 1.0f) {
 					doneLerping = true;
 					lerpT = 0f;
 				}
@@ -71,27 +71,25 @@ public class DevCombat : MonoBehaviour {
 
 	void triggerAttack(){
 		myAnimator.SetBool ("doAttack", true);
-		switch (myAnimator.GetInteger ("quickAttack")){
-		case 1:
-			Invoke ("makeEnemiesReact", 0.38f);
-			break;
-		case 2:
-			Invoke("makeEnemiesReact", 0.3f);
-			break;
-		case 3:
-			Invoke("makeEnemiesReact", 0.45f);
-			break;
-		default:
-			break;
-		}
+//		switch (myAnimator.GetInteger ("quickAttack")){
+//		case 1:
+//			Invoke ("makeEnemyReact", 0.38f);
+//			break;
+//		case 2:
+//			Invoke("makeEnemyReact", 0.3f);
+//			break;
+//		case 3:
+//			Invoke("makeEnemyReact", 0.45f);
+//			break;
+//		default:
+//			break;
+//		}
 
 		Invoke ("switchAttack", 0.5f);
 	}
 
-	void makeEnemiesReact(){
-		GameObject[] enemies = GameObject.FindGameObjectsWithTag ("Enemy");
-		foreach (GameObject enemy in enemies)
-			enemy.GetComponent<EnemyCombatAI> ().playReactAnimation ();
+	void makeEnemyReact(){
+			cam.GetComponent<MouseMovement> ().closestEnemyObject.GetComponent<EnemyCombatAI> ().playReactAnimation ();
 	}
 
 	//animation 1: 1.84
@@ -100,13 +98,13 @@ public class DevCombat : MonoBehaviour {
 	float offsetByAnimation(){
 		switch (myAnimator.GetInteger ("quickAttack")){
 		case 1:
-			return 2.3f;
-//			return 1.84f;
+			return 1.8f;
+//			return 1.9f;
 		case 2:
-			return 2f;
-//			return 1.84f;
+			return 1.8f;
+//			return 1.9f;
 		case 3:
-			return 1.37f;
+			return 1.3f;
 		default:
 			Debug.LogAssertion ("Quick attack has bad value!");
 			return 0;
@@ -134,10 +132,16 @@ public class DevCombat : MonoBehaviour {
 		float totalOffset = totalVectorOffset.magnitude;
 		float desiredOffset = offsetByAnimation ();
 		float remaining = totalOffset - desiredOffset;
-		if (Mathf.Abs (remaining) < 0.01f)
+		if (Mathf.Abs (remaining) < 0.01f) {
 			doneLerping = true;
-		else
-			transform.position = Vector3.Lerp (transform.position, transform.position + (totalVectorOffset.normalized * remaining), lerpT);
+			myAnimator.SetFloat ("VSpeed", 0f);
+			myAnimator.SetFloat ("HorizSpeed", 0f);
+		}
+		else {
+			Vector3 deltaPos = totalVectorOffset.normalized * remaining;
+			transform.position = Vector3.Lerp (transform.position, transform.position + deltaPos, lerpT * 2.0f);
+//			myAnimator.SetFloat ("VSpeed", remaining); 
+		}
 	}
 
 	public bool notInCombatMove() {

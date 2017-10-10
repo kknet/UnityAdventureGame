@@ -13,6 +13,7 @@ public class MouseMovement : MonoBehaviour {
 	public bool oldInCombatZone;
 	public float combatExitTime;
 	public Vector3 closestEnemy;
+	public GameObject closestEnemyObject;
 
 	private bool firstTimeAdjust;
 	private float dif;
@@ -168,7 +169,7 @@ public class MouseMovement : MonoBehaviour {
 		if (player.gameObject.GetComponent<DevMovement> ().rolling ())
 			return;
 		Vector3 oldForward = player.transform.forward;
-		player.transform.forward = Vector3.RotateTowards (player.transform.forward, displacement + (player.transform.right * 1f), 20f * Time.deltaTime, 0.0f); 
+		player.transform.forward = Vector3.RotateTowards (player.transform.forward, displacement + (player.transform.right * 0.7f), 20f * Time.deltaTime, 0.0f); 
 //		if ((oldForward-player.transform.forward).magnitude > 0.05f) {
 //			myAnimator.SetFloat ("VSpeed", Mathf.MoveTowards (myAnimator.GetFloat ("VSpeed"), 1f, Time.deltaTime*2f));
 //			player.transform.Translate (player.transform.forward * Time.deltaTime * 2f);
@@ -280,12 +281,16 @@ public class MouseMovement : MonoBehaviour {
 			if (col.gameObject.CompareTag ("Enemy")) {
 				if (closestEnemy == Vector3.zero) {
 					closestEnemy = col.gameObject.transform.position;
+					closestEnemyObject = col.gameObject;
 					dist = (closestEnemy - player.transform.position).magnitude;
 				} else {
 					tuple t = closer (dist, closestEnemy, col.gameObject.transform.position);
 					enemyChanged = t.third ();
 					dist = t.second ();
 					closestEnemy = t.first ();
+
+					if (enemyChanged)
+						closestEnemyObject = col.gameObject;
 				}					
 			} else
 				closestEnemy = Vector3.zero;
