@@ -32,9 +32,6 @@ public class DevCombat : MonoBehaviour {
 	void Update () {
 		if (needToAttack) {
 			if (doneLerping) {
-				myAnimator.SetBool ("roll", false);
-				myAnimator.speed = 1f;
-				triggerAttack ();
 				needToAttack = false;
 			}
 			else {
@@ -73,25 +70,11 @@ public class DevCombat : MonoBehaviour {
 
 	void triggerAttack(){
 		myAnimator.SetBool ("doAttack", true);
-//		switch (myAnimator.GetInteger ("quickAttack")){
-//		case 1:
-//			Invoke ("makeEnemyReact", 0.38f);
-//			break;
-//		case 2:
-//			Invoke("makeEnemyReact", 0.3f);
-//			break;
-//		case 3:
-//			Invoke("makeEnemyReact", 0.45f);
-//			break;
-//		default:
-//			break;
-//		}
-
 		Invoke ("switchAttack", 0.5f);
 	}
 
 	void makeEnemyReact(){
-			cam.GetComponent<MouseMovement> ().closestEnemyObject.GetComponent<EnemyCombatAI> ().playReactAnimation ();
+		cam.GetComponent<MouseMovement> ().getClosestEnemyObject().GetComponent<EnemyCombatAI> ().playReactAnimation ();
 	}
 
 	//animation 1: 1.84
@@ -114,10 +97,10 @@ public class DevCombat : MonoBehaviour {
 	}
 
 	bool closeEnoughToAttack(){
-		Vector3 totalVectorOffset = cam.GetComponent<MouseMovement> ().closestEnemy - transform.position;
+		Vector3 totalVectorOffset = cam.GetComponent<MouseMovement> ().getClosestEnemy() - transform.position;
 		totalVectorOffset = new Vector3 (totalVectorOffset.x, 0f, totalVectorOffset.z);
 		float totalOffset = totalVectorOffset.magnitude;
-		if (totalOffset > 40f)
+		if (totalOffset > 5f)
 			return false;		
 		return true;
 	}
@@ -125,22 +108,17 @@ public class DevCombat : MonoBehaviour {
 	void startGettingIntoPosition(){
 		needToAttack = true;
 		lerpT = 0f;
-		if(Vector3.Distance(cam.GetComponent<MouseMovement> ().closestEnemy, transform.position) > 10f){
-			myAnimator.SetBool ("roll", true);
-			myAnimator.speed = 2f;
-		}
+		triggerAttack ();
 	}
 
 	void getIntoPosition(){
-		Vector3 totalVectorOffset = cam.GetComponent<MouseMovement> ().closestEnemy - transform.position;
+		Vector3 totalVectorOffset = cam.GetComponent<MouseMovement> ().getClosestEnemy() - transform.position;
 		totalVectorOffset = new Vector3 (totalVectorOffset.x, 0f, totalVectorOffset.z);
 		float totalOffset = totalVectorOffset.magnitude;
 		float desiredOffset = offsetByAnimation ();
 		float remaining = totalOffset - desiredOffset;
-		if (Mathf.Abs (remaining) < 0.01f) {
+		if (Mathf.Abs (remaining) < 0.001f) {
 			doneLerping = true;
-			myAnimator.SetFloat ("VSpeed", 0f);
-			myAnimator.SetFloat ("HorizSpeed", 0f);
 		}
 		else {
 			Vector3 deltaPos = totalVectorOffset.normalized * remaining;

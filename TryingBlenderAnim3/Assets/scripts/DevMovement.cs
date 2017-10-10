@@ -4,114 +4,144 @@ using UnityEngine;
 
 public class DevMovement : MonoBehaviour {
 
-	public GameObject player;
-	public Transform CamTransform;
-	public Animator myAnimator;
-	public int adjustCounter;
-	public AudioSource footstep1;
-	public AudioSource footstep2;
-	public AudioSource footstep3;
-	public AudioSource footstep4;
-	public AudioSource land;
-	public AudioSource flipJump;
-	public bool horizRot;
-
-	private GameObject terrain;
-	private float desiredRot;
-	private bool applyJumpTrans;
-	private float needToRot;
-	private int runCounter;
-	private mapNode lastRegenNode;
-
+	#region imports you don't need to worry about
 	public bool doPathfinding;
 
-	// Use this for initialization
+	#region AudioSource Imports
+	public AudioSource footstep1,
+					   footstep2,
+					   footstep3,
+					   footstep4,
+					   land,
+					   flipJump;
+	#endregion
+
+	#region other imports (scripts, gameobjs, etc)
+	private MouseMovement mouseMovementScript;
+	private DevCombat devCombatScript;
+	private MapPathfind gridGraphScript;
+	private ClosestNodes closestNodesScript;
+
+	private GameObject player, terrain;
+	private Transform CamTransform;
+	private Animator myAnimator;
+	private mapNode lastRegenNode;
+
+	private bool movingVert, 
+				 movingHoriz,
+				 inCombatZone,
+				 horizRot,
+				 applyJumpTrans;
+
+	private float needToRot, desiredRot;
+	private int runCounter, adjustCounter;
+
+	#endregion
+	#endregion
+
+	#region imports you can tweak / need to worry about
+	private const float rollDistanceMultiplier = 0.5f;
+	#endregion
+
+	#region Start and Update
 	public void Start () {
+		player = GameObject.Find ("DevDrake");
 		terrain = GameObject.Find ("Terrain");
+		CamTransform = Camera.main.transform;
 		myAnimator = GetComponent<Animator> ();
-		needToRot = 0;
-		adjustCounter = 0;
-		runCounter = 0;
-		applyJumpTrans = false;
+
+		mouseMovementScript = Camera.main.GetComponent<MouseMovement>();
+		devCombatScript = player.GetComponent<DevCombat> ();
+		closestNodesScript = terrain.GetComponent<ClosestNodes> ();
+		gridGraphScript = terrain.GetComponent<MapPathfind>();
+
 		desiredRot = Camera.main.transform.eulerAngles.y;
-		horizRot = false;
 		initDevCell ();
 	}
 
-
-	private mapNode getDevCell(){
-		return terrain.GetComponent<MapPathfind> ().devCell;
-	}
-
-	public void initDevCell(){
-		if(terrain==null)
-			terrain = GameObject.Find ("Terrain");
-		terrain.GetComponent<MapPathfind> ().devCell = terrain.GetComponent<MapPathfind> ().containingCell (transform.position);
-		markNeighbors ();
-	}
-
-	public GameObject[] getEnemies(){
-		return GameObject.FindGameObjectsWithTag ("Enemy");
-	}
-
-	private float rand(float a, float b){
-		return UnityEngine.Random.Range (a, b);
-	}
-
-	private void clearNeighbors(){
-		mapNode[] neighbors = terrain.GetComponent<MapPathfind> ().devCell.getNeighbors ();
-		foreach (mapNode node in neighbors)
-			node.setEmpty ();
-	}
-
-	private void markNeighbors(){
-		mapNode[] neighbors = terrain.GetComponent<MapPathfind> ().devCell.getNeighbors ();
-		foreach (mapNode node in neighbors)
-			node.setFull (-3);		
-	}
-
-	public void setDevCellNoRepath(){
-		//dev's current location
-		mapNode newDevCell = terrain.GetComponent<MapPathfind> ().containingCell (transform.position);
-		if (newDevCell == null) {
-			Debug.LogAssertion ("bad");
-		}
-		else if (!newDevCell.equalTo (terrain.GetComponent<MapPathfind> ().devCell)) {
-
-			clearNeighbors ();
-			terrain.GetComponent<MapPathfind> ().devCell.setEmpty ();
-			terrain.GetComponent<MapPathfind> ().devCell = newDevCell;
-			terrain.GetComponent<MapPathfind> ().devCell.setFull (-3);
-			markNeighbors ();		
-		}
-	}
+	void Update () {
+		if(doPathfinding)
+			setDevCell ();
 		
-	public void setDevCell() {
-		//dev's current location
-		mapNode newDevCell = terrain.GetComponent<MapPathfind> ().containingCell (transform.position);
-		if (newDevCell == null) {
-			Debug.LogAssertion ("bad");
-		}
-//			if (GameObject.Find ("Enemy") != null && !newDevCell.equalTo (terrain.GetComponent<MapPathfind> ().devCell)) {
-		else if (!newDevCell.equalTo (terrain.GetComponent<MapPathfind> ().devCell)) {
+		AnimatorStateInfo anim = myAnimator.GetCurrentAnimatorStateInfo (0);
+		if (anim.IsTag ("equip"))
+			return;
+		if (anim.IsTag ("impact"))
+			impactMoveBack ();
+		if (rolling ())
+			transform.Translate (Vector3.forward * Time.deltaTime * rollDistanceMultiplier);
 
-			terrain.GetComponent<MapPathfind> ().devCell.setEmpty ();
-			terrain.GetComponent<MapPathfind> ().devCell = newDevCell;
-			terrain.GetComponent<MapPathfind> ().devCell.setFull (-3);
-			if (lastRegenNode == null || lastRegenNode.distance (newDevCell) >= 3f) {
-				terrain.GetComponent<ClosestNodes> ().regenPathsLongQuick();
-				lastRegenNode = newDevCell;
+		moveCharacter ();
+
+		if (!movingVert && !movingHoriz) {
+			stopFootstepSound ();
+		}
+
+		if (applyJumpTrans && anim.IsTag("Jumps")) {
+			if(anim.IsName("running_jump")) {
+				transform.Translate (Vector3.forward * Time.deltaTime * 8f);
+			} else {
+				transform.Translate (Vector3.forward * Time.deltaTime * 12f);
 			}
+		}
+
+		if (myAnimator.GetBool ("WeaponDrawn") && Input.GetButtonDown("Jump")) {
+			myAnimator.SetBool ("roll", true);
+			Invoke ("stopRolling", 1.0f);
+		}
+
+		if (anim.IsName ("quick_roll_to_run")) {
+			transform.Translate (Vector3.forward * Time.deltaTime * 2f);
+		}
+
+		if(Input.GetButtonDown("Jump") && movingVert && adjustCounter == 0 
+			&& devCombatScript.notInCombatMove())
+		{
+			myAnimator.SetBool("Jumping", true);
+			Invoke ("stopJumping", 0.8f);
+		}
+		else if(Input.GetButtonDown("FrontFlip") && movingVert && adjustCounter == 0
+			&& devCombatScript.notInCombatMove())
+		{
+			myAnimator.SetBool ("shouldFrontFlip", true);
+			Invoke ("stopFrontFlip", 2.1f);
+		}
+
+		//rotate dev horizontally IF dev is moving and in a non-combat zone, 
+		//but is not currently adjusting to a camera shift, jumping, flipping, or attacking/blocking
+		if(!inCombatZone && adjustCounter == 0 && (movingVert || movingHoriz)) {
+			if (!anim.IsTag("Jumps") && !myAnimator.GetBool ("Jumping") && !myAnimator.GetBool ("shouldFrontFlip") && devCombatScript.notInCombatMove()) {
+				transform.Rotate (Vector3.up * Input.GetAxisRaw("Mouse X") * Time.deltaTime * mouseMovementScript.sensitivityX);
+			}
+		}
+	}
+	#endregion
+
+	#region Non-combat and Combat Movement
+	private void moveCharacter(){
+		bool inCombatZone = mouseMovementScript.getInCombatZone();
+		bool weaponDrawn = myAnimator.GetBool ("WeaponDrawn");
+		bool inCombatMove = !devCombatScript.notInCombatMove ();
+		movingVert = !Mathf.Approximately (myAnimator.GetFloat ("VSpeed"), 0f);
+		movingHoriz = !Mathf.Approximately (myAnimator.GetFloat ("HorizSpeed"), 0f);
+
+		if (inCombatZone && weaponDrawn && !jumping () && !inCombatMove) {
+//			Debug.LogError ("");
+			combatMovement ();
+		} else {
+//			Debug.LogError ("Not in combat movement");
+//			mouseMovementScript.setInCombatZone(false);
+			nonCombatMovement ();
 		}
 	}
 
 	private void nonCombatMovement(){
 		AnimatorStateInfo anim = myAnimator.GetCurrentAnimatorStateInfo (0);
-		if ((Time.time - Camera.main.GetComponent<MouseMovement> ().combatExitTime) < 1f) {
+		if ((Time.time - mouseMovementScript.getCombatExitTime()) < 1f) {
 			myAnimator.SetFloat ("VSpeed", 0f);
 			myAnimator.SetFloat ("HorizSpeed", 0f);
 		}
-		else if(anim.IsTag("Running")) {
+		if(anim.IsTag("Running")) {
 			float doIt = 1f;
 			if (Input.GetKey (KeyCode.W) || Input.GetKey (KeyCode.UpArrow)) {
 				myAnimator.SetFloat ("VSpeed", Mathf.MoveTowards (myAnimator.GetFloat ("VSpeed"), Input.GetAxisRaw ("Vertical"), 0.1f)); 
@@ -193,89 +223,92 @@ public class DevMovement : MonoBehaviour {
 
 		transform.Translate (((Vector3.forward * X) + (Vector3.right * Y)) * Time.deltaTime * 2f);
 	}
+	#endregion
 
-	void Update () {
-		if(doPathfinding)
-			setDevCell ();
-//		mapNode ourCell = GameObject.Find ("Terrain").GetComponent<MapPathfind> ().containingCell (transform.position);
-//		if (ourCell!=null) {
-//			KeyValuePair<int, int> coords = ourCell.getIndices ();
-//			Debug.Log (coords.Key + ", " + coords.Value);
-//		}
-		AnimatorStateInfo anim = myAnimator.GetCurrentAnimatorStateInfo (0);
-		bool inCombatZone = Camera.main.GetComponent<MouseMovement> ().inCombatZone;
-		bool weaponDrawn = myAnimator.GetBool ("WeaponDrawn");
-		bool inCombatMove = !GetComponent<DevCombat> ().notInCombatMove ();
-		bool movingVert = !Mathf.Approximately (myAnimator.GetFloat ("VSpeed"), 0f);
-		bool movingHoriz = !Mathf.Approximately (myAnimator.GetFloat ("HorizSpeed"), 0f);
+	#region Grid Graph Cell Functions
+	private mapNode getDevCell(){
+		return gridGraphScript.devCell;
+	}
 
-		if (anim.IsTag ("equip"))
-			return;
-		if (anim.IsTag ("impact"))
-			impactMoveBack ();
-		if (rolling ())
-			transform.Translate (Vector3.forward * Time.deltaTime * 0.5f);
-						
-		if (inCombatZone && weaponDrawn && !jumping() && !inCombatMove)
-			combatMovement ();
-		else
-			nonCombatMovement ();
+	public void initDevCell(){
+		if(terrain==null)
+			terrain = GameObject.Find ("Terrain");
+		gridGraphScript.devCell = gridGraphScript.containingCell (transform.position);
+		markNeighbors ();
+	}
 
-		if (!movingVert && !movingHoriz) {
-			stopFootstepSound ();
+	private void clearNeighbors(){
+		mapNode[] neighbors = gridGraphScript.devCell.getNeighbors ();
+		foreach (mapNode node in neighbors)
+			node.setEmpty ();
+	}
+
+	private void markNeighbors(){
+		mapNode[] neighbors = gridGraphScript.devCell.getNeighbors ();
+		foreach (mapNode node in neighbors)
+			node.setFull (-3);		
+	}
+
+	public void setDevCellNoRepath(){
+		//dev's current location
+		mapNode newDevCell = gridGraphScript.containingCell (transform.position);
+		if (newDevCell == null) {
+			Debug.LogAssertion ("bad");
 		}
+		else if (!newDevCell.equalTo (gridGraphScript.devCell)) {
 
-		if (applyJumpTrans && anim.IsTag("Jumps")) {
-			if(anim.IsName("running_jump")) {
-				transform.Translate (Vector3.forward * Time.deltaTime * 8f);
-			} else {
-				transform.Translate (Vector3.forward * Time.deltaTime * 12f);
-			}
+			clearNeighbors ();
+			gridGraphScript.devCell.setEmpty ();
+			gridGraphScript.devCell = newDevCell;
+			gridGraphScript.devCell.setFull (-3);
+			markNeighbors ();		
 		}
+	}
 
-		if (myAnimator.GetBool ("WeaponDrawn") && Input.GetButtonDown("Jump")) {
-			myAnimator.SetBool ("roll", true);
-			Invoke ("stopRolling", 1.0f);
+	public void setDevCell() {
+		//dev's current location
+		mapNode newDevCell = gridGraphScript.containingCell (transform.position);
+		if (newDevCell == null) {
+			Debug.LogAssertion ("bad");
 		}
+		//			if (GameObject.Find ("Enemy") != null && !newDevCell.equalTo (gridGraphScript.devCell)) {
+		else if (!newDevCell.equalTo (gridGraphScript.devCell)) {
 
-		if (anim.IsName ("quick_roll_to_run")) {
-			transform.Translate (Vector3.forward * Time.deltaTime * 2f);
-		}
-
-		if(Input.GetButtonDown("Jump") && movingVert && adjustCounter == 0 
-			&& player.GetComponent<DevCombat>().notInCombatMove())
-		{
-			myAnimator.SetBool("Jumping", true);
-			Invoke ("stopJumping", 0.8f);
-		}
-		else if(Input.GetButtonDown("FrontFlip") && movingVert && adjustCounter == 0
-			&& player.GetComponent<DevCombat>().notInCombatMove())
-		{
-			myAnimator.SetBool ("shouldFrontFlip", true);
-			Invoke ("stopFrontFlip", 2.1f);
-		}
-
-		//rotate dev horizontally IF dev is moving and in a non-combat zone, 
-		//but is not currently adjusting to a camera shift, jumping, flipping, or attacking/blocking
-		if(!inCombatZone && adjustCounter == 0 && (movingVert || movingHoriz)) {
-			if (!anim.IsTag("Jumps") && !myAnimator.GetBool ("Jumping") && !myAnimator.GetBool ("shouldFrontFlip") && player.GetComponent<DevCombat>().notInCombatMove()) {
-				transform.Rotate (Vector3.up * Input.GetAxisRaw("Mouse X") * Time.deltaTime * Camera.main.GetComponent<MouseMovement>().sensitivityX);
+			gridGraphScript.devCell.setEmpty ();
+			gridGraphScript.devCell = newDevCell;
+			gridGraphScript.devCell.setFull (-3);
+			if (lastRegenNode == null || lastRegenNode.distance (newDevCell) >= 3f) {
+				closestNodesScript.regenPathsLongQuick();
+				lastRegenNode = newDevCell;
 			}
 		}
 	}
+	#endregion
 
-	public void impactMoveBack(){
-		transform.Translate (Vector3.back * 0.5f * Time.deltaTime);
-	}
 
-	void rotateRight(){
-		transform.Rotate(new Vector3(0f, 9f, 0f)); 
-	}
 
-	void rotateLeft(){
-		transform.Rotate(new Vector3(0f, -9f, 0f));  
-	}
+	/*	void rotateRight(){
+			transform.Rotate(new Vector3(0f, 9f, 0f)); 
+		}
+	*/
 
+	/*	void rotateLeft(){
+			transform.Rotate(new Vector3(0f, -9f, 0f));  
+		}
+	*/
+
+	/*void stopTurnRight(){
+	myAnimator.SetBool ("TurnRight", false);
+	}*/
+
+	/*void stopTurnLeft(){
+	myAnimator.SetBool ("TurnLeft", false);
+	}*/
+
+
+
+
+	#region sounds
 	void runningSound(){
 		if (runCounter == 0)
 			footstep1.Play ();
@@ -306,14 +339,6 @@ public class DevMovement : MonoBehaviour {
 			runCounter = 0;
 	}
 
-	void onApplyTrans(){
-		applyJumpTrans = true;
-	}
-
-	void offApplyTrans(){
-		applyJumpTrans = false;
-	}
-		
 	void flipTakeOffSound(){
 		flipJump.Play ();
 	}
@@ -322,6 +347,28 @@ public class DevMovement : MonoBehaviour {
 		land.Play ();
 	}
 
+	void stopFootstepSound(){
+		if (footstep1.isPlaying)
+			footstep1.Stop ();
+		if (footstep2.isPlaying)
+			footstep2.Stop ();
+		if (footstep3.isPlaying)
+			footstep3.Stop ();
+		if (footstep4.isPlaying)
+			footstep4.Stop ();
+	}
+
+	#endregion
+
+	#region methods called by animation events
+	void onApplyTrans(){
+		applyJumpTrans = true;
+	}
+
+	void offApplyTrans(){
+		applyJumpTrans = false;
+	}
+		
 	void stopRolling(){
 		myAnimator.SetBool ("roll", false);
 	}
@@ -337,25 +384,10 @@ public class DevMovement : MonoBehaviour {
 		myAnimator.SetBool ("shouldFrontFlip", false);
 		applyJumpTrans = false;
 	}
-
-	void stopFootstepSound(){
-		if (footstep1.isPlaying)
-			footstep1.Stop ();
-		if (footstep2.isPlaying)
-			footstep2.Stop ();
-		if (footstep3.isPlaying)
-			footstep3.Stop ();
-		if (footstep4.isPlaying)
-			footstep4.Stop ();
-	}
-
-
-	void stopTurnRight(){
-		myAnimator.SetBool ("TurnRight", false);
-	}
-
-	void stopTurnLeft(){
-		myAnimator.SetBool ("TurnLeft", false);
+	#endregion
+	
+	public void impactMoveBack(){
+		transform.Translate (Vector3.back * 0.5f * Time.deltaTime);
 	}
 
 	public void adjustToCam(float dif, bool firstTimeAdjust)
@@ -375,6 +407,15 @@ public class DevMovement : MonoBehaviour {
 		--adjustCounter;
 	}
 
+	#region common helpers
+	public GameObject[] getEnemies(){
+		return GameObject.FindGameObjectsWithTag ("Enemy");
+	}
+
+	private float rand(float a, float b){
+		return UnityEngine.Random.Range (a, b);
+	}
+
 	private float clamp(float angle){
 		if (angle < -180f) {
 			angle += 360f;
@@ -387,7 +428,9 @@ public class DevMovement : MonoBehaviour {
 
 		return angle;
 	}
+	#endregion
 
+	#region methods to get info about player state
 	public bool isIdle()
 	{
 		AnimatorStateInfo anim = myAnimator.GetCurrentAnimatorStateInfo (0);
@@ -416,5 +459,20 @@ public class DevMovement : MonoBehaviour {
 	private bool camRotChanged(){
 		return !Mathf.Approximately (Camera.main.transform.eulerAngles.y, desiredRot);
 	}
+	#endregion
 
+	#region getters
+	public bool getHorizRot(){ return horizRot; }
+	public int getAdjustCounter(){ return adjustCounter; }
+	#endregion
+
+	#region setters
+	public void setAdjustCounter(int _adjustCounter){
+		adjustCounter = _adjustCounter;
+	}
+	
+	public void setHorizRot(bool _horizRot){
+	horizRot = _horizRot;
+	}
+	#endregion
 }
