@@ -33,6 +33,9 @@ public class MouseMovement : MonoBehaviour {
 
 	private Animator myAnimator;
 
+	private DevMovement devMovementScript;
+	private DevCombat devCombatScript;
+
 	[SerializeField][HideInInspector]
 	private Vector3 initialOffset;
 	private Vector3 currentOffset;
@@ -49,6 +52,8 @@ public class MouseMovement : MonoBehaviour {
 		goal = player.transform.rotation.eulerAngles.y;
 		distance = initialOffset.magnitude;
 		lastEnemyCheckTime = Time.realtimeSinceStartup;
+		devMovementScript = player.GetComponent<DevMovement>();
+		devCombatScript = player.GetComponent<DevCombat>();
 	}
 
 	private void Update(){
@@ -129,10 +134,10 @@ public class MouseMovement : MonoBehaviour {
 
 	#region NonCombatCamera
 	private void HorizontalRotation(){
-		bool idle = player.GetComponent<DevMovement>().isIdle ();
+		bool idle = devMovementScript.isIdle ();
 		float movementX = Input.GetAxisRaw ("Mouse X") * sensitivityX * Time.deltaTime;
-		bool combating = !player.GetComponent<DevCombat> ().notInCombatMove ();
-		bool counterZero = (player.GetComponent<DevMovement> ().getAdjustCounter() == 0);
+		bool combating = !devCombatScript.notInCombatMove ();
+		bool counterZero = (devMovementScript.getAdjustCounter() == 0);
 		bool camMoved = !Mathf.Approximately (movementX, 0f);
 		AnimatorStateInfo anim = myAnimator.GetCurrentAnimatorStateInfo (0);
 		bool jumping = anim.IsTag("Jumps");
@@ -182,16 +187,16 @@ public class MouseMovement : MonoBehaviour {
 		if (difBig () && (firstTimeAdjust || !counterZero)) {
 			if (!movementButtonPressed ()) {
 				myAnimator.SetFloat ("VSpeed", Mathf.MoveTowards (myAnimator.GetFloat ("VSpeed"), 1f, 0.1f));
-				player.GetComponent<DevMovement> ().setHorizRot(true);
+				devMovementScript.setHorizRot(true);
 			} else {
-				player.GetComponent<DevMovement> ().setHorizRot(false);
+				devMovementScript.setHorizRot(false);
 			}
 
-			player.GetComponent<DevMovement> ().adjustToCam (dif, firstTimeAdjust);
+			devMovementScript.adjustToCam (dif, firstTimeAdjust);
 			firstTimeAdjust = false;
 		} else {
-			player.GetComponent<DevMovement> ().setHorizRot(false);
-			player.GetComponent<DevMovement> ().setAdjustCounter(0);
+			devMovementScript.setHorizRot(false);
+			devMovementScript.setAdjustCounter(0);
 		}
 
 		transform.RotateAround (player.transform.position + new Vector3(0.0f, 3.0f, 0.0f), Vector3.up, movementX);
@@ -275,7 +280,7 @@ public class MouseMovement : MonoBehaviour {
 
 			player.transform.forward = Vector3.RotateTowards (player.transform.forward, rollAngle - player.transform.forward, 15f * Time.deltaTime, 0.0f); 
 		}
-		else if(player.GetComponent<DevCombat>().notInCombatMove()){
+		else if(devCombatScript.notInCombatMove()){
 			rollAngle = Vector3.zero;
 			//rotate character towards closest enemy
 			Invoke("adjustToEnemy", 0.1f);
@@ -306,7 +311,6 @@ public class MouseMovement : MonoBehaviour {
 			closestEnemyObject = null;
 			return;
 		}
-		Debug.LogError ("Got here 1");
 			
 		bool enemyChanged = false;
 		float dist = 0f;
@@ -336,7 +340,6 @@ public class MouseMovement : MonoBehaviour {
 		if (enemyChanged)
 			enemyLockOnStart = Time.time;
 
-		Debug.LogError (enemyChanged);
 	}
 	#endregion
 

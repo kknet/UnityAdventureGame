@@ -3,55 +3,29 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class DevCombat : MonoBehaviour {
-	public Animator myAnimator;
-
+	private Animator myAnimator;
 	private Camera cam;
-	private float lerpT = 0f;
-	private bool needToAttack = false;
-	private bool doneLerping = false;
+	private float lerpT, lerpSpeedMultiplier;
+	private bool needToAttack, doneLerping;
 
-	// Use this for initialization
 	void Start () {
 		myAnimator = GetComponent<Animator>();
 		cam = Camera.main;
+		lerpSpeedMultiplier = 2.0f;
 	}
-
-	private bool movementButtonPressed(){
-		return Input.GetKeyDown (KeyCode.W) || Input.GetKeyDown (KeyCode.A) 
-			|| Input.GetKeyDown (KeyCode.S) || Input.GetKeyDown (KeyCode.D)
-			|| Input.GetKeyDown (KeyCode.UpArrow) || Input.GetKeyDown (KeyCode.LeftArrow) 
-			|| Input.GetKeyDown (KeyCode.RightArrow) || Input.GetKeyDown (KeyCode.DownArrow) 
-			|| Input.GetKey (KeyCode.W) || Input.GetKey (KeyCode.A) 
-			|| Input.GetKey (KeyCode.S) || Input.GetKey (KeyCode.D)
-			|| Input.GetKey (KeyCode.UpArrow) || Input.GetKey (KeyCode.LeftArrow) 
-			|| Input.GetKey (KeyCode.RightArrow) || Input.GetKey (KeyCode.DownArrow);
-		
-	}
-
-	// Update is called once per frame
 	void Update () {
-		if (needToAttack) {
-			if (doneLerping) {
-				needToAttack = false;
-			}
-			else {
-				lerpT += Time.deltaTime * 1f;
-				getIntoPosition ();
-				if (lerpT >= 1.0f) {
-					doneLerping = true;
-					lerpT = 0f;
-				}
-			}
-		}
+		handleAttacking ();
+		handleInput ();
+	}
 
-		//dev is not rotating, and there is no saved action, so do action right now (normal way)
+	private void handleInput(){
 		if (Input.GetKey (KeyCode.Mouse1)) {
-			stopAttack();
+			stopAttack ();
 			myAnimator.SetBool ("isBlocking", true);
 		} else {
 			myAnimator.SetBool ("isBlocking", false);		
 			//otherwise, if clicked LMB, attack
-			if (Input.GetKeyDown (KeyCode.Mouse0) && notInCombatMove()) {
+			if (Input.GetKeyDown (KeyCode.Mouse0) && notInCombatMove ()) {
 				if (closeEnoughToAttack ()) {
 					startGettingIntoPosition ();
 					return;
@@ -61,6 +35,23 @@ public class DevCombat : MonoBehaviour {
 		}
 	}
 
+	private void handleAttacking(){
+		if (needToAttack) {
+			if (doneLerping) {
+				needToAttack = false;
+			}
+			else {
+				lerpT += Time.deltaTime * lerpSpeedMultiplier;
+				getIntoPosition ();
+				if (lerpT >= 1.0f) {
+					doneLerping = true;
+					lerpT = 0f;
+				}
+			}
+		}	
+	}
+
+	#region helper methods to prepare for attack
 	public void stopAttack(){
 		myAnimator.SetBool ("doAttack", false);
 		needToAttack = false;
@@ -77,10 +68,10 @@ public class DevCombat : MonoBehaviour {
 		cam.GetComponent<MouseMovement> ().getClosestEnemyObject().GetComponent<EnemyCombatAI> ().playReactAnimation ();
 	}
 
-	//animation 1: 1.84
-	//animation 2: 1.84
-	//animation 3: 1.37
 	float offsetByAnimation(){
+		//animation 1: 1.84
+		//animation 2: 1.84
+		//animation 3: 1.37
 		switch (myAnimator.GetInteger ("quickAttack")){
 		case 1:
 			return 1.8f;
@@ -89,7 +80,7 @@ public class DevCombat : MonoBehaviour {
 			return 1.8f;
 //			return 1.9f;
 		case 3:
-			return 1.3f;
+			return 1f;
 		default:
 			Debug.LogAssertion ("Quick attack has bad value!");
 			return 0;
@@ -103,37 +94,6 @@ public class DevCombat : MonoBehaviour {
 		if (totalOffset > 5f)
 			return false;		
 		return true;
-	}
-
-	void startGettingIntoPosition(){
-		needToAttack = true;
-		lerpT = 0f;
-		triggerAttack ();
-	}
-
-	void getIntoPosition(){
-		Vector3 totalVectorOffset = cam.GetComponent<MouseMovement> ().getClosestEnemy() - transform.position;
-		totalVectorOffset = new Vector3 (totalVectorOffset.x, 0f, totalVectorOffset.z);
-		float totalOffset = totalVectorOffset.magnitude;
-		float desiredOffset = offsetByAnimation ();
-		float remaining = totalOffset - desiredOffset;
-		if (Mathf.Abs (remaining) < 0.001f) {
-			doneLerping = true;
-		}
-		else {
-			Vector3 deltaPos = totalVectorOffset.normalized * remaining;
-			transform.position = Vector3.Lerp (transform.position, transform.position + deltaPos, lerpT * 0.5f);
-//			myAnimator.SetFloat ("VSpeed", remaining); 
-		}
-	}
-
-	public bool notInCombatMove() {
-		return !isAttacking() && !myAnimator.GetBool ("isBlocking");
-	}
-
-	public bool isAttacking() {
-		AnimatorStateInfo info = myAnimator.GetCurrentAnimatorStateInfo (0);
-		return info.IsName ("quick_1") || info.IsName ("quick_2") || info.IsName ("quick_3");
 	}
 
 	public void switchAttack(){
@@ -152,4 +112,50 @@ public class DevCombat : MonoBehaviour {
 			break;
 		}
 	}
+
+	void startGettingIntoPosition(){
+		needToAttack = true;
+		lerpT = 0f;
+		triggerAttack ();
+	}
+
+	void getIntoPosition(){
+		Vector3 totalVectorOffset = cam.GetComponent<MouseMovement> ().getClosestEnemy() - transform.position;
+		totalVectorOffset = new Vector3 (totalVectorOffset.x, 0f, totalVectorOffset.z);
+		float totalOffset = totalVectorOffset.magnitude;
+		float desiredOffset = offsetByAnimation ();
+		float remaining = totalOffset - desiredOffset;
+		if (Mathf.Abs (remaining) < 0.01f) {
+			doneLerping = true;
+		}
+		else {
+			Vector3 deltaPos = totalVectorOffset.normalized * remaining;
+			transform.position = Vector3.Lerp (transform.position, transform.position + deltaPos, lerpT);
+//			myAnimator.SetFloat ("VSpeed", remaining); 
+		}
+	}
+	#endregion
+
+	#region getters
+	private bool movementButtonPressed(){
+		return Input.GetKeyDown (KeyCode.W) || Input.GetKeyDown (KeyCode.A) 
+			|| Input.GetKeyDown (KeyCode.S) || Input.GetKeyDown (KeyCode.D)
+			|| Input.GetKeyDown (KeyCode.UpArrow) || Input.GetKeyDown (KeyCode.LeftArrow) 
+			|| Input.GetKeyDown (KeyCode.RightArrow) || Input.GetKeyDown (KeyCode.DownArrow) 
+			|| Input.GetKey (KeyCode.W) || Input.GetKey (KeyCode.A) 
+			|| Input.GetKey (KeyCode.S) || Input.GetKey (KeyCode.D)
+			|| Input.GetKey (KeyCode.UpArrow) || Input.GetKey (KeyCode.LeftArrow) 
+			|| Input.GetKey (KeyCode.RightArrow) || Input.GetKey (KeyCode.DownArrow);
+
+	}
+
+	public bool notInCombatMove() {
+		return !isAttacking() && !myAnimator.GetBool ("isBlocking");
+	}
+
+	public bool isAttacking() {
+		AnimatorStateInfo info = myAnimator.GetCurrentAnimatorStateInfo (0);
+		return info.IsName ("quick_1") || info.IsName ("quick_2") || info.IsName ("quick_3");
+	}
+	#endregion
 }
