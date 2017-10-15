@@ -88,7 +88,7 @@ public class DevCombat : MonoBehaviour {
 	}
 
 	bool closeEnoughToAttack(){
-		Vector3 totalVectorOffset = cam.GetComponent<MouseMovement> ().getClosestEnemy() - transform.position;
+		Vector3 totalVectorOffset = cam.GetComponent<MouseMovement> ().getClosestEnemyObject().transform.position - transform.position;
 		totalVectorOffset = new Vector3 (totalVectorOffset.x, 0f, totalVectorOffset.z);
 		float totalOffset = totalVectorOffset.magnitude;
 		if (totalOffset > 5f)
@@ -120,7 +120,7 @@ public class DevCombat : MonoBehaviour {
 	}
 
 	void getIntoPosition(){
-		Vector3 totalVectorOffset = cam.GetComponent<MouseMovement> ().getClosestEnemy() - transform.position;
+		Vector3 totalVectorOffset = cam.GetComponent<MouseMovement> ().getClosestEnemyObject().transform.position - transform.position;
 		totalVectorOffset = new Vector3 (totalVectorOffset.x, 0f, totalVectorOffset.z);
 		float totalOffset = totalVectorOffset.magnitude;
 		float desiredOffset = offsetByAnimation ();
