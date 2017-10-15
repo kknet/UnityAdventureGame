@@ -65,7 +65,7 @@ public class DevCombat : MonoBehaviour {
 	}
 
 	void makeEnemyReact(){
-		cam.GetComponent<MouseMovement> ().getClosestEnemyObject().GetComponent<EnemyCombatAI> ().playReactAnimation ();
+		cam.GetComponent<MouseMovement> ().getClosestEnemyObject().GetComponent<EnemyCombatAI> ().playReactAnimation (myAnimator.GetInteger("quickAttack"));
 	}
 
 	float offsetByAnimation(){
