@@ -54,11 +54,18 @@ public class MouseMovement : MonoBehaviour {
 		lastEnemyCheckTime = Time.realtimeSinceStartup;
 		devMovementScript = player.GetComponent<DevMovement>();
 		devCombatScript = player.GetComponent<DevCombat>();
+		closestEnemyObject = GameObject.Find ("Brute2");
 	}
 
 	private void Update(){
 		transform.position = player.transform.position + currentOffset;
-		getNearestEnemy (); 
+
+		//GET NEAREST ENEMY DOESN'T EXACTLY WORK!
+		//		getNearestEnemy (); 
+
+
+
+		closestEnemy = closestEnemyObject.transform.position;
 
 		if ((Time.realtimeSinceStartup - lastEnemyCheckTime) > 1.0f) {
 			inCombatZone = (closestEnemy != Vector3.zero);

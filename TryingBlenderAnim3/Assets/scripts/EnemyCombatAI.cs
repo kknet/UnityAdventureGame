@@ -12,12 +12,17 @@ public class EnemyCombatAI : MonoBehaviour {
 		"React from Right and Move Back"
 	};
 
-	private float[] reactTimes = {
-		0.2f,
-		0.2f,
-		0.2f
+	private float[] crossFadeTimes = {
+		0.05f,
+		0.05f,
+		0.05f
 	};
 
+	private float[] callDelayTimes = {
+		0.1f,
+		0.1f,
+		0.1f
+	};
 
 	// Use this for initialization
 	void Start () {
@@ -31,9 +36,12 @@ public class EnemyCombatAI : MonoBehaviour {
 	}
 		
 	public void playReactAnimation(int animationIndex){
-//		Debug.Log(Vector3.Distance(transform.position, dev.transform.position));
-//		enemyAnim.CrossFade ("standing_react_large_from_right", 0.2f);
-		enemyAnim.CrossFade (reactAnimations[animationIndex-1], reactTimes[animationIndex-1]);
+		StartCoroutine (callAnimation(animationIndex));
+	}
+
+	private IEnumerator callAnimation(int animationIndex){
+		yield return new WaitForSeconds (callDelayTimes [animationIndex - 1]);
+		enemyAnim.CrossFade (reactAnimations[animationIndex-1], crossFadeTimes[animationIndex-1]);
 	}
 
 	/*	void OnDrawGizmos(){

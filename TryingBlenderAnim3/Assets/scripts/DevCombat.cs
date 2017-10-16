@@ -7,11 +7,13 @@ public class DevCombat : MonoBehaviour {
 	private Camera cam;
 	private float lerpT, lerpSpeedMultiplier;
 	private bool needToAttack, doneLerping;
+	private GameObject brute1;
 
 	void Start () {
 		myAnimator = GetComponent<Animator>();
 		cam = Camera.main;
 		lerpSpeedMultiplier = 2.0f;
+		brute1 = GameObject.Find ("Brute2");
 	}
 	void Update () {
 		handleAttacking ();
@@ -65,7 +67,8 @@ public class DevCombat : MonoBehaviour {
 	}
 
 	void makeEnemyReact(){
-		cam.GetComponent<MouseMovement> ().getClosestEnemyObject().GetComponent<EnemyCombatAI> ().playReactAnimation (myAnimator.GetInteger("quickAttack"));
+//		cam.GetComponent<MouseMovement> ().getClosestEnemyObject().GetComponent<EnemyCombatAI> ().playReactAnimation (myAnimator.GetInteger("quickAttack"));
+		brute1.GetComponent<EnemyCombatAI> ().playReactAnimation (myAnimator.GetInteger("quickAttack"));
 	}
 
 	float offsetByAnimation(){
@@ -75,12 +78,10 @@ public class DevCombat : MonoBehaviour {
 		switch (myAnimator.GetInteger ("quickAttack")){
 		case 1:
 			return 1.8f;
-//			return 1.9f;
 		case 2:
 			return 1.8f;
-//			return 1.9f;
 		case 3:
-			return 1f;
+			return 1.0f;
 		default:
 			Debug.LogAssertion ("Quick attack has bad value!");
 			return 0;
@@ -88,7 +89,8 @@ public class DevCombat : MonoBehaviour {
 	}
 
 	bool closeEnoughToAttack(){
-		Vector3 totalVectorOffset = cam.GetComponent<MouseMovement> ().getClosestEnemyObject().transform.position - transform.position;
+//		Vector3 totalVectorOffset = cam.GetComponent<MouseMovement> ().getClosestEnemyObject().transform.position - transform.position;
+		Vector3 totalVectorOffset = getEnemyPos() - transform.position;
 		totalVectorOffset = new Vector3 (totalVectorOffset.x, 0f, totalVectorOffset.z);
 		float totalOffset = totalVectorOffset.magnitude;
 		if (totalOffset > 5f)
@@ -119,8 +121,13 @@ public class DevCombat : MonoBehaviour {
 		triggerAttack ();
 	}
 
+	Vector3 getEnemyPos(){
+		return brute1.transform.position;
+	}
+
 	void getIntoPosition(){
-		Vector3 totalVectorOffset = cam.GetComponent<MouseMovement> ().getClosestEnemyObject().transform.position - transform.position;
+//		Vector3 totalVectorOffset = cam.GetComponent<MouseMovement> ().getClosestEnemyObject().transform.position - transform.position;
+		Vector3 totalVectorOffset = getEnemyPos() - transform.position;
 		totalVectorOffset = new Vector3 (totalVectorOffset.x, 0f, totalVectorOffset.z);
 		float totalOffset = totalVectorOffset.magnitude;
 		float desiredOffset = offsetByAnimation ();

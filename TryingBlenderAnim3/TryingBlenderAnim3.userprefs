@@ -1,12 +1,11 @@
 ﻿<Properties StartupItem="Assembly-CSharp.csproj">
   <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" PreferredExecutionTarget="Unity.Instance.Unity Editor" />
-  <MonoDevelop.Ide.Workbench ActiveDocument="Assets\scripts\DevCombat.cs">
+  <MonoDevelop.Ide.Workbench ActiveDocument="Assets\scripts\EnemyCombatAI.cs">
     <Files>
       <File FileName="Assets\scripts\DevMovement.cs" Line="1" Column="1" />
-      <File FileName="Assets\scripts\MouseMovement.cs" Line="1" Column="1" />
-      <File FileName="Assets\scripts\EnemyCombatAI.cs" Line="1" Column="1" />
-      <File FileName="Assets\scripts\DevCombat.cs" Line="123" Column="108" />
-      <File FileName="Assets\MoveDuringReactions.cs" Line="12" Column="3" />
+      <File FileName="Assets\scripts\MouseMovement.cs" Line="67" Column="3" />
+      <File FileName="Assets\scripts\EnemyCombatAI.cs" Line="23" Column="6" />
+      <File FileName="Assets\scripts\DevCombat.cs" Line="82" Column="16" />
     </Files>
   </MonoDevelop.Ide.Workbench>
   <MonoDevelop.Ide.DebuggingService.Breakpoints>
