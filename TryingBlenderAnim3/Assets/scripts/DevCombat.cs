@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class DevCombat : MonoBehaviour {
+	public AudioSource quickAttack;
+
 	private Animator myAnimator;
 	private Camera cam;
 	private float lerpT, lerpSpeedMultiplier;
@@ -164,5 +166,16 @@ public class DevCombat : MonoBehaviour {
 		AnimatorStateInfo info = myAnimator.GetCurrentAnimatorStateInfo (0);
 		return info.IsName ("quick_1") || info.IsName ("quick_2") || info.IsName ("quick_3");
 	}
+	#endregion
+
+	#region sounds
+
+	public void playQuickAttackSound(){
+		if(quickAttack.isPlaying)
+			quickAttack.Stop();
+
+		quickAttack.Play ();
+	}
+
 	#endregion
 }
