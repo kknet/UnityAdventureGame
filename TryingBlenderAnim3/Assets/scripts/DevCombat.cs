@@ -4,18 +4,23 @@ using UnityEngine;
 
 public class DevCombat : MonoBehaviour {
 	public AudioSource quickAttack, quickAttack2, quickAttack3;
+	public AudioSource strongHit;
 
 	private Animator myAnimator;
 	private Camera cam;
 	private float lerpT, lerpSpeedMultiplier;
 	private bool needToAttack, doneLerping;
-	private GameObject brute1;
+	private GameObject currentEnemy;
+	private AudioSource[] enemyQuickAttackSounds = new AudioSource[3];
 
 	void Start () {
 		myAnimator = GetComponent<Animator>();
 		cam = Camera.main;
 		lerpSpeedMultiplier = 2.0f;
-		brute1 = GameObject.Find ("Brute2");
+		currentEnemy = GameObject.Find ("Brute2");
+		enemyQuickAttackSounds[0] = quickAttack;
+		enemyQuickAttackSounds[1] = quickAttack2;
+		enemyQuickAttackSounds[2] = quickAttack3;
 	}
 	void Update () {
 		handleAttacking ();
@@ -65,12 +70,12 @@ public class DevCombat : MonoBehaviour {
 
 	void triggerAttack(){
 		myAnimator.SetBool ("doAttack", true);
-		Invoke ("switchAttack", 0.5f);
+//		Invoke ("switchAttack", 0.5f);
 	}
 
 	void makeEnemyReact(){
 //		cam.GetComponent<MouseMovement> ().getClosestEnemyObject().GetComponent<EnemyCombatAI> ().playReactAnimation (myAnimator.GetInteger("quickAttack"));
-		brute1.GetComponent<EnemyCombatAI> ().playReactAnimation (myAnimator.GetInteger("quickAttack"));
+		currentEnemy.GetComponent<EnemyCombatAI> ().playReactAnimation (myAnimator.GetInteger("quickAttack"));
 	}
 
 	float offsetByAnimation(){
@@ -117,6 +122,13 @@ public class DevCombat : MonoBehaviour {
 		}
 	}
 
+	public void setHitStrong(){
+		if (currentEnemy.GetComponent<EnemyCombatAI> ().isBlocking ()) {
+//			myAnimator.SetBool ("hitStrong", true);
+			myAnimator.CrossFade("sword_and_shield_impact_1", 0.2f);
+		}
+	}
+
 	void startGettingIntoPosition(){
 		needToAttack = true;
 		lerpT = 0f;
@@ -124,7 +136,7 @@ public class DevCombat : MonoBehaviour {
 	}
 
 	Vector3 getEnemyPos(){
-		return brute1.transform.position;
+		return currentEnemy.transform.position;
 	}
 
 	void getIntoPosition(){
@@ -171,6 +183,8 @@ public class DevCombat : MonoBehaviour {
 	#region sounds
 
 	public void playQuickAttackSound(){
+		if (strongHit.isPlaying)
+			strongHit.Stop ();
 		if(quickAttack2.isPlaying)
 			quickAttack2.Stop();
 		if(quickAttack.isPlaying)
@@ -178,30 +192,46 @@ public class DevCombat : MonoBehaviour {
 		if (quickAttack3.isPlaying)
 			quickAttack3.Stop ();
 
-		quickAttack.Play ();
+
+		if (currentEnemy.GetComponent<EnemyCombatAI> ().isBlocking ()) {
+			strongHit.Play ();
+		} else {
+			enemyQuickAttackSounds [myAnimator.GetInteger ("quickAttack") - 1].Play ();
+		}
 	}
-
-	public void playQuickAttackSound2(){
-		if(quickAttack2.isPlaying)
-			quickAttack2.Stop();
-		if(quickAttack.isPlaying)
-			quickAttack.Stop();
-		if (quickAttack3.isPlaying)
-			quickAttack3.Stop ();
-
-		quickAttack2.Play ();
-	}
-
-	public void playQuickAttackSound3(){
-		if(quickAttack2.isPlaying)
-			quickAttack2.Stop();
-		if(quickAttack.isPlaying)
-			quickAttack.Stop();
-		if (quickAttack3.isPlaying)
-			quickAttack3.Stop ();
-
-		quickAttack3.Play ();
-	}
+		
+//	public void playQuickAttackSound(){
+//		if(quickAttack2.isPlaying)
+//			quickAttack2.Stop();
+//		if(quickAttack.isPlaying)
+//			quickAttack.Stop();
+//		if (quickAttack3.isPlaying)
+//			quickAttack3.Stop ();
+//
+//		quickAttack.Play ();
+//	}
+//
+//	public void playQuickAttackSound2(){
+//		if(quickAttack2.isPlaying)
+//			quickAttack2.Stop();
+//		if(quickAttack.isPlaying)
+//			quickAttack.Stop();
+//		if (quickAttack3.isPlaying)
+//			quickAttack3.Stop ();
+//
+//		quickAttack2.Play ();
+//	}
+//
+//	public void playQuickAttackSound3(){
+//		if(quickAttack2.isPlaying)
+//			quickAttack2.Stop();
+//		if(quickAttack.isPlaying)
+//			quickAttack.Stop();
+//		if (quickAttack3.isPlaying)
+//			quickAttack3.Stop ();
+//
+//		quickAttack3.Play ();
+//	}
 
 
 	#endregion

@@ -4,6 +4,8 @@ using UnityEngine;
 
 public class EnemyCombatAI : MonoBehaviour {
 
+	public bool setBlocking;
+
 	private GameObject dev;
 	private Animator enemyAnim;
 	private string[] reactAnimations = {
@@ -19,20 +21,22 @@ public class EnemyCombatAI : MonoBehaviour {
 	};
 
 	private float[] callDelayTimes = {
-		0.1f,
-		0.1f,
-		0.1f
+		0.25f,
+		0.3f,
+		0.6f
 	};
 
 	// Use this for initialization
 	void Start () {
 		enemyAnim = this.gameObject.GetComponent<Animator> ();
 		dev = GameObject.Find ("DevDrake");
+		enemyAnim.SetBool ("enemyBlock", setBlocking);
 	}
 	
 	// Update is called once per frame
 	void Update () {
 //		bool collision = Physics.Raycast (transform.position + transform.up + (transform.forward * 0.3f), transform.forward, 0.5f);
+
 	}
 		
 	public void playReactAnimation(int animationIndex){
@@ -41,7 +45,15 @@ public class EnemyCombatAI : MonoBehaviour {
 
 	private IEnumerator callAnimation(int animationIndex){
 		yield return new WaitForSeconds (callDelayTimes [animationIndex - 1]);
-		enemyAnim.CrossFade (reactAnimations[animationIndex-1], crossFadeTimes[animationIndex-1]);
+		if(enemyAnim.GetCurrentAnimatorStateInfo(0).IsName("sword_and_shield_block_idle"))
+			enemyAnim.CrossFade ("standing_block_react_large", 0.1f);
+		else
+			enemyAnim.CrossFade (reactAnimations[animationIndex-1], crossFadeTimes[animationIndex-1]);
+	}
+
+	public bool isBlocking(){
+		AnimatorStateInfo info = enemyAnim.GetCurrentAnimatorStateInfo (0);
+		return info.IsName ("sword_and_shield_block_idle") || info.IsName("standing_block_react_large");
 	}
 
 	/*	void OnDrawGizmos(){
