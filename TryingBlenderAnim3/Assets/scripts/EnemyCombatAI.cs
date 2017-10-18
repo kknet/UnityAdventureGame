@@ -26,6 +26,12 @@ public class EnemyCombatAI : MonoBehaviour {
 		0.6f
 	};
 
+	private float[] blockDelayTimes = {
+		0.05f,
+		0.01f,
+		0.01f
+	};
+
 	// Use this for initialization
 	void Start () {
 		enemyAnim = this.gameObject.GetComponent<Animator> ();
@@ -44,11 +50,14 @@ public class EnemyCombatAI : MonoBehaviour {
 	}
 
 	private IEnumerator callAnimation(int animationIndex){
-		yield return new WaitForSeconds (callDelayTimes [animationIndex - 1]);
-		if(enemyAnim.GetCurrentAnimatorStateInfo(0).IsName("sword_and_shield_block_idle"))
-			enemyAnim.CrossFade ("standing_block_react_large", 0.1f);
-		else
-			enemyAnim.CrossFade (reactAnimations[animationIndex-1], crossFadeTimes[animationIndex-1]);
+		if (enemyAnim.GetCurrentAnimatorStateInfo (0).IsName ("sword_and_shield_block_idle")) {
+			yield return new WaitForSeconds (blockDelayTimes [animationIndex - 1]);
+			enemyAnim.CrossFade ("standing_block_react_large", 0.05f);
+		}
+		else {
+			yield return new WaitForSeconds (callDelayTimes [animationIndex - 1]);
+			enemyAnim.CrossFade (reactAnimations [animationIndex - 1], crossFadeTimes [animationIndex - 1]);
+		}
 	}
 
 	public bool isBlocking(){

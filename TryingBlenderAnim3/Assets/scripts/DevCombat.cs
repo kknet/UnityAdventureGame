@@ -13,6 +13,8 @@ public class DevCombat : MonoBehaviour {
 	private GameObject currentEnemy;
 	private AudioSource[] enemyQuickAttackSounds = new AudioSource[3];
 
+	private float[] strongHitCrossFadeTimes = { 0.2f, 0.2f, 0.05f };
+
 	void Start () {
 		myAnimator = GetComponent<Animator>();
 		cam = Camera.main;
@@ -125,7 +127,7 @@ public class DevCombat : MonoBehaviour {
 	public void setHitStrong(){
 		if (currentEnemy.GetComponent<EnemyCombatAI> ().isBlocking ()) {
 //			myAnimator.SetBool ("hitStrong", true);
-			myAnimator.CrossFade("sword_and_shield_impact_1", 0.2f);
+			myAnimator.CrossFade("sword_and_shield_impact_1", strongHitCrossFadeTimes[myAnimator.GetInteger("quickAttack")]);
 		}
 	}
 
