@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class DevCombat : MonoBehaviour {
-	public AudioSource quickAttack;
+	public AudioSource quickAttack, quickAttack2, quickAttack3;
 
 	private Animator myAnimator;
 	private Camera cam;
@@ -171,11 +171,38 @@ public class DevCombat : MonoBehaviour {
 	#region sounds
 
 	public void playQuickAttackSound(){
+		if(quickAttack2.isPlaying)
+			quickAttack2.Stop();
 		if(quickAttack.isPlaying)
 			quickAttack.Stop();
+		if (quickAttack3.isPlaying)
+			quickAttack3.Stop ();
 
 		quickAttack.Play ();
 	}
+
+	public void playQuickAttackSound2(){
+		if(quickAttack2.isPlaying)
+			quickAttack2.Stop();
+		if(quickAttack.isPlaying)
+			quickAttack.Stop();
+		if (quickAttack3.isPlaying)
+			quickAttack3.Stop ();
+
+		quickAttack2.Play ();
+	}
+
+	public void playQuickAttackSound3(){
+		if(quickAttack2.isPlaying)
+			quickAttack2.Stop();
+		if(quickAttack.isPlaying)
+			quickAttack.Stop();
+		if (quickAttack3.isPlaying)
+			quickAttack3.Stop ();
+
+		quickAttack3.Play ();
+	}
+
 
 	#endregion
 }
