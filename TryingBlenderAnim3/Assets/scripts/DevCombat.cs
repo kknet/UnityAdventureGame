@@ -12,8 +12,10 @@ public class DevCombat : MonoBehaviour {
 	private bool needToAttack, doneLerping;
 	private GameObject currentEnemy;
 	private AudioSource[] enemyQuickAttackSounds = new AudioSource[3];
-
 	private float[] strongHitCrossFadeTimes = { 0.2f, 0.2f, 0.05f };
+	private float spaceBarPressedTime, leftMousePressedTime, FPressedTime;
+
+	private float twoButtonPressTimeMax = 0.1f;
 
 	void Start () {
 		myAnimator = GetComponent<Animator>();
@@ -29,21 +31,97 @@ public class DevCombat : MonoBehaviour {
 		handleInput ();
 	}
 
+	private void handleLeftMousePressed(){
+		if (Time.time - spaceBarPressedTime < twoButtonPressTimeMax) {
+			leftMousePressedTime = 0f;
+			spaceBarPressedTime = 0f;
+			myAnimator.SetBool ("doJumpAttack", true);
+			return;
+		}
+
+		if (Time.time - FPressedTime < (twoButtonPressTimeMax)) {
+			leftMousePressedTime = 0f;
+			FPressedTime = 0f;
+			myAnimator.SetBool ("doFlipAttack", true);
+			return;
+		}
+		leftMousePressedTime = Time.time;
+	}
+
+	private void handleSpaceBarPressed(){
+		if (Time.time - leftMousePressedTime < twoButtonPressTimeMax) {
+			spaceBarPressedTime = 0f;
+			leftMousePressedTime = 0f;
+			myAnimator.SetBool ("doJumpAttack", true);
+			return;
+		}
+		spaceBarPressedTime = Time.time;
+	}
+
+	private void handleFPressed(){
+		if (Time.time - leftMousePressedTime < (twoButtonPressTimeMax)) {
+			FPressedTime = 0f;
+			leftMousePressedTime = 0f;
+			myAnimator.SetBool ("doFlipAttack", true);
+			return;
+		}
+		leftMousePressedTime = Time.time;
+	}
+
 	private void handleInput(){
-		if (Input.GetKey (KeyCode.Mouse1)) {
+		bool leftMousePressed = Input.GetKeyDown (KeyCode.Mouse0);
+		bool leftMouseHeld = Input.GetKey (KeyCode.Mouse0);
+
+		bool spaceBarPressed = Input.GetKeyDown (KeyCode.Space);
+		bool spaceBarHeld = Input.GetKey (KeyCode.Space);
+
+		bool rightMouseHeld = Input.GetKey (KeyCode.Mouse1);
+		bool rightMouseReleased = Input.GetKeyUp (KeyCode.Mouse1);
+
+		bool FPressed = Input.GetKeyDown (KeyCode.F);
+		bool FHeld = Input.GetKeyDown (KeyCode.F);
+
+		if (rightMouseReleased) {
+			myAnimator.SetBool ("isBlocking", false);
+		}
+
+		if (leftMousePressedTime > 0f && (Time.time - leftMousePressedTime > twoButtonPressTimeMax)) {
+			leftMousePressedTime = 0f;
+			if (notInCombatMove () && closeEnoughToAttack ()) {
+				startGettingIntoPosition ();
+				return;
+			}
+			stopAttack ();
+		} else if (spaceBarPressedTime > 0f && (Time.time - spaceBarPressedTime > twoButtonPressTimeMax)) {
+			spaceBarPressedTime = 0f;
+			if (myAnimator.GetBool ("WeaponDrawn")) {
+				myAnimator.SetBool ("roll", true);
+				Invoke ("stopRolling", 1.0f);
+			}
+		} else if (FPressedTime > 0f && (Time.time - FPressedTime > twoButtonPressTimeMax)) {
+			FPressedTime = 0f;
+		}
+
+
+
+		if (rightMouseHeld) {
 			stopAttack ();
 			myAnimator.SetBool ("isBlocking", true);
-		} else {
-			myAnimator.SetBool ("isBlocking", false);		
-			//otherwise, if clicked LMB, attack
-			if (Input.GetKeyDown (KeyCode.Mouse0) && notInCombatMove ()) {
-				if (closeEnoughToAttack ()) {
-					startGettingIntoPosition ();
-					return;
-				}
-				stopAttack ();
-			}
+		} else if (leftMousePressed && spaceBarPressed) {
+			myAnimator.SetBool ("doJumpAttack", true);
+		} else if (leftMousePressed && FPressed) {
+			myAnimator.SetBool ("doFlipAttack", true);
+		} else if (leftMousePressed) {
+			handleLeftMousePressed ();
+		} else if (spaceBarPressed) {
+			handleSpaceBarPressed ();
+		} else if (FPressed) {
+			handleFPressed ();
 		}
+	}
+
+	void stopRolling(){
+		myAnimator.SetBool ("roll", false);
 	}
 
 	private void handleAttacking(){

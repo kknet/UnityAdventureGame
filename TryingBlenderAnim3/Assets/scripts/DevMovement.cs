@@ -85,11 +85,6 @@ public class DevMovement : MonoBehaviour {
 			}
 		}
 
-		if (myAnimator.GetBool ("WeaponDrawn") && Input.GetButtonDown("Jump")) {
-			myAnimator.SetBool ("roll", true);
-			Invoke ("stopRolling", 1.0f);
-		}
-
 		if (anim.IsName ("quick_roll_to_run")) {
 			transform.Translate (Vector3.forward * Time.deltaTime * 2f);
 		}
@@ -367,10 +362,6 @@ public class DevMovement : MonoBehaviour {
 
 	void offApplyTrans(){
 		applyJumpTrans = false;
-	}
-		
-	void stopRolling(){
-		myAnimator.SetBool ("roll", false);
 	}
 
 	void stopJumping()
