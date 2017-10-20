@@ -213,8 +213,8 @@ public class DevMovement : MonoBehaviour {
 				else if (A) X=-1;
 			}
 		}
-		myAnimator.SetFloat ("VSpeed", Mathf.MoveTowards (myAnimator.GetFloat ("VSpeed"), X * 1f, 4f * Time.deltaTime));
-		myAnimator.SetFloat ("HorizSpeed", Mathf.MoveTowards (myAnimator.GetFloat ("HorizSpeed"), Y * 1f, 4f * Time.deltaTime));
+		myAnimator.SetFloat ("VSpeed", Mathf.MoveTowards (myAnimator.GetFloat ("VSpeed"), X * 0.5f, 4f * Time.deltaTime));
+		myAnimator.SetFloat ("HorizSpeed", Mathf.MoveTowards (myAnimator.GetFloat ("HorizSpeed"), Y * 0.5f, 4f * Time.deltaTime));
 
 		transform.Translate (((Vector3.forward * X) + (Vector3.right * Y)) * Time.deltaTime * 2f);
 	}
@@ -256,7 +256,7 @@ public class DevMovement : MonoBehaviour {
 			gridGraphScript.devCell.setEmpty ();
 			gridGraphScript.devCell = newDevCell;
 			gridGraphScript.devCell.setFull (-3);
-			markNeighbors ();		
+			markNeighbors ();
 		}
 	}
 
