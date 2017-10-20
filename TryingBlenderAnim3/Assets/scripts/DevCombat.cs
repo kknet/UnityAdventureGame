@@ -11,13 +11,12 @@ public class DevCombat : MonoBehaviour {
 	private float lerpT, lerpSpeedMultiplier;
 	private bool needToAttack, doneLerping;
 	private GameObject currentEnemy;
-	private AudioSource[] enemyQuickAttackSounds = new AudioSource[3];
+	private AudioSource[] enemyAttackReactionSounds = new AudioSource[4];
 	private float[] strongHitCrossFadeTimes = { 0.2f, 0.2f, 0.05f };
 	private float spaceBarPressedTime, leftMousePressedTime, FPressedTime;
 	private float twoButtonPressTimeMax = 0.1f;
 	private float[] quickAttackOffsets = {1.8f, 1.8f, 1.0f};
-	private float jumpAttackStartingOffset = 5.0f;
-	private float jumpAttackEndingOffset = 1.3f;
+	private float jumpAttackStartingOffset = 3.7f;
 	float desiredOffset;
 
 	enum AttackType {
@@ -31,9 +30,10 @@ public class DevCombat : MonoBehaviour {
 		cam = Camera.main;
 		lerpSpeedMultiplier = 2.0f;
 		currentEnemy = GameObject.Find ("Brute2");
-		enemyQuickAttackSounds[0] = quickAttack;
-		enemyQuickAttackSounds[1] = quickAttack2;
-		enemyQuickAttackSounds[2] = quickAttack3;
+		enemyAttackReactionSounds[0] = quickAttack;
+		enemyAttackReactionSounds[1] = quickAttack2;
+		enemyAttackReactionSounds[2] = quickAttack3;
+		enemyAttackReactionSounds[3] = quickAttack3;
 	}
 	void Update () {
 		handleAttacking ();
@@ -134,9 +134,28 @@ public class DevCombat : MonoBehaviour {
 //		}
 	}
 
+
+	private IEnumerator triggerJumpAttack(){
+		while (needToAttack == true) {
+			yield return new WaitForSeconds (0.1f);
+		}
+		myAnimator.SetBool ("doJumpAttack", true);
+	}
+
 	private void InitiateStepsToAttack(AttackType type){
 		if (notInCombatMove () && closeEnoughToAttack ()) {
-			startGettingIntoPosition (type);
+			if (type == AttackType.quick) {
+				cam.GetComponent<MouseMovement> ().doCombatRotationOffset (true);
+				startGettingIntoPosition ();
+				desiredOffset = quickAttackOffsets[myAnimator.GetInteger("quickAttack")-1];
+				triggerQuickAttack ();
+			} else if (type == AttackType.jump) {
+				cam.GetComponent<MouseMovement> ().doCombatRotationOffset (false);
+				startGettingIntoPosition ();
+				desiredOffset = jumpAttackStartingOffset;
+				StartCoroutine (triggerJumpAttack());
+			}
+
 		}
 	}
 
@@ -171,32 +190,13 @@ public class DevCombat : MonoBehaviour {
 	}
 
 
-	void triggerAttack(AttackType current){
+	void triggerQuickAttack(){
 		myAnimator.SetBool ("doAttack", true);	
 	}
-
-//	void triggerAttack(AttackType current){
-//
-//		switch (current) {
-//		case AttackType.quick: 
-//			myAnimator.SetBool ("doAttack", true);
-//			break;
-//		case AttackType.flip:
-//			myAnimator.SetBool("doFlipAttack", true);
-//			break;
-//		case AttackType.jump:
-//			myAnimator.SetBool("doJumpAttack", true);
-//			break;
-//		default:
-//			Debug.LogAssertion ("Trying to trigger attack of type none!");
-//			break;
-//		}
-////		Invoke ("switchAttack", 0.5f);
-//	}
-
-	void makeEnemyReact(){
+		
+	void makeEnemyReact(int index){
 //		cam.GetComponent<MouseMovement> ().getClosestEnemyObject().GetComponent<EnemyCombatAI> ().playReactAnimation (myAnimator.GetInteger("quickAttack"));
-		currentEnemy.GetComponent<EnemyCombatAI> ().playReactAnimation (myAnimator.GetInteger("quickAttack"));
+		currentEnemy.GetComponent<EnemyCombatAI> ().playReactAnimation (index);
 	}
 		
 	bool closeEnoughToAttack(){
@@ -232,33 +232,9 @@ public class DevCombat : MonoBehaviour {
 			myAnimator.CrossFade("sword_and_shield_impact_1", strongHitCrossFadeTimes[myAnimator.GetInteger("quickAttack")]);
 		}
 	}
-		
-	void pickOffset(AttackType current){
-		desiredOffset = quickAttackOffsets[myAnimator.GetInteger("quickAttack")-1];
-	}
-
-//	void pickOffset(AttackType current){
-//		switch (current) {
-//		case AttackType.quick: 
-//			desiredOffset = quickAttackOffsets[myAnimator.GetInteger("quickAttack")-1];
-//			break;
-//		case AttackType.flip:
-//			desiredOffset = flipAttackOffset;
-//			break;
-//		case AttackType.jump:
-//			desiredOffset = jumpAttackOffset;
-//			break;
-//		default:
-//			Debug.LogAssertion ("Trying to trigger attack of type none!");
-//			break;
-//		}
-//	}
-
-	void startGettingIntoPosition(AttackType current){
+	void startGettingIntoPosition(){
 		needToAttack = true;
 		lerpT = 0f;
-		pickOffset (current);
-		triggerAttack (current);
 	}
 
 	Vector3 getEnemyPos(){
@@ -307,7 +283,7 @@ public class DevCombat : MonoBehaviour {
 
 	#region sounds
 
-	public void playQuickAttackSound(){
+	public void playQuickAttackSound(int index){
 		if (strongHit.isPlaying)
 			strongHit.Stop ();
 		if(quickAttack2.isPlaying)
@@ -321,7 +297,7 @@ public class DevCombat : MonoBehaviour {
 		if (currentEnemy.GetComponent<EnemyCombatAI> ().isBlocking ()) {
 			strongHit.Play ();
 		} else {
-			enemyQuickAttackSounds [myAnimator.GetInteger ("quickAttack") - 1].Play ();
+			enemyAttackReactionSounds [index - 1].Play ();
 		}
 	}
 		

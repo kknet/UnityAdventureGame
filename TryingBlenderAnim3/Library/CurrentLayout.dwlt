@@ -106,10 +106,10 @@ MonoBehaviour:
     y: 30
     width: 1280
     height: 932
-  m_MinSize: {x: 583, y: 242}
-  m_MaxSize: {x: 12008, y: 8042}
+  m_MinSize: {x: 581, y: 221}
+  m_MaxSize: {x: 12006, y: 8021}
   vertical: 0
-  controlID: 6083
+  controlID: 12979
 --- !u!114 &6
 MonoBehaviour:
   m_ObjectHideFlags: 52
@@ -155,10 +155,10 @@ MonoBehaviour:
     y: 0
     width: 1076
     height: 932
-  m_MinSize: {x: 381, y: 242}
-  m_MaxSize: {x: 8006, y: 8042}
+  m_MinSize: {x: 381, y: 221}
+  m_MaxSize: {x: 8006, y: 8021}
   vertical: 1
-  controlID: 6084
+  controlID: 12980
 --- !u!114 &8
 MonoBehaviour:
   m_ObjectHideFlags: 52
@@ -182,7 +182,7 @@ MonoBehaviour:
   m_MinSize: {x: 381, y: 121}
   m_MaxSize: {x: 8006, y: 4021}
   vertical: 0
-  controlID: 6085
+  controlID: 12981
 --- !u!114 &9
 MonoBehaviour:
   m_ObjectHideFlags: 52
@@ -366,9 +366,9 @@ MonoBehaviour:
     height: 911
   m_TreeViewState:
     scrollPos: {x: 0, y: 0}
-    m_SelectedIDs: 
+    m_SelectedIDs: f83e0000
     m_LastClickedID: 0
-    m_ExpandedIDs: 1afcffff00000000
+    m_ExpandedIDs: 1afcffff00000000583a0000
     m_RenameOverlay:
       m_UserAcceptedRename: 0
       m_Name: 
@@ -456,13 +456,13 @@ MonoBehaviour:
     - {fileID: 1107977678282459830, guid: 29641dc74745883409bec32b1180e428, type: 2}
     - {fileID: 1107960539084711434, guid: 29641dc74745883409bec32b1180e428, type: 2}
     m_ValueSerializationHelper:
-    - {x: 1351.6001, y: 208.80005}
+    - {x: 1210.6001, y: 299.80005}
     - {x: 296.6, y: 288.40002}
     - {x: 457.40002, y: 95.600006}
     - {x: 292.6, y: 698.80005}
     - {x: 280.79996, y: 164.40002}
-    - {x: 333.60004, y: 43.80005}
-    - {x: 264.6, y: 682.80005}
+    - {x: 330.60004, y: 0}
+    - {x: 467.59998, y: 144.80005}
     - {x: 302.6, y: 297.40002}
     - {x: 775.6, y: 109}
     - {x: 349.80002, y: 286.2}
@@ -582,7 +582,7 @@ MonoBehaviour:
   m_ScrollPosition: {x: 0, y: 0}
   m_InspectorMode: 0
   m_PreviewResizer:
-    m_CachedPref: -196
+    m_CachedPref: 324
     m_ControlHash: -371814159
     m_PrefName: Preview_InspectorPreview
   m_PreviewWindow: {fileID: 0}
@@ -650,19 +650,19 @@ MonoBehaviour:
     m_ShowAllHits: 0
     m_SearchArea: 0
     m_Folders:
-    - Assets/Dev Drake/animations/combat/sword_attacks
+    - Assets/Enemies/brute2/Animations/Combat
   m_ViewMode: 1
   m_StartGridSize: 76
   m_LastFolders:
-  - Assets/Dev Drake/animations/combat/sword_attacks
+  - Assets/Enemies/brute2/Animations/Combat
   m_LastFoldersGridSize: 76
   m_LastProjectPath: C:\Users\rsa\Documents\GitHub\UnityAdventureGame\UnityAdventureGame\TryingBlenderAnim3
   m_IsLocked: 0
   m_FolderTreeState:
-    scrollPos: {x: 0, y: 95}
-    m_SelectedIDs: 742d0000
-    m_LastClickedID: 11636
-    m_ExpandedIDs: 00000000362800008829000092290000ae290000742a0000782a0000be2b0000682c0000f02c0000f62c0000742d00007c2d0000562f000002300000b8310000ba3100002032000058330000bc330000ce33000090350000a0350000ca35000016360000203600002c36000072360000a8360000c4360000e636000040370000b23f0000b43f0000b63f000000ca9a3bffffff7f
+    scrollPos: {x: 0, y: 143}
+    m_SelectedIDs: c2320000
+    m_LastClickedID: 12994
+    m_ExpandedIDs: 00000000382800008a29000094290000b0290000762a00007a2a0000c02b00006a2c0000f22c0000f82c0000762d00007e2d0000582f000004300000ba310000bc310000223200005a330000be330000d033000092350000a2350000cc35000018360000223600002e36000074360000aa360000c6360000e836000042370000ac3f0000ae3f0000b03f000000ca9a3bffffff7f
     m_RenameOverlay:
       m_UserAcceptedRename: 0
       m_Name: 
@@ -690,7 +690,7 @@ MonoBehaviour:
     scrollPos: {x: 0, y: 0}
     m_SelectedIDs: 
     m_LastClickedID: 0
-    m_ExpandedIDs: 00000000362800008829000092290000ae290000742a0000782a0000be2b0000682c0000f02c0000f62c0000742d00007c2d0000562f000002300000b8310000ba3100002032000058330000bc330000ce33000090350000a0350000ca35000016360000203600002c36000072360000a8360000c4360000e636000040370000b23f0000b43f0000b63f000000ca9a3bffffff7f
+    m_ExpandedIDs: 00000000382800008a29000094290000b0290000762a00007a2a0000c02b00006a2c0000f22c0000f82c0000762d00007e2d0000582f000004300000ba310000bc310000223200005a330000be330000d033000092350000a2350000cc35000018360000223600002e36000074360000aa360000c6360000e836000042370000ac3f0000ae3f0000b03f000000ca9a3bffffff7f
     m_RenameOverlay:
       m_UserAcceptedRename: 0
       m_Name: 
@@ -715,9 +715,9 @@ MonoBehaviour:
       m_Icon: {fileID: 0}
       m_ResourceFile: 
   m_ListAreaState:
-    m_SelectedInstanceIDs: 
-    m_LastClickedInstanceID: 0
-    m_HadKeyboardFocusLastEvent: 0
+    m_SelectedInstanceIDs: f62a0100
+    m_LastClickedInstanceID: 76534
+    m_HadKeyboardFocusLastEvent: 1
     m_ExpandedInstanceIDs: 0000000026240000b624000012c6feff0a2500001cf4ffff9606000064250000ac28000062ecffff7e2a0000d02a00003a2a000062560000ae300000de2f00002e360000502a000014350000e2300000502f0000
     m_RenameOverlay:
       m_UserAcceptedRename: 0

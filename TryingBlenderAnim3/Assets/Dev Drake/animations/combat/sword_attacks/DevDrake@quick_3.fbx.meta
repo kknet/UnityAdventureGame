@@ -196,14 +196,14 @@ ModelImporter:
         data: 
         objectReferenceParameter: {instanceID: 0}
         floatParameter: 0
-        intParameter: 0
+        intParameter: 3
         messageOptions: 0
       - time: 0.44498584
         functionName: playQuickAttackSound
         data: 
         objectReferenceParameter: {instanceID: 0}
         floatParameter: 0
-        intParameter: 0
+        intParameter: 3
         messageOptions: 0
       - time: 0.46304473
         functionName: stopAttack

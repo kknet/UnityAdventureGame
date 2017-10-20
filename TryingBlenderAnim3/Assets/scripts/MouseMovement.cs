@@ -2,7 +2,7 @@ using UnityEngine;
 
 public class MouseMovement : MonoBehaviour {
 
-	#region imports
+	#region globals
 	public float sensitivityX, 
 				 sensitivityY;
 
@@ -14,7 +14,8 @@ public class MouseMovement : MonoBehaviour {
 				 triggeredDraw,
 				 inCombatZone,
 				 wepIsOut,
-				 oldInCombatZone;
+				 oldInCombatZone,
+				 haveDevCombatOffset;
 
 	private Vector3 closestEnemy,
 					displacement,
@@ -55,6 +56,7 @@ public class MouseMovement : MonoBehaviour {
 		devMovementScript = player.GetComponent<DevMovement>();
 		devCombatScript = player.GetComponent<DevCombat>();
 		closestEnemyObject = GameObject.Find ("Brute2");
+		haveDevCombatOffset = true;
 	}
 
 	private void Update(){
@@ -297,11 +299,17 @@ public class MouseMovement : MonoBehaviour {
 		transform.RotateAround (player.transform.position, Vector3.up, movementX);
 	}
 
+	public void doCombatRotationOffset(bool shouldHaveOffset){
+		haveDevCombatOffset = shouldHaveOffset;
+		adjustToEnemy ();
+	}
+
 	private void adjustToEnemy(){
 		if (player.gameObject.GetComponent<DevMovement> ().rolling ())
 			return;
 		Vector3 oldForward = player.transform.forward;
-		player.transform.forward = Vector3.RotateTowards (player.transform.forward, displacement + (player.transform.right * 0.7f), 20f * Time.deltaTime, 0.0f); 
+		Vector3 offset = haveDevCombatOffset ? (player.transform.right * 0.7f) : (player.transform.right * -0.5f);
+		player.transform.forward = Vector3.RotateTowards (player.transform.forward, displacement + offset, 20f * Time.deltaTime, 0.0f); 
 	}
 
 	//return position of nearest enemy

@@ -11,10 +11,12 @@ public class EnemyCombatAI : MonoBehaviour {
 	private string[] reactAnimations = {
 		"standing_react_large_from_right",
 		"standing_react_large_from_left",
+		"React from Right and Move Back",
 		"React from Right and Move Back"
 	};
 
 	private float[] crossFadeTimes = {
+		0.05f,
 		0.05f,
 		0.05f,
 		0.05f
@@ -23,13 +25,15 @@ public class EnemyCombatAI : MonoBehaviour {
 	private float[] callDelayTimes = {
 		0.25f,
 		0.3f,
+		0.6f,
 		0.6f
 	};
 
 	private float[] blockDelayTimes = {
-		0.05f,
+		0.07f,
 		0.01f,
-		0.01f
+		0.15f,
+		0.4f
 	};
 
 	// Use this for initialization
@@ -53,6 +57,11 @@ public class EnemyCombatAI : MonoBehaviour {
 		if (enemyAnim.GetCurrentAnimatorStateInfo (0).IsName ("sword_and_shield_block_idle")) {
 			yield return new WaitForSeconds (blockDelayTimes [animationIndex - 1]);
 			enemyAnim.CrossFade ("standing_block_react_large", 0.05f);
+
+			if (animationIndex != 2) {
+				yield return new WaitForSeconds (0.3f);
+				enemyAnim.CrossFade ("React from Right and Move Back", 0.1f);
+			}
 		}
 		else {
 			yield return new WaitForSeconds (callDelayTimes [animationIndex - 1]);
