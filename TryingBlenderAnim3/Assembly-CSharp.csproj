@@ -149,6 +149,7 @@
      <Compile Include="Assets\scripts\mapNode.cs" />
      <Compile Include="Assets\scripts\MapPathfind.cs" />
      <Compile Include="Assets\scripts\MouseMovement.cs" />
+     <Compile Include="Assets\scripts\MoveDuringJumpAttack.cs" />
      <Compile Include="Assets\scripts\PersonHit.cs" />
      <Compile Include="Assets\scripts\Priority Queues\GenericPriorityQueue.cs" />
      <Compile Include="Assets\scripts\Priority Queues\GenericPriorityQueueNode.cs" />

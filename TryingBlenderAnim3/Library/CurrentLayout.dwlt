@@ -109,7 +109,7 @@ MonoBehaviour:
   m_MinSize: {x: 583, y: 242}
   m_MaxSize: {x: 12008, y: 8042}
   vertical: 0
-  controlID: 5469
+  controlID: 6083
 --- !u!114 &6
 MonoBehaviour:
   m_ObjectHideFlags: 52
@@ -158,7 +158,7 @@ MonoBehaviour:
   m_MinSize: {x: 381, y: 242}
   m_MaxSize: {x: 8006, y: 8042}
   vertical: 1
-  controlID: 5540
+  controlID: 6084
 --- !u!114 &8
 MonoBehaviour:
   m_ObjectHideFlags: 52
@@ -182,7 +182,7 @@ MonoBehaviour:
   m_MinSize: {x: 381, y: 121}
   m_MaxSize: {x: 8006, y: 4021}
   vertical: 0
-  controlID: 5541
+  controlID: 6085
 --- !u!114 &9
 MonoBehaviour:
   m_ObjectHideFlags: 52
@@ -366,7 +366,7 @@ MonoBehaviour:
     height: 911
   m_TreeViewState:
     scrollPos: {x: 0, y: 0}
-    m_SelectedIDs: bc3e0000
+    m_SelectedIDs: 
     m_LastClickedID: 0
     m_ExpandedIDs: 1afcffff00000000
     m_RenameOverlay:
@@ -456,10 +456,10 @@ MonoBehaviour:
     - {fileID: 1107977678282459830, guid: 29641dc74745883409bec32b1180e428, type: 2}
     - {fileID: 1107960539084711434, guid: 29641dc74745883409bec32b1180e428, type: 2}
     m_ValueSerializationHelper:
-    - {x: 1158.6001, y: 273.80005}
+    - {x: 1351.6001, y: 208.80005}
     - {x: 296.6, y: 288.40002}
     - {x: 457.40002, y: 95.600006}
-    - {x: 387.59998, y: 682.80005}
+    - {x: 292.6, y: 698.80005}
     - {x: 280.79996, y: 164.40002}
     - {x: 333.60004, y: 43.80005}
     - {x: 264.6, y: 682.80005}
@@ -582,7 +582,7 @@ MonoBehaviour:
   m_ScrollPosition: {x: 0, y: 0}
   m_InspectorMode: 0
   m_PreviewResizer:
-    m_CachedPref: 196
+    m_CachedPref: -196
     m_ControlHash: -371814159
     m_PrefName: Preview_InspectorPreview
   m_PreviewWindow: {fileID: 0}
@@ -650,18 +650,18 @@ MonoBehaviour:
     m_ShowAllHits: 0
     m_SearchArea: 0
     m_Folders:
-    - Assets/scripts
+    - Assets/Dev Drake/animations/combat/sword_attacks
   m_ViewMode: 1
   m_StartGridSize: 76
   m_LastFolders:
-  - Assets/scripts
+  - Assets/Dev Drake/animations/combat/sword_attacks
   m_LastFoldersGridSize: 76
   m_LastProjectPath: C:\Users\rsa\Documents\GitHub\UnityAdventureGame\UnityAdventureGame\TryingBlenderAnim3
   m_IsLocked: 0
   m_FolderTreeState:
-    scrollPos: {x: 0, y: 879}
-    m_SelectedIDs: 02300000
-    m_LastClickedID: 12290
+    scrollPos: {x: 0, y: 95}
+    m_SelectedIDs: 742d0000
+    m_LastClickedID: 11636
     m_ExpandedIDs: 00000000362800008829000092290000ae290000742a0000782a0000be2b0000682c0000f02c0000f62c0000742d00007c2d0000562f000002300000b8310000ba3100002032000058330000bc330000ce33000090350000a0350000ca35000016360000203600002c36000072360000a8360000c4360000e636000040370000b23f0000b43f0000b63f000000ca9a3bffffff7f
     m_RenameOverlay:
       m_UserAcceptedRename: 0
@@ -715,8 +715,8 @@ MonoBehaviour:
       m_Icon: {fileID: 0}
       m_ResourceFile: 
   m_ListAreaState:
-    m_SelectedInstanceIDs: 7a390000
-    m_LastClickedInstanceID: 14714
+    m_SelectedInstanceIDs: 
+    m_LastClickedInstanceID: 0
     m_HadKeyboardFocusLastEvent: 0
     m_ExpandedInstanceIDs: 0000000026240000b624000012c6feff0a2500001cf4ffff9606000064250000ac28000062ecffff7e2a0000d02a00003a2a000062560000ae300000de2f00002e360000502a000014350000e2300000502f0000
     m_RenameOverlay:

@@ -14,8 +14,17 @@ public class DevCombat : MonoBehaviour {
 	private AudioSource[] enemyQuickAttackSounds = new AudioSource[3];
 	private float[] strongHitCrossFadeTimes = { 0.2f, 0.2f, 0.05f };
 	private float spaceBarPressedTime, leftMousePressedTime, FPressedTime;
-
 	private float twoButtonPressTimeMax = 0.1f;
+	private float[] quickAttackOffsets = {1.8f, 1.8f, 1.0f};
+	private float jumpAttackStartingOffset = 5.0f;
+	private float jumpAttackEndingOffset = 1.3f;
+	float desiredOffset;
+
+	enum AttackType {
+		none,
+		jump,
+		quick
+	};
 
 	void Start () {
 		myAnimator = GetComponent<Animator>();
@@ -31,20 +40,25 @@ public class DevCombat : MonoBehaviour {
 		handleInput ();
 	}
 
+	public GameObject getCurrentEnemy(){
+		return currentEnemy;
+	}
+
+	#region handlingInput helpers
 	private void handleLeftMousePressed(){
 		if (Time.time - spaceBarPressedTime < twoButtonPressTimeMax) {
 			leftMousePressedTime = 0f;
 			spaceBarPressedTime = 0f;
-			myAnimator.SetBool ("doJumpAttack", true);
+			InitiateStepsToAttack (AttackType.jump);
 			return;
 		}
 
-		if (Time.time - FPressedTime < (twoButtonPressTimeMax)) {
-			leftMousePressedTime = 0f;
-			FPressedTime = 0f;
-			myAnimator.SetBool ("doFlipAttack", true);
-			return;
-		}
+//		if (Time.time - FPressedTime < (twoButtonPressTimeMax)) {
+//			leftMousePressedTime = 0f;
+//			FPressedTime = 0f;
+//			InitiateStepsToAttack (AttackType.flip);
+//			return;
+//		}
 		leftMousePressedTime = Time.time;
 	}
 
@@ -52,21 +66,22 @@ public class DevCombat : MonoBehaviour {
 		if (Time.time - leftMousePressedTime < twoButtonPressTimeMax) {
 			spaceBarPressedTime = 0f;
 			leftMousePressedTime = 0f;
-			myAnimator.SetBool ("doJumpAttack", true);
+			InitiateStepsToAttack (AttackType.jump);
 			return;
 		}
 		spaceBarPressedTime = Time.time;
 	}
 
-	private void handleFPressed(){
-		if (Time.time - leftMousePressedTime < (twoButtonPressTimeMax)) {
-			FPressedTime = 0f;
-			leftMousePressedTime = 0f;
-			myAnimator.SetBool ("doFlipAttack", true);
-			return;
-		}
-		leftMousePressedTime = Time.time;
-	}
+//	private void handleFPressed(){
+//		if (Time.time - leftMousePressedTime < (twoButtonPressTimeMax)) {
+//			FPressedTime = 0f;
+//			leftMousePressedTime = 0f;
+//			InitiateStepsToAttack (AttackType.flip);
+//			return;
+//		}
+//		leftMousePressedTime = Time.time;
+//	}
+	#endregion
 
 	private void handleInput(){
 		bool leftMousePressed = Input.GetKeyDown (KeyCode.Mouse0);
@@ -78,8 +93,8 @@ public class DevCombat : MonoBehaviour {
 		bool rightMouseHeld = Input.GetKey (KeyCode.Mouse1);
 		bool rightMouseReleased = Input.GetKeyUp (KeyCode.Mouse1);
 
-		bool FPressed = Input.GetKeyDown (KeyCode.F);
-		bool FHeld = Input.GetKeyDown (KeyCode.F);
+//		bool FPressed = Input.GetKeyDown (KeyCode.F);
+//		bool FHeld = Input.GetKeyDown (KeyCode.F);
 
 		if (rightMouseReleased) {
 			myAnimator.SetBool ("isBlocking", false);
@@ -87,41 +102,42 @@ public class DevCombat : MonoBehaviour {
 
 		if (leftMousePressedTime > 0f && (Time.time - leftMousePressedTime > twoButtonPressTimeMax)) {
 			leftMousePressedTime = 0f;
-			if (notInCombatMove () && closeEnoughToAttack ()) {
-				startGettingIntoPosition ();
-				return;
-			}
-			stopAttack ();
+			InitiateStepsToAttack (AttackType.quick);
 		} else if (spaceBarPressedTime > 0f && (Time.time - spaceBarPressedTime > twoButtonPressTimeMax)) {
 			spaceBarPressedTime = 0f;
 			if (myAnimator.GetBool ("WeaponDrawn")) {
 				myAnimator.SetBool ("roll", true);
 				Invoke ("stopRolling", 1.0f);
 			}
-		} else if (FPressedTime > 0f && (Time.time - FPressedTime > twoButtonPressTimeMax)) {
-			FPressedTime = 0f;
 		}
-
+//		else if (FPressedTime > 0f && (Time.time - FPressedTime > twoButtonPressTimeMax)) {
+//			FPressedTime = 0f;
+//		}
 
 
 		if (rightMouseHeld) {
 			stopAttack ();
 			myAnimator.SetBool ("isBlocking", true);
 		} else if (leftMousePressed && spaceBarPressed) {
-			myAnimator.SetBool ("doJumpAttack", true);
-		} else if (leftMousePressed && FPressed) {
-			myAnimator.SetBool ("doFlipAttack", true);
-		} else if (leftMousePressed) {
+			InitiateStepsToAttack (AttackType.jump);
+		} 
+//		else if (leftMousePressed && FPressed) {
+//			InitiateStepsToAttack (AttackType.flip);
+//		} 
+		else if (leftMousePressed) {
 			handleLeftMousePressed ();
 		} else if (spaceBarPressed) {
 			handleSpaceBarPressed ();
-		} else if (FPressed) {
-			handleFPressed ();
-		}
+		} 
+//		else if (FPressed) {
+//			handleFPressed ();
+//		}
 	}
 
-	void stopRolling(){
-		myAnimator.SetBool ("roll", false);
+	private void InitiateStepsToAttack(AttackType type){
+		if (notInCombatMove () && closeEnoughToAttack ()) {
+			startGettingIntoPosition (type);
+		}
 	}
 
 	private void handleAttacking(){
@@ -140,47 +156,55 @@ public class DevCombat : MonoBehaviour {
 		}	
 	}
 
+	void stopRolling(){
+		myAnimator.SetBool ("roll", false);
+	}
+
 	#region helper methods to prepare for attack
 	public void stopAttack(){
 		myAnimator.SetBool ("doAttack", false);
+		myAnimator.SetBool ("doFlipAttack", false);
+		myAnimator.SetBool ("doJumpAttack", false);
 		needToAttack = false;
 		lerpT = 0f;
 		doneLerping = false;
 	}
 
-	void triggerAttack(){
-		myAnimator.SetBool ("doAttack", true);
-//		Invoke ("switchAttack", 0.5f);
+
+	void triggerAttack(AttackType current){
+		myAnimator.SetBool ("doAttack", true);	
 	}
+
+//	void triggerAttack(AttackType current){
+//
+//		switch (current) {
+//		case AttackType.quick: 
+//			myAnimator.SetBool ("doAttack", true);
+//			break;
+//		case AttackType.flip:
+//			myAnimator.SetBool("doFlipAttack", true);
+//			break;
+//		case AttackType.jump:
+//			myAnimator.SetBool("doJumpAttack", true);
+//			break;
+//		default:
+//			Debug.LogAssertion ("Trying to trigger attack of type none!");
+//			break;
+//		}
+////		Invoke ("switchAttack", 0.5f);
+//	}
 
 	void makeEnemyReact(){
 //		cam.GetComponent<MouseMovement> ().getClosestEnemyObject().GetComponent<EnemyCombatAI> ().playReactAnimation (myAnimator.GetInteger("quickAttack"));
 		currentEnemy.GetComponent<EnemyCombatAI> ().playReactAnimation (myAnimator.GetInteger("quickAttack"));
 	}
-
-	float offsetByAnimation(){
-		//animation 1: 1.84
-		//animation 2: 1.84
-		//animation 3: 1.37
-		switch (myAnimator.GetInteger ("quickAttack")){
-		case 1:
-			return 1.8f;
-		case 2:
-			return 1.8f;
-		case 3:
-			return 1.0f;
-		default:
-			Debug.LogAssertion ("Quick attack has bad value!");
-			return 0;
-		}
-	}
-
+		
 	bool closeEnoughToAttack(){
 //		Vector3 totalVectorOffset = cam.GetComponent<MouseMovement> ().getClosestEnemyObject().transform.position - transform.position;
 		Vector3 totalVectorOffset = getEnemyPos() - transform.position;
 		totalVectorOffset = new Vector3 (totalVectorOffset.x, 0f, totalVectorOffset.z);
 		float totalOffset = totalVectorOffset.magnitude;
-		if (totalOffset > 5f)
+		if (totalOffset > 10f)
 			return false;		
 		return true;
 	}
@@ -208,23 +232,44 @@ public class DevCombat : MonoBehaviour {
 			myAnimator.CrossFade("sword_and_shield_impact_1", strongHitCrossFadeTimes[myAnimator.GetInteger("quickAttack")]);
 		}
 	}
+		
+	void pickOffset(AttackType current){
+		desiredOffset = quickAttackOffsets[myAnimator.GetInteger("quickAttack")-1];
+	}
 
-	void startGettingIntoPosition(){
+//	void pickOffset(AttackType current){
+//		switch (current) {
+//		case AttackType.quick: 
+//			desiredOffset = quickAttackOffsets[myAnimator.GetInteger("quickAttack")-1];
+//			break;
+//		case AttackType.flip:
+//			desiredOffset = flipAttackOffset;
+//			break;
+//		case AttackType.jump:
+//			desiredOffset = jumpAttackOffset;
+//			break;
+//		default:
+//			Debug.LogAssertion ("Trying to trigger attack of type none!");
+//			break;
+//		}
+//	}
+
+	void startGettingIntoPosition(AttackType current){
 		needToAttack = true;
 		lerpT = 0f;
-		triggerAttack ();
+		pickOffset (current);
+		triggerAttack (current);
 	}
 
 	Vector3 getEnemyPos(){
 		return currentEnemy.transform.position;
 	}
-
+		
 	void getIntoPosition(){
 //		Vector3 totalVectorOffset = cam.GetComponent<MouseMovement> ().getClosestEnemyObject().transform.position - transform.position;
 		Vector3 totalVectorOffset = getEnemyPos() - transform.position;
 		totalVectorOffset = new Vector3 (totalVectorOffset.x, 0f, totalVectorOffset.z);
 		float totalOffset = totalVectorOffset.magnitude;
-		float desiredOffset = offsetByAnimation ();
 		float remaining = totalOffset - desiredOffset;
 		if (Mathf.Abs (remaining) < 0.01f) {
 			doneLerping = true;
@@ -256,7 +301,7 @@ public class DevCombat : MonoBehaviour {
 
 	public bool isAttacking() {
 		AnimatorStateInfo info = myAnimator.GetCurrentAnimatorStateInfo (0);
-		return info.IsName ("quick_1") || info.IsName ("quick_2") || info.IsName ("quick_3");
+		return info.IsName ("quick_1") || info.IsName ("quick_2") || info.IsName ("quick_3") || info.IsName("jump attack") || info.IsName("flip attack");
 	}
 	#endregion
 

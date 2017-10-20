@@ -4,8 +4,8 @@
     <Files>
       <File FileName="Assets\scripts\DevMovement.cs" Line="1" Column="1" />
       <File FileName="Assets\scripts\MouseMovement.cs" Line="1" Column="1" />
-      <File FileName="Assets\scripts\EnemyCombatAI.cs" Line="1" Column="1" />
-      <File FileName="Assets\scripts\DevCombat.cs" Line="87" Column="3" />
+      <File FileName="Assets\scripts\EnemyCombatAI.cs" Line="24" Column="9" />
+      <File FileName="Assets\scripts\DevCombat.cs" Line="47" Column="2" />
     </Files>
   </MonoDevelop.Ide.Workbench>
   <MonoDevelop.Ide.DebuggingService.Breakpoints>
