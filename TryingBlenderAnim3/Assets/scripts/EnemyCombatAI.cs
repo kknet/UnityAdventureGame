@@ -5,6 +5,7 @@ using UnityEngine;
 public class EnemyCombatAI : MonoBehaviour {
 
 	public bool setBlocking;
+	public int health;
 
 	private GameObject dev;
 	private Animator enemyAnim;
@@ -45,12 +46,16 @@ public class EnemyCombatAI : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
+		if (health <= 0) {
+			enemyAnim.SetBool ("Dead", true);
+		}
 //		bool collision = Physics.Raycast (transform.position + transform.up + (transform.forward * 0.3f), transform.forward, 0.5f);
 
 	}
 		
 	public void playReactAnimation(int animationIndex){
-		StartCoroutine (callAnimation(animationIndex));
+		if(health > 0)
+			StartCoroutine (callAnimation(animationIndex));
 	}
 
 	private IEnumerator callAnimation(int animationIndex){
@@ -66,6 +71,7 @@ public class EnemyCombatAI : MonoBehaviour {
 		else {
 			yield return new WaitForSeconds (callDelayTimes [animationIndex - 1]);
 			enemyAnim.CrossFade (reactAnimations [animationIndex - 1], crossFadeTimes [animationIndex - 1]);
+			--health;
 		}
 	}
 
