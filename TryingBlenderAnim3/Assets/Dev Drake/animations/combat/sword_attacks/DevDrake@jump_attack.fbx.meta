@@ -138,7 +138,7 @@ ModelImporter:
     - serializedVersion: 16
       name: air_attack
       takeName: mixamo.com
-      firstFrame: 0
+      firstFrame: 5
       lastFrame: 55
       wrapMode: 0
       orientationOffsetY: 0
