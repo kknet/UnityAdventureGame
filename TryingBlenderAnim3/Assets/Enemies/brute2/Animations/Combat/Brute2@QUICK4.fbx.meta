@@ -1,9 +1,9 @@
 fileFormatVersion: 2
-guid: 4b1fce71ca736a344a8aaff93214aca0
-timeCreated: 1501014359
+guid: 7f4b286da39fbe148bf32420708188da
+timeCreated: 1501014360
 licenseType: Free
 ModelImporter:
-  serializedVersion: 19
+  serializedVersion: 21
   fileIDToRecycleName:
     100000: //RootNode
     100002: mixamorig:Head
@@ -109,7 +109,7 @@ ModelImporter:
     400098: mixamorig:Spine
     400100: mixamorig:Spine1
     400102: mixamorig:Spine2
-    7400000: standing_melee_attack_downward
+    7400000: BRUTE QUICK 4
     9500000: //RootNode
   materials:
     importMaterials: 1
@@ -133,12 +133,13 @@ ModelImporter:
     animationScaleError: 0.5
     animationWrapMode: 0
     extraExposedTransformPaths: []
+    extraUserProperties: []
     clipAnimations:
     - serializedVersion: 16
-      name: standing_melee_attack_downward
+      name: BRUTE QUICK 4
       takeName: mixamo.com
       firstFrame: 0
-      lastFrame: 68
+      lastFrame: 75
       wrapMode: 0
       orientationOffsetY: 0
       level: 0
@@ -158,7 +159,7 @@ ModelImporter:
       bodyMask: 01000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000
       curves: []
       events:
-      - time: 0.9207856
+      - time: 0.9089279
         functionName: stopEnemyAttack
         data: 
         objectReferenceParameter: {instanceID: 0}
@@ -279,7 +280,10 @@ ModelImporter:
     globalScale: 1
     meshCompression: 0
     addColliders: 0
+    importVisibility: 0
     importBlendShapes: 1
+    importCameras: 0
+    importLights: 0
     swapUVChannels: 0
     generateSecondaryUV: 0
     useFileUnits: 1
@@ -295,6 +299,7 @@ ModelImporter:
     normalSmoothAngle: 60
     normalImportMode: 0
     tangentImportMode: 3
+    normalCalculationMode: 0
   importAnimation: 1
   copyAvatar: 1
   humanDescription:

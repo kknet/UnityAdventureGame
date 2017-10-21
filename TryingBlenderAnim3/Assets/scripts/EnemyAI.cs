@@ -325,11 +325,6 @@ public class EnemyAI : MonoBehaviour {
 		Invoke ("switchAttack", 0.5f);
 	}
 
-	public void stopEnemyAttack(){
-		enemyAnim.SetBool ("enemyAttack", false);
-	}
-
-
 	private void switchAttack(){
 		switch (enemyAnim.GetInteger ("enemyQuick")) {
 		case 1:
