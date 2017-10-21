@@ -29,7 +29,7 @@ public class EnemyCombatAI : MonoBehaviour {
 		dev = GameObject.Find ("DevDrake");
 		enemyAnim.SetBool ("enemyBlock", setBlocking);
 
-		devAttackReactionSounds = new AudioSource[] {quickAttack1, quickAttack3, quickAttack3, quickAttack1, quickAttack2};
+		devAttackReactionSounds = new AudioSource[] {quickAttack1, quickAttack3, quickAttack2, quickAttack3, quickAttack2};
 
 		/*variables to tweak*/
 		strongHitCrossFadeTimes = new float[]{ 0.2f, 0.2f, 0.05f , 0.2f, 0.2f};
