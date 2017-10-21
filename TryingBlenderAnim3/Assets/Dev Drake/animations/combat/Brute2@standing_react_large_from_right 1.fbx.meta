@@ -122,7 +122,11 @@ ModelImporter:
     optimizeGameObjects: 0
     motionNodeName: 
     rigImportErrors: 
-    rigImportWarnings: 
+    rigImportWarnings: "Copied Avatar Rig Configuration mis-match. Bone length in
+      copied configuration does not match position in animation file:\n\t'mixamorig:LeftUpLeg'
+      : position error = 50.052128 mm\n\t'mixamorig:LeftLeg' : position error = 66.733864
+      mm\n\t'mixamorig:LeftFoot' : position error = 64.626900 mm\n\t'mixamorig:LeftToeBase'
+      : position error = 78.939461 mm\n"
     animationImportErrors: 
     animationImportWarnings: 
     animationRetargetingWarnings: 
@@ -139,7 +143,7 @@ ModelImporter:
       name: standing_react_large_from_right
       takeName: mixamo.com
       firstFrame: 0
-      lastFrame: 39.9
+      lastFrame: 42
       wrapMode: 0
       orientationOffsetY: 0
       level: 0
@@ -153,7 +157,7 @@ ModelImporter:
       loopBlendPositionXZ: 1
       keepOriginalOrientation: 0
       keepOriginalPositionY: 1
-      keepOriginalPositionXZ: 0
+      keepOriginalPositionXZ: 1
       heightFromFeet: 0
       mirror: 0
       bodyMask: 01000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000

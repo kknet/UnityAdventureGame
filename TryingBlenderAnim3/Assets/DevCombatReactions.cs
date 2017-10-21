@@ -12,8 +12,8 @@ public class DevCombatReactions : MonoBehaviour {
 	private string[] reactAnimations = {
 		"standing_react_large_from_right",
 		"React from Right and Move Back",
+		"standing_react_large_from_left",
 		"React from Right and Move Back",
-		"standing_react_large_from_right",
 		"standing_react_large_from_left",
 	};
 
@@ -26,16 +26,18 @@ public class DevCombatReactions : MonoBehaviour {
 	};
 
 	private float[] callDelayTimes = {
-		0.25f,
-		0.3f,
+		0.71f,
+		0.73f,
 		0.6f,
-		0.6f
+		0.7f,
+		0.7f
 	};
 
 	private float[] blockDelayTimes = {
-		0.07f,
+		0.05f,
 		0.01f,
 		0.15f,
+		0.4f, 
 		0.4f
 	};
 

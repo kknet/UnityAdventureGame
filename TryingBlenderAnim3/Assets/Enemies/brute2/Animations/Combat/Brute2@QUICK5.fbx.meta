@@ -139,7 +139,7 @@ ModelImporter:
       name: BRUTE QUICK 5
       takeName: mixamo.com
       firstFrame: 0
-      lastFrame: 72
+      lastFrame: 60
       wrapMode: 0
       orientationOffsetY: 0
       level: 0
@@ -165,6 +165,13 @@ ModelImporter:
         objectReferenceParameter: {instanceID: 0}
         floatParameter: 0
         intParameter: 0
+        messageOptions: 0
+      - time: 0
+        functionName: makeDevReact
+        data: 
+        objectReferenceParameter: {instanceID: 0}
+        floatParameter: 0
+        intParameter: 5
         messageOptions: 0
       transformMask:
       - path: 

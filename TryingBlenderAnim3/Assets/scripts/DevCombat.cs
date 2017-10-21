@@ -107,7 +107,7 @@ public class DevCombat : MonoBehaviour {
 	}
 
 	private void handleAttacking(){
-		Debug.Log ("lerpT:" + lerpT);
+//		Debug.Log ("lerpT:" + lerpT);
 		if (needToAttack) {
 			if (doneLerping) {
 				needToAttack = false;
