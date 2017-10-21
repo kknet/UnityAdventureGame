@@ -180,7 +180,7 @@ ModelImporter:
         floatParameter: 0
         intParameter: 0
         messageOptions: 0
-      - time: 0.34638697
+      - time: 0.39236397
         functionName: setHitStrong
         data: 
         objectReferenceParameter: {instanceID: 0}

@@ -10,16 +10,20 @@ public class DevCombat : MonoBehaviour {
 
 	private Animator myAnimator;
 	private Camera cam;
-	private float lerpT, lerpSpeedMultiplier, desiredOffset;
-	private bool needToAttack, doneLerping;
 	private GameObject currentEnemy;
-	private AudioSource[] enemyAttackReactionSounds = new AudioSource[4];
-	private float[] strongHitCrossFadeTimes = { 0.2f, 0.2f, 0.05f };
-	private float spaceBarPressedTime, leftMousePressedTime, FPressedTime;
-	private float twoButtonPressTimeMax = 0.1f;
-	private float[] quickAttackOffsets = {1.8f, 1.8f, 1.0f};
-	private float jumpAttackStartingOffset = 3.7f;
-	private string[] quickAttackStateNames = {"quick_1", "quick_2", "quick_3"};
+	private AudioSource[] enemyAttackReactionSounds;
+
+	private float[] strongHitCrossFadeTimes, quickAttackOffsets;
+	private string[] quickAttackStateNames;
+
+	private float lerpT, lerpSpeedMultiplier, desiredOffset,
+						 spaceBarPressedTime, leftMousePressedTime, 
+						 FPressedTime, twoButtonPressTimeMax, 
+						 jumpAttackStartingOffset;
+
+	private bool needToAttack, doneLerping, needsRunningAnimation;
+
+
 	AttackType currentType;
 	#endregion
 
@@ -33,11 +37,15 @@ public class DevCombat : MonoBehaviour {
 		myAnimator = GetComponent<Animator>();
 		cam = Camera.main;
 		currentEnemy = GameObject.Find ("Brute2");
-		enemyAttackReactionSounds[0] = quickAttack;
-		enemyAttackReactionSounds[1] = quickAttack2;
-		enemyAttackReactionSounds[2] = quickAttack3;
-		enemyAttackReactionSounds[3] = quickAttack3;
 		currentType = AttackType.none;
+		quickAttackStateNames = new string[] {"quick_1", "quick_2", "quick_3"};
+		enemyAttackReactionSounds = new AudioSource[] {quickAttack, quickAttack2, quickAttack3, quickAttack3};
+
+		/*variables to tweak*/
+		strongHitCrossFadeTimes = new float[]{ 0.2f, 0.2f, 0.05f };
+		quickAttackOffsets = new float[]{1.8f, 1.8f, 1.0f};
+		twoButtonPressTimeMax = 0.1f;
+		jumpAttackStartingOffset = 3.7f;
 	}
 	void Update () {
 		handleAttacking ();
@@ -225,8 +233,8 @@ public class DevCombat : MonoBehaviour {
 	}
 		
 	void makeEnemyReact(int index){
-//		cam.GetComponent<MouseMovement> ().getClosestEnemyObject().GetComponent<EnemyCombatAI> ().playReactAnimation (myAnimator.GetInteger("quickAttack"));
-		currentEnemy.GetComponent<EnemyCombatAI> ().playReactAnimation (index);
+//		cam.GetComponent<MouseMovement> ().getClosestEnemyObject().GetComponent<EnemyCombatReactions> ().playReactAnimation (myAnimator.GetInteger("quickAttack"));
+		currentEnemy.GetComponent<EnemyCombatReactions> ().playReactAnimation (index);
 	}
 		
 	bool closeEnoughToAttack(){
@@ -257,7 +265,7 @@ public class DevCombat : MonoBehaviour {
 	}
 
 	public void setHitStrong(){
-		if (currentEnemy.GetComponent<EnemyCombatAI> ().isBlocking ()) {
+		if (currentEnemy.GetComponent<EnemyCombatReactions> ().isBlocking () && currentEnemy.GetComponent<EnemyCombatReactions> ().rotationAllowsBlock()) {
 //			myAnimator.SetBool ("hitStrong", true);
 			myAnimator.CrossFade("sword_and_shield_impact_1", strongHitCrossFadeTimes[myAnimator.GetInteger("quickAttack")]);
 		}
@@ -265,6 +273,7 @@ public class DevCombat : MonoBehaviour {
 	void startGettingIntoPosition(){
 		needToAttack = true;
 		lerpT = 0f;
+
 	}
 
 
@@ -379,7 +388,7 @@ public class DevCombat : MonoBehaviour {
 			quickAttack3.Stop ();
 
 
-		if (currentEnemy.GetComponent<EnemyCombatAI> ().isBlocking ()) {
+		if (currentEnemy.GetComponent<EnemyCombatReactions> ().isBlocking () && currentEnemy.GetComponent<EnemyCombatReactions> ().rotationAllowsBlock()) {
 			strongHit.Play ();
 		} else {
 			enemyAttackReactionSounds [index - 1].Play ();

@@ -51,6 +51,8 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+     <Compile Include="Assets\DevCombatReactions.cs" />
+     <Compile Include="Assets\EnemyCombatAI.cs" />
      <Compile Include="Assets\Environment\NatureStarterKit2\Standard Assets\Effects\ImageEffects\Scripts\Antialiasing.cs" />
      <Compile Include="Assets\Environment\NatureStarterKit2\Standard Assets\Effects\ImageEffects\Scripts\Bloom.cs" />
      <Compile Include="Assets\Environment\NatureStarterKit2\Standard Assets\Effects\ImageEffects\Scripts\BloomAndFlares.cs" />
@@ -143,7 +145,7 @@
      <Compile Include="Assets\scripts\EmptyClass.cs" />
      <Compile Include="Assets\scripts\EmptyClass2.cs" />
      <Compile Include="Assets\scripts\EnemyAI.cs" />
-     <Compile Include="Assets\scripts\EnemyCombatAI.cs" />
+     <Compile Include="Assets\scripts\EnemyCombatReactions.cs" />
      <Compile Include="Assets\scripts\MaintainLocalPositionDuringRootMotion.cs" />
      <Compile Include="Assets\scripts\ManageHealth.cs" />
      <Compile Include="Assets\scripts\mapNode.cs" />
