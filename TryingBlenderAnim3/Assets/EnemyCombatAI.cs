@@ -9,7 +9,7 @@ public class EnemyCombatAI : MonoBehaviour {
 	#region variables
 
 	public bool setBlocking;
-	public AudioSource quickAttack1, quickAttack2, quickAttack3;
+	public AudioSource quickAttack1, quickAttack2, quickAttack3, battleCry;
 	public AudioSource strongHit;
 
 	private GameObject dev;
@@ -44,6 +44,20 @@ public class EnemyCombatAI : MonoBehaviour {
 		handleAttacking ();
 	}
 
+	public void playBattleCry(){
+		if (strongHit.isPlaying)
+			strongHit.Stop ();
+		if(quickAttack2.isPlaying)
+			quickAttack2.Stop();
+		if(quickAttack1.isPlaying)
+			quickAttack1.Stop();
+		if (quickAttack3.isPlaying)
+			quickAttack3.Stop ();
+		if (battleCry.isPlaying)
+			battleCry.Stop ();
+
+		battleCry.Play ();
+	}
 
 	private void handleAttacking(){
 		//		Debug.Log ("lerpT:" + lerpT);
@@ -75,7 +89,7 @@ public class EnemyCombatAI : MonoBehaviour {
 	}
 
 	private void InitiateStepsToAttack(){
-		lerpSpeedMultiplier = 0.3f;
+		lerpSpeedMultiplier = 0.2f;
 
 		bool canAttack = notInCombatMove () && closeEnoughToAttack ();
 		if (!canAttack)
@@ -183,7 +197,13 @@ public class EnemyCombatAI : MonoBehaviour {
 		if (isAttacking ())
 			return;
 
-		if (Input.GetKeyDown (KeyCode.Alpha6)) {
+		//call taunt animation on equals sign press
+		if (Input.GetKeyDown (KeyCode.Equals)) {
+			enemyAnim.SetBool ("doBattlecry", true);
+		}
+
+		//call attack animations on number presses
+		else if (Input.GetKeyDown (KeyCode.Alpha6)) {
 			enemyAnim.SetInteger ("enemyQuick", 1);
 			InitiateStepsToAttack ();
 		} else if (Input.GetKeyDown (KeyCode.Alpha7)) {

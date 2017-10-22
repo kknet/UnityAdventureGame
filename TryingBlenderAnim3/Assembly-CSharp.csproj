@@ -165,7 +165,9 @@
      <Compile Include="Assets\scripts\TrackObstacles.cs" />
      <Compile Include="Assets\scripts\WeaponHitsStrong.cs" />
      <Compile Include="Assets\scripts\WeaponToggle.cs" />
+     <Compile Include="Assets\StopBattlecry.cs" />
      <Compile Include="Assets\StopDying.cs" />
+     <Compile Include="Assets\StopSuccess.cs" />
      <None Include="Assets\PostProcessing\Resources\Shaders\DepthOfField.shader" />
      <None Include="Assets\Environment\NatureStarterKit2\Standard Assets\Effects\GlassRefraction\Shaders\GlassStainedBumpDistort.shader" />
      <None Include="Assets\Environment\NatureStarterKit2\Standard Assets\Effects\ImageEffects\Shaders\_BloomAndFlares\BlendOneOne.shader" />
