@@ -59,6 +59,10 @@ public class EnemyCombatAI : MonoBehaviour {
 		battleCry.Play ();
 	}
 
+	public void toggleSuccess(){
+		enemyAnim.SetBool ("success", true);
+	}
+
 	private void handleAttacking(){
 		//		Debug.Log ("lerpT:" + lerpT);
 		if (needToAttack) {

@@ -55,6 +55,10 @@ public class DevCombat : MonoBehaviour {
 		myAnimator.SetBool ("roll", false);
 	}
 
+	public void toggleEnemySuccess(){
+		currentEnemy.GetComponent<EnemyCombatAI> ().toggleSuccess ();
+	}
+
 	private void handleInput(){
 		bool leftMousePressed = Input.GetKeyDown (KeyCode.Mouse0);
 		bool leftMouseHeld = Input.GetKey (KeyCode.Mouse0);
