@@ -51,6 +51,8 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+     <Compile Include="Assets\DevCombatReactions.cs" />
+     <Compile Include="Assets\EnemyCombatAI.cs" />
      <Compile Include="Assets\Environment\NatureStarterKit2\Standard Assets\Effects\ImageEffects\Scripts\Antialiasing.cs" />
      <Compile Include="Assets\Environment\NatureStarterKit2\Standard Assets\Effects\ImageEffects\Scripts\Bloom.cs" />
      <Compile Include="Assets\Environment\NatureStarterKit2\Standard Assets\Effects\ImageEffects\Scripts\BloomAndFlares.cs" />
@@ -139,12 +141,10 @@
      <Compile Include="Assets\scripts\CameraZoom.cs" />
      <Compile Include="Assets\scripts\ClosestNodes.cs" />
      <Compile Include="Assets\scripts\DevCombat.cs" />
-     <Compile Include="Assets\scripts\DevCombatReactions.cs" />
      <Compile Include="Assets\scripts\DevMovement.cs" />
      <Compile Include="Assets\scripts\EmptyClass.cs" />
      <Compile Include="Assets\scripts\EmptyClass2.cs" />
      <Compile Include="Assets\scripts\EnemyAI.cs" />
-     <Compile Include="Assets\scripts\EnemyCombatAI.cs" />
      <Compile Include="Assets\scripts\EnemyCombatReactions.cs" />
      <Compile Include="Assets\scripts\MaintainLocalPositionDuringRootMotion.cs" />
      <Compile Include="Assets\scripts\ManageHealth.cs" />
@@ -159,16 +159,15 @@
      <Compile Include="Assets\scripts\Priority Queues\IPriorityQueue.cs" />
      <Compile Include="Assets\scripts\Priority Queues\SimplePriorityQueue.cs" />
      <Compile Include="Assets\scripts\RootMotionScript.cs" />
-     <Compile Include="Assets\scripts\StopBattlecry.cs" />
-     <Compile Include="Assets\scripts\StopDying.cs" />
      <Compile Include="Assets\scripts\StopFlipAttack.cs" />
      <Compile Include="Assets\scripts\StopHitStrong.cs" />
      <Compile Include="Assets\scripts\StopJumpAttack.cs" />
-     <Compile Include="Assets\scripts\StopSuccess.cs" />
      <Compile Include="Assets\scripts\TrackObstacles.cs" />
      <Compile Include="Assets\scripts\WeaponHitsStrong.cs" />
      <Compile Include="Assets\scripts\WeaponToggle.cs" />
-     <Compile Include="Assets\StopEnemyAttacking.cs" />
+     <Compile Include="Assets\StopBattlecry.cs" />
+     <Compile Include="Assets\StopDying.cs" />
+     <Compile Include="Assets\StopSuccess.cs" />
      <None Include="Assets\PostProcessing\Resources\Shaders\DepthOfField.shader" />
      <None Include="Assets\Environment\NatureStarterKit2\Standard Assets\Effects\GlassRefraction\Shaders\GlassStainedBumpDistort.shader" />
      <None Include="Assets\Environment\NatureStarterKit2\Standard Assets\Effects\ImageEffects\Shaders\_BloomAndFlares\BlendOneOne.shader" />

@@ -55,14 +55,6 @@ public class DevCombatReactions : MonoBehaviour {
 	private void updateHealthBar(){
 		float ratio = health / maxHealth;
 		healthBar.rectTransform.localScale = new Vector3 (Mathf.MoveTowards(healthBar.rectTransform.localScale.x, ratio, 0.005f), 1f, 1f);
-
-		Color blendColor;
-		if (ratio < .5) { 
-			blendColor = Color.Lerp (Color.red, Color.yellow, ratio*2.0f);
-		} else {
-			blendColor = Color.Lerp (Color.yellow, Color.green, (ratio-0.5f)*2.0f);
-		}
-		healthBar.color = blendColor;
 	}
 
 	// Update is called once per frame

@@ -60,10 +60,6 @@ public class DevCombat : MonoBehaviour {
 	}
 
 	private void handleInput(){
-		bool shiftHeld = Input.GetKey (KeyCode.LeftShift);
-		if (shiftHeld)
-			return;
-
 		bool leftMousePressed = Input.GetKeyDown (KeyCode.Mouse0);
 		bool leftMouseHeld = Input.GetKey (KeyCode.Mouse0);
 

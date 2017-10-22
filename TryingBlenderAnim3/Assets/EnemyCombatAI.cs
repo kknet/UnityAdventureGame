@@ -8,7 +8,7 @@ public class EnemyCombatAI : MonoBehaviour {
 
 	#region variables
 
-	public bool setBlocking, doEnemyAI;
+	public bool setBlocking;
 	public AudioSource quickAttack1, quickAttack2, quickAttack3, battleCry;
 	public AudioSource strongHit;
 
@@ -22,16 +22,7 @@ public class EnemyCombatAI : MonoBehaviour {
 	private bool needToAttack, doneLerping;
 	private float lerpSpeedMultiplier, lerpT, desiredOffset;
 
-	enum combatState{
-		idle,
-		attacking,
-		blocking
-	}
-
-	private combatState currentState;
-
 	#endregion
-
 	// Use this for initialization
 	void Start () {
 		enemyAnim = this.gameObject.GetComponent<Animator> ();
@@ -43,118 +34,36 @@ public class EnemyCombatAI : MonoBehaviour {
 		/*variables to tweak*/
 		strongHitCrossFadeTimes = new float[]{ 0.05f, 0.05f, 0.05f , 0.05f, 0.05f};
 		quickAttackOffsets = new float[]{1.5f, 1.4f, 1.5f, 1.5f, 1.4f};
-		currentState = combatState.idle;
 
 	}
 
 	// Update is called once per frame
 	void Update () {
-
-		if (doEnemyAI)
-			runEnemyAI ();
-		else
-			handleTestingInput ();
+		handleTestingInput ();
 
 		if(!notInCombatMove())
 			lookAtDev ();
 
 		handleAttacking ();
 	}
-
-	public void toggleEnemyAI(){
-		doEnemyAI = !doEnemyAI;
-	}
-
-	private float rand(float a, float b){
-		return UnityEngine.Random.Range (a, b);
-	}
-
-	private void runEnemyAI(){
-		/*
-		if dev is idle
-			attack him
-		if dev is blocking
-			if rand > 0.5
-				attack him
-		if dev is rolling
-			do nothing
-		if dev is attacking
-			if rand > 0.75
-				attack him
-			else if rand > 0.5
-				block
-			else
-				do nothing
-		*/
-
-		/*Dev's relevant combat states*/
-		bool blocking = dev.GetComponent<DevCombatReactions> ().isBlocking ();
-		bool attacking = dev.GetComponent<DevCombat> ().isAttacking ();
-		bool rolling = dev.GetComponent<DevMovement> ().rolling ();
-		bool idle = !blocking && !attacking && !rolling;
-
-		if (attacking || isAttacking())
-			return;
-
-		if (idle) {
-			stopBlocking ();
-			InitiateStepsToAttack ();
-		} else if (blocking) {
-			if (rand (0f, 1f) > 0.5f) {
-				stopBlocking ();
-				InitiateStepsToAttack ();
-			}		
-		} else if (attacking) {
-			if (isBlocking ())//if already blocking, keep blocking
-				return;
-
-			float chance = rand (0f, 1f);
-			if (chance > 0.75f) {//in some cases the enemy might choose to attack at the same time
-				stopBlocking ();
-				InitiateStepsToAttack ();
-			} else if (chance > 0.5f){
-				startBlocking ();
-			}
-		}
-	}
 		
-	#region handleAttack helpers/getters
+	public void playBattleCry(){
+		if (strongHit.isPlaying)
+			strongHit.Stop ();
+		if(quickAttack2.isPlaying)
+			quickAttack2.Stop();
+		if(quickAttack1.isPlaying)
+			quickAttack1.Stop();
+		if (quickAttack3.isPlaying)
+			quickAttack3.Stop ();
+		if (battleCry.isPlaying)
+			battleCry.Stop ();
 
-	public void switchAttack(){
-		switch (enemyAnim.GetInteger ("enemyQuick")) {
-		case 1:
-			enemyAnim.SetInteger ("enemyQuick", 2);
-			break;
-		case 2:
-			enemyAnim.SetInteger ("enemyQuick", 3);
-			break;
-		case 3:
-			enemyAnim.SetInteger ("enemyQuick", 4);
-			break;
-		case 4:
-			enemyAnim.SetInteger ("enemyQuick", 5);
-			break;
-		case 5:
-			enemyAnim.SetInteger ("enemyQuick", 1);
-			break;
-		default:
-			Debug.LogAssertion ("enemyQuick is not set to 1-5, look at EnemyCombatAI.cs script");
-			break;
-		}
+		battleCry.Play ();
 	}
 
-	private bool isBlocking(){
-		return enemyAnim.GetBool ("enemyBlock");
-	}
-
-	private void stopBlocking(){
-		currentState = combatState.idle;
-		enemyAnim.SetBool ("enemyBlock", false);
-	}
-
-	private void startBlocking(){
-		currentState = combatState.blocking;
-		enemyAnim.SetBool ("enemyBlock", true);
+	public void toggleSuccess(){
+		enemyAnim.SetBool ("success", true);
 	}
 
 	private void handleAttacking(){
@@ -176,19 +85,7 @@ public class EnemyCombatAI : MonoBehaviour {
 	}
 
 
-
-	public bool notInCombatMove() {
-		return !isAttacking() && !enemyAnim.GetBool ("enemyBlock");
-	}
-
-	public bool isAttacking() {
-		AnimatorStateInfo info = enemyAnim.GetCurrentAnimatorStateInfo (0);
-		return info.IsName ("QUICK1") || info.IsName ("QUICK2") || info.IsName ("QUICK3") || info.IsName("QUICK4") || info.IsName("QUICK5");
-	}
-
-	public void toggleSuccess(){
-		enemyAnim.SetBool ("success", true);
-	}
+	#region handleAttack helpers
 
 	private IEnumerator triggerQuickAttack(){
 		while (needToAttack == true && lerpT < 0.8f) {
@@ -199,7 +96,6 @@ public class EnemyCombatAI : MonoBehaviour {
 	}
 
 	private void InitiateStepsToAttack(){
-		currentState = combatState.attacking;
 		lerpSpeedMultiplier = 0.2f;
 
 		bool canAttack = notInCombatMove () && closeEnoughToAttack ();
@@ -212,7 +108,6 @@ public class EnemyCombatAI : MonoBehaviour {
 	}
 
 	public void stopEnemyAttack(){
-		currentState = combatState.idle;
 		enemyAnim.SetBool ("enemyAttack", false);
 		needToAttack = false;
 		lerpT = 0f;
@@ -289,23 +184,6 @@ public class EnemyCombatAI : MonoBehaviour {
 	#endregion
 
 	#region sounds
-
-	public void playBattleCry(){
-		if (strongHit.isPlaying)
-			strongHit.Stop ();
-		if(quickAttack2.isPlaying)
-			quickAttack2.Stop();
-		if(quickAttack1.isPlaying)
-			quickAttack1.Stop();
-		if (quickAttack3.isPlaying)
-			quickAttack3.Stop ();
-		if (battleCry.isPlaying)
-			battleCry.Stop ();
-
-		battleCry.Play ();
-	}
-
-
 	public void playQuickAttackSound(int index){
 		if (strongHit.isPlaying)
 			strongHit.Stop ();
@@ -354,5 +232,14 @@ public class EnemyCombatAI : MonoBehaviour {
 		}
 	}
 	#endregion
-			
+
+	public bool notInCombatMove() {
+		return !isAttacking() && !enemyAnim.GetBool ("enemyBlock");
+	}
+
+	public bool isAttacking() {
+		AnimatorStateInfo info = enemyAnim.GetCurrentAnimatorStateInfo (0);
+		return info.IsName ("QUICK1") || info.IsName ("QUICK2") || info.IsName ("QUICK3") || info.IsName("QUICK4") || info.IsName("QUICK5");
+	}
+		
 }
