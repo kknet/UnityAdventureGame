@@ -40,10 +40,13 @@ public class EnemyCombatAI : MonoBehaviour {
 	// Update is called once per frame
 	void Update () {
 		handleTestingInput ();
-		lookAtDev ();
+
+		if(!notInCombatMove())
+			lookAtDev ();
+
 		handleAttacking ();
 	}
-
+		
 	public void playBattleCry(){
 		if (strongHit.isPlaying)
 			strongHit.Stop ();
