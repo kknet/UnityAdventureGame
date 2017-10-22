@@ -34,11 +34,11 @@ public class DevCombatReactions : MonoBehaviour {
 	};
 
 	private float[] blockDelayTimes = {
-		0.05f,
-		0.01f,
-		0.15f,
-		0.4f, 
-		0.4f
+		0.71f,
+		0.73f,
+		0.6f,
+		0.7f,
+		0.7f
 	};
 
 	// Use this for initialization
@@ -65,8 +65,8 @@ public class DevCombatReactions : MonoBehaviour {
 	}
 
 	public bool rotationAllowsBlock(){
-		float myAngle = transform.eulerAngles.y; Clamp (myAngle);
-		float devAngle = dev.transform.eulerAngles.y; Clamp (devAngle);
+		float myAngle = GetComponent<DevCombat>().getCurrentEnemy().transform.eulerAngles.y; Clamp (myAngle);
+		float devAngle = transform.eulerAngles.y; Clamp (devAngle);
 		float rotDifference;
 		if (myAngle > devAngle)
 			rotDifference = Mathf.Abs (myAngle - devAngle);
@@ -86,12 +86,12 @@ public class DevCombatReactions : MonoBehaviour {
 	private IEnumerator callAnimation(int animationIndex){
 		if (enemyAnim.GetCurrentAnimatorStateInfo (0).IsName ("sword_and_shield_block_idle") && rotationAllowsBlock()) {
 			yield return new WaitForSeconds (blockDelayTimes [animationIndex - 1]);
-			enemyAnim.CrossFade ("standing_block_react_large", 0.05f);
+			enemyAnim.CrossFade ("sword_and_shield_impact_1", 0.05f);
 
-			if (animationIndex != 2) {
-				yield return new WaitForSeconds (0.3f);
-				enemyAnim.CrossFade ("React from Right and Move Back", 0.1f);
-			}
+//			if (animationIndex != 2) {
+//				yield return new WaitForSeconds (0.3f);
+//				enemyAnim.CrossFade ("React from Right and Move Back", 0.1f);
+//			}
 		}
 		else {
 			yield return new WaitForSeconds (callDelayTimes [animationIndex - 1]);
@@ -102,7 +102,7 @@ public class DevCombatReactions : MonoBehaviour {
 
 	public bool isBlocking(){
 		AnimatorStateInfo info = enemyAnim.GetCurrentAnimatorStateInfo (0);
-		return info.IsName ("sword_and_shield_block_idle") || info.IsName("standing_block_react_large");
+		return info.IsName ("sword_and_shield_block_idle") || info.IsName("sword_and_shield_impact_1");
 	}
 
 }

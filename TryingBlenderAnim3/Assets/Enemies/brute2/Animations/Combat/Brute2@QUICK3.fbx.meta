@@ -160,6 +160,13 @@ ModelImporter:
       curves: []
       events:
       - time: 0
+        functionName: stopEnemyAttack
+        data: 
+        objectReferenceParameter: {instanceID: 0}
+        floatParameter: 0
+        intParameter: 0
+        messageOptions: 0
+      - time: 0
         functionName: makeDevReact
         data: 
         objectReferenceParameter: {instanceID: 0}
@@ -173,8 +180,8 @@ ModelImporter:
         floatParameter: 0
         intParameter: 3
         messageOptions: 0
-      - time: 0.9207856
-        functionName: stopEnemyAttack
+      - time: 0.41142857
+        functionName: setHitStrong
         data: 
         objectReferenceParameter: {instanceID: 0}
         floatParameter: 0

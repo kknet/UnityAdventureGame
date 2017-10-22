@@ -32,7 +32,7 @@ public class EnemyCombatAI : MonoBehaviour {
 		devAttackReactionSounds = new AudioSource[] {quickAttack1, quickAttack3, quickAttack2, quickAttack3, quickAttack2};
 
 		/*variables to tweak*/
-		strongHitCrossFadeTimes = new float[]{ 0.2f, 0.2f, 0.05f , 0.2f, 0.2f};
+		strongHitCrossFadeTimes = new float[]{ 0.05f, 0.05f, 0.05f , 0.05f, 0.05f};
 		quickAttackOffsets = new float[]{1.5f, 1.4f, 1.5f, 1.5f, 1.4f};
 
 	}
@@ -129,8 +129,12 @@ public class EnemyCombatAI : MonoBehaviour {
 	}
 
 	public void setHitStrong(){
-		if (dev.GetComponent<DevCombatReactions> ().isBlocking () && dev.GetComponent<DevCombatReactions> ().rotationAllowsBlock()) {
-			enemyAnim.CrossFade("sword_and_shield_impact_1", strongHitCrossFadeTimes[enemyAnim.GetInteger("enemyQuick")]);
+		bool isBlocking = dev.GetComponent<DevCombatReactions> ().isBlocking ();
+		bool rotationAllows = dev.GetComponent<DevCombatReactions> ().rotationAllowsBlock ();
+		if (isBlocking && rotationAllows) {
+			enemyAnim.CrossFade ("sword_and_shield_impact_1", strongHitCrossFadeTimes [enemyAnim.GetInteger ("enemyQuick") - 1]);
+		} else {
+//			Debug.Log (isBlocking + " " + rotationAllows);	
 		}
 	}
 

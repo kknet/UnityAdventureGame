@@ -166,6 +166,13 @@ ModelImporter:
         floatParameter: 0
         intParameter: 2
         messageOptions: 0
+      - time: 0
+        functionName: stopEnemyAttack
+        data: 
+        objectReferenceParameter: {instanceID: 0}
+        floatParameter: 0
+        intParameter: 0
+        messageOptions: 0
       - time: 0.3355177
         functionName: playQuickAttackSound
         data: 
@@ -173,8 +180,8 @@ ModelImporter:
         floatParameter: 0
         intParameter: 2
         messageOptions: 0
-      - time: 0.8962145
-        functionName: stopEnemyAttack
+      - time: 0.41142857
+        functionName: setHitStrong
         data: 
         objectReferenceParameter: {instanceID: 0}
         floatParameter: 0
