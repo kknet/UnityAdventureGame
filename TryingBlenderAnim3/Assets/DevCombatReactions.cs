@@ -1,13 +1,17 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class DevCombatReactions : MonoBehaviour {
 	public int health;
+	public Image healthBar;
 
 	private GameObject dev;
 	private Animator enemyAnim;
+	private float maxHealth;
 
+	private Color green, yellow, red;
 
 	private string[] reactAnimations = {
 		"standing_react_large_from_right",
@@ -45,6 +49,12 @@ public class DevCombatReactions : MonoBehaviour {
 	void Start () {
 		enemyAnim = this.gameObject.GetComponent<Animator> ();
 		dev = GameObject.Find ("DevDrake");
+		maxHealth = health;
+	}
+
+	private void updateHealthBar(){
+		float ratio = health / maxHealth;
+		healthBar.rectTransform.localScale = new Vector3 (Mathf.MoveTowards(healthBar.rectTransform.localScale.x, ratio, 0.005f), 1f, 1f);
 	}
 
 	// Update is called once per frame
@@ -52,6 +62,7 @@ public class DevCombatReactions : MonoBehaviour {
 		if (health <= 0) {
 			enemyAnim.SetBool ("Dead", true);
 		}
+		updateHealthBar ();
 		//		bool collision = Physics.Raycast (transform.position + transform.up + (transform.forward * 0.3f), transform.forward, 0.5f);
 
 	}

@@ -1,11 +1,14 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class EnemyCombatReactions : MonoBehaviour {
 
 	public int health;
+	public Image enemyHealthBar;
 
+	private float maxHealth;
 	private GameObject dev;
 	private Animator enemyAnim;
 
@@ -42,6 +45,7 @@ public class EnemyCombatReactions : MonoBehaviour {
 	void Start () {
 		enemyAnim = this.gameObject.GetComponent<Animator> ();
 		dev = GameObject.Find ("DevDrake");
+		maxHealth = health;
 	}
 	
 	// Update is called once per frame
@@ -49,7 +53,14 @@ public class EnemyCombatReactions : MonoBehaviour {
 		if (health <= 0) {
 			enemyAnim.SetBool ("Dead", true);
 		}
+		updateHealthBar ();
 //		bool collision = Physics.Raycast (transform.position + transform.up + (transform.forward * 0.3f), transform.forward, 0.5f);
+
+	}
+
+	private void updateHealthBar(){
+		float ratio = health / maxHealth;
+		enemyHealthBar.rectTransform.localScale = new Vector3 (Mathf.MoveTowards(enemyHealthBar.rectTransform.localScale.x, ratio, 0.005f), 1f, 1f);
 
 	}
 
