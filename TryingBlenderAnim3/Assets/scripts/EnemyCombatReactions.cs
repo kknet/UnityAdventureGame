@@ -81,7 +81,8 @@ public class EnemyCombatReactions : MonoBehaviour {
 	}
 
 	private IEnumerator callAnimation(int animationIndex){
-		if (enemyAnim.GetCurrentAnimatorStateInfo (0).IsName ("sword_and_shield_block_idle") && rotationAllowsBlock()) {
+		bool rotationAllows = rotationAllowsBlock ();
+		if (enemyAnim.GetCurrentAnimatorStateInfo (0).IsName ("sword_and_shield_block_idle") && rotationAllows) {
 			yield return new WaitForSeconds (blockDelayTimes [animationIndex - 1]);
 			enemyAnim.CrossFade ("standing_block_react_large", 0.05f);
 
@@ -89,11 +90,14 @@ public class EnemyCombatReactions : MonoBehaviour {
 				yield return new WaitForSeconds (0.3f);
 				enemyAnim.CrossFade ("React from Right and Move Back", 0.1f);
 			}
-		}
-		else {
+		} else if (rotationAllows) {
 			yield return new WaitForSeconds (callDelayTimes [animationIndex - 1]);
 			enemyAnim.CrossFade (reactAnimations [animationIndex - 1], crossFadeTimes [animationIndex - 1]);
 			--health;
+		} else {
+			yield return new WaitForSeconds (callDelayTimes [animationIndex - 1]);
+			enemyAnim.CrossFade ("standing_react_large_gut", crossFadeTimes [animationIndex - 1]);
+			--health;		
 		}
 	}
 

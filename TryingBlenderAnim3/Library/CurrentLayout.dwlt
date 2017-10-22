@@ -20,7 +20,7 @@ MonoBehaviour:
   m_ShowMode: 4
   m_Title: 
   m_RootView: {fileID: 2}
-  m_MinSize: {x: 950, y: 442}
+  m_MinSize: {x: 950, y: 300}
   m_MaxSize: {x: 10000, y: 10000}
 --- !u!114 &2
 MonoBehaviour:
@@ -43,7 +43,7 @@ MonoBehaviour:
     y: 0
     width: 1280
     height: 982
-  m_MinSize: {x: 950, y: 442}
+  m_MinSize: {x: 950, y: 300}
   m_MaxSize: {x: 10000, y: 10000}
 --- !u!114 &3
 MonoBehaviour:
@@ -106,10 +106,10 @@ MonoBehaviour:
     y: 30
     width: 1280
     height: 932
-  m_MinSize: {x: 583, y: 392}
-  m_MaxSize: {x: 14004, y: 14042}
+  m_MinSize: {x: 577, y: 200}
+  m_MaxSize: {x: 12002, y: 8021}
   vertical: 0
-  controlID: 5141
+  controlID: 988
 --- !u!114 &6
 MonoBehaviour:
   m_ObjectHideFlags: 52
@@ -155,10 +155,10 @@ MonoBehaviour:
     y: 0
     width: 1008
     height: 932
-  m_MinSize: {x: 381, y: 392}
-  m_MaxSize: {x: 10002, y: 14042}
+  m_MinSize: {x: 377, y: 200}
+  m_MaxSize: {x: 8002, y: 8021}
   vertical: 1
-  controlID: 5256
+  controlID: 989
 --- !u!114 &8
 MonoBehaviour:
   m_ObjectHideFlags: 52
@@ -179,10 +179,10 @@ MonoBehaviour:
     y: 0
     width: 1008
     height: 590
-  m_MinSize: {x: 381, y: 121}
-  m_MaxSize: {x: 8006, y: 4021}
+  m_MinSize: {x: 377, y: 100}
+  m_MaxSize: {x: 8002, y: 4021}
   vertical: 0
-  controlID: 5257
+  controlID: 990
 --- !u!114 &9
 MonoBehaviour:
   m_ObjectHideFlags: 52
@@ -254,14 +254,14 @@ MonoBehaviour:
     y: 590
     width: 1008
     height: 342
-  m_MinSize: {x: 232, y: 271}
-  m_MaxSize: {x: 10002, y: 10021}
-  m_ActualView: {fileID: 19}
+  m_MinSize: {x: 102, y: 121}
+  m_MaxSize: {x: 4002, y: 4021}
+  m_ActualView: {fileID: 18}
   m_Panes:
   - {fileID: 18}
   - {fileID: 19}
-  m_Selected: 1
-  m_LastSelected: 0
+  m_Selected: 0
+  m_LastSelected: 1
 --- !u!114 &12
 MonoBehaviour:
   m_ObjectHideFlags: 52
@@ -366,9 +366,9 @@ MonoBehaviour:
     height: 911
   m_TreeViewState:
     scrollPos: {x: 0, y: 0}
-    m_SelectedIDs: d0400000
+    m_SelectedIDs: 74400000
     m_LastClickedID: 0
-    m_ExpandedIDs: 1afcffff00000000f83b0000
+    m_ExpandedIDs: 1afcffff00000000
     m_RenameOverlay:
       m_UserAcceptedRename: 0
       m_Name: 
@@ -458,7 +458,7 @@ MonoBehaviour:
     - {fileID: 1107099143477483674, guid: 9ea4f799bd9a9dd49b201833f1096038, type: 2}
     - {fileID: 110715676, guid: 85adcab9e891c3d4ea49d5de4b88ec85, type: 2}
     m_ValueSerializationHelper:
-    - {x: 1330.2, y: 376.40002}
+    - {x: 1128.4, y: 326.80005}
     - {x: 296.6, y: 288.40002}
     - {x: 457.40002, y: 95.600006}
     - {x: 330.80005, y: 475.40015}
@@ -664,9 +664,9 @@ MonoBehaviour:
   m_IsLocked: 0
   m_FolderTreeState:
     scrollPos: {x: 0, y: 279}
-    m_SelectedIDs: a8330000
-    m_LastClickedID: 13224
-    m_ExpandedIDs: 0000000042280000cc290000d8290000c82a0000cc2a0000382c0000762d00007c2d00000a2e000008300000963200000233000042340000aa340000bc340000aa360000d83600002637000036370000443700008c370000c6370000e23700000638000064380000a6410000a8410000aa41000000ca9a3bffffff7f
+    m_SelectedIDs: b2330000
+    m_LastClickedID: 13234
+    m_ExpandedIDs: 0000000046280000d0290000dc290000cc2a0000d02a00003c2c00007a2d0000802d00000e2e000012300000a03200000c3300004c340000b4340000c6340000b4360000e236000030370000403700004e37000096370000d0370000ec370000103800006e380000bc410000be410000c041000000ca9a3bffffff7f
     m_RenameOverlay:
       m_UserAcceptedRename: 0
       m_Name: 
@@ -694,7 +694,7 @@ MonoBehaviour:
     scrollPos: {x: 0, y: 0}
     m_SelectedIDs: 
     m_LastClickedID: 0
-    m_ExpandedIDs: 0000000042280000cc290000d8290000c82a0000cc2a0000382c0000762d00007c2d00000a2e000008300000963200000233000042340000aa340000bc340000aa360000d83600002637000036370000443700008c370000c6370000e23700000638000064380000a6410000a8410000aa41000000ca9a3bffffff7f
+    m_ExpandedIDs: 0000000046280000d0290000dc290000cc2a0000d02a00003c2c00007a2d0000802d00000e2e000012300000a03200000c3300004c340000b4340000c6340000b4360000e236000030370000403700004e37000096370000d0370000ec370000103800006e380000bc410000be410000c041000000ca9a3bffffff7f
     m_RenameOverlay:
       m_UserAcceptedRename: 0
       m_Name: 

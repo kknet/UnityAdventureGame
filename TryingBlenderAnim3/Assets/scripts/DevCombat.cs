@@ -391,11 +391,14 @@ public class DevCombat : MonoBehaviour {
 		if (quickAttack3.isPlaying)
 			quickAttack3.Stop ();
 
+		bool rotationAllows = currentEnemy.GetComponent<EnemyCombatReactions> ().rotationAllowsBlock ();
 
-		if (currentEnemy.GetComponent<EnemyCombatReactions> ().isBlocking () && currentEnemy.GetComponent<EnemyCombatReactions> ().rotationAllowsBlock()) {
+		if (currentEnemy.GetComponent<EnemyCombatReactions> ().isBlocking () && rotationAllows) {
 			strongHit.Play ();
-		} else {
+		} else if (rotationAllows) {
 			enemyAttackReactionSounds [index - 1].Play ();
+		} else {
+			quickAttack.Play ();
 		}
 	}
 	#endregion
