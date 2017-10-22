@@ -1,11 +1,11 @@
 ﻿<Properties StartupItem="Assembly-CSharp.csproj">
   <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" PreferredExecutionTarget="Unity.Instance.Unity Editor" />
-  <MonoDevelop.Ide.Workbench ActiveDocument="Assets\scripts\EnemyCombatReactions.cs">
+  <MonoDevelop.Ide.Workbench ActiveDocument="Assets\scripts\DevMovement.cs">
     <Files>
-      <File FileName="Assets\scripts\DevMovement.cs" Line="49" Column="41" />
+      <File FileName="Assets\scripts\DevMovement.cs" Line="44" Column="12" />
       <File FileName="Assets\scripts\MouseMovement.cs" Line="1" Column="1" />
       <File FileName="Assets\scripts\DevCombat.cs" Line="401" Column="24" />
-      <File FileName="Assets\scripts\EnemyCombatReactions.cs" Line="63" Column="131" />
+      <File FileName="Assets\scripts\EnemyCombatReactions.cs" Line="1" Column="1" />
       <File FileName="Assets\DevCombatReactions.cs" Line="57" Column="121" />
       <File FileName="Assets\EnemyCombatAI.cs" Line="137" Column="53" />
     </Files>

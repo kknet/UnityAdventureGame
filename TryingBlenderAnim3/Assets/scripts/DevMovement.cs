@@ -40,7 +40,7 @@ public class DevMovement : MonoBehaviour {
 	#endregion
 
 	#region imports you can tweak / need to worry about
-	private const float rollDistanceMultiplier = 0.5f;
+	private const float rollDistanceMultiplier = 0.0f;
 	#endregion
 
 	#region Start and Update
