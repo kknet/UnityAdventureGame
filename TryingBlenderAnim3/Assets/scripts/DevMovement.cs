@@ -216,7 +216,7 @@ public class DevMovement : MonoBehaviour {
 		myAnimator.SetFloat ("VSpeed", Mathf.MoveTowards (myAnimator.GetFloat ("VSpeed"), X * 0.5f, 4f * Time.deltaTime));
 		myAnimator.SetFloat ("HorizSpeed", Mathf.MoveTowards (myAnimator.GetFloat ("HorizSpeed"), Y * 0.5f, 4f * Time.deltaTime));
 
-		transform.Translate (((Vector3.forward * X) + (Vector3.right * Y)) * Time.deltaTime * 2f);
+		transform.Translate (((Vector3.forward * X) + (Vector3.right * Y * 0.75f)) * Time.deltaTime * 0.5f);
 	}
 	#endregion
 

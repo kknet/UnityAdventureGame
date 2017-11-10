@@ -8,7 +8,7 @@ public class EnemyCombatAI : MonoBehaviour {
 
 	#region variables
 
-	public bool setBlocking;
+	public bool setBlocking, setLookAtDev;
 	public AudioSource quickAttack1, quickAttack2, quickAttack3, battleCry;
 	public AudioSource strongHit;
 
@@ -41,7 +41,7 @@ public class EnemyCombatAI : MonoBehaviour {
 	void Update () {
 		handleTestingInput ();
 
-		if(!notInCombatMove())
+		if(setLookAtDev && !notInCombatMove())
 			lookAtDev ();
 
 		handleAttacking ();

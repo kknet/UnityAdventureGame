@@ -60,8 +60,9 @@ public class EnemyCombatReactions : MonoBehaviour {
 
 	private void updateHealthBar(){
 		float ratio = health / maxHealth;
+		if (ratio < 0f)
+			ratio = 0f;
 		enemyHealthBar.rectTransform.localScale = new Vector3 (Mathf.MoveTowards(enemyHealthBar.rectTransform.localScale.x, ratio, 0.005f), 1f, 1f);
-
 	}
 
 	private float Clamp(float f){
@@ -105,6 +106,8 @@ public class EnemyCombatReactions : MonoBehaviour {
 			yield return new WaitForSeconds (callDelayTimes [animationIndex - 1]);
 			enemyAnim.CrossFade (reactAnimations [animationIndex - 1], crossFadeTimes [animationIndex - 1]);
 			--health;
+			if (animationIndex == 4)
+				health -= 2;
 		} else {
 			yield return new WaitForSeconds (callDelayTimes [animationIndex - 1]);
 			enemyAnim.CrossFade ("standing_react_large_gut", crossFadeTimes [animationIndex - 1]);

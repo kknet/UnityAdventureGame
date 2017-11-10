@@ -309,6 +309,7 @@ public class MouseMovement : MonoBehaviour {
 			return;
 		Vector3 oldForward = player.transform.forward;
 		Vector3 offset = haveDevCombatOffset ? (player.transform.right * 0.7f) : (player.transform.right * -0.5f);
+
 		player.transform.forward = Vector3.RotateTowards (player.transform.forward, displacement + offset, 20f * Time.deltaTime, 0.0f); 
 	}
 
