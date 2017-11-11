@@ -8,7 +8,7 @@ public class DevCombatReactions : MonoBehaviour {
 	public Image healthBar;
 
 	private GameObject dev;
-	private Animator enemyAnim;
+	private Animator myAnimator;
 	private float maxHealth;
 
 	private Color green, yellow, red;
@@ -47,7 +47,7 @@ public class DevCombatReactions : MonoBehaviour {
 
 	// Use this for initialization
 	void Start () {
-		enemyAnim = this.gameObject.GetComponent<Animator> ();
+		myAnimator = this.gameObject.GetComponent<Animator> ();
 		dev = GameObject.Find ("DevDrake");
 		maxHealth = health;
 	}
@@ -70,7 +70,7 @@ public class DevCombatReactions : MonoBehaviour {
 	// Update is called once per frame
 	void Update () {
 		if (health <= 0) {
-			enemyAnim.SetBool ("Dead", true);
+			myAnimator.SetBool ("Dead", true);
 		}
 		updateHealthBar ();
 		//		bool collision = Physics.Raycast (transform.position + transform.up + (transform.forward * 0.3f), transform.forward, 0.5f);
@@ -104,26 +104,34 @@ public class DevCombatReactions : MonoBehaviour {
 			StartCoroutine (callAnimation(animationIndex));
 	}
 
+	private IEnumerator callConcurrentAnimation(int animationIndex){
+		yield return new WaitForSeconds (callDelayTimes [animationIndex - 1]);
+		myAnimator.CrossFade (reactAnimations [animationIndex - 1], crossFadeTimes [animationIndex - 1]);
+	}
+
 	private IEnumerator callAnimation(int animationIndex){
-		if (enemyAnim.GetCurrentAnimatorStateInfo (0).IsName ("sword_and_shield_block_idle") && rotationAllowsBlock()) {
-			yield return new WaitForSeconds (blockDelayTimes [animationIndex - 1]);
-			enemyAnim.CrossFade ("sword_and_shield_impact_1", 0.05f);
+		if ((myAnimator.GetCurrentAnimatorStateInfo (0).IsName ("sword_and_shield_block_idle") || myAnimator.GetCurrentAnimatorStateInfo (1).IsName ("sword_and_shield_block_idle")) && rotationAllowsBlock()) {
+			StartCoroutine (callConcurrentAnimation (animationIndex));
+//			yield return new WaitForSeconds (blockDelayTimes [animationIndex - 1]);
+//			myAnimator.CrossFade ("sword_and_shield_impact_1", 0.05f);
 
 //			if (animationIndex != 2) {
 //				yield return new WaitForSeconds (0.3f);
-//				enemyAnim.CrossFade ("React from Right and Move Back", 0.1f);
+//				myAnimator.CrossFade ("React from Right and Move Back", 0.1f);
 //			}
 		}
 		else {
 			yield return new WaitForSeconds (callDelayTimes [animationIndex - 1]);
-			enemyAnim.CrossFade (reactAnimations [animationIndex - 1], crossFadeTimes [animationIndex - 1]);
+			myAnimator.CrossFade (reactAnimations [animationIndex - 1], crossFadeTimes [animationIndex - 1]);
 			--health;
 		}
 	}
 
 	public bool isBlocking(){
-		AnimatorStateInfo info = enemyAnim.GetCurrentAnimatorStateInfo (0);
-		return info.IsName ("sword_and_shield_block_idle") || info.IsName("sword_and_shield_impact_1");
+		AnimatorStateInfo info = myAnimator.GetCurrentAnimatorStateInfo (0);
+		AnimatorStateInfo info2 = myAnimator.GetCurrentAnimatorStateInfo (1);
+		return info.IsName ("sword_and_shield_block_idle") || info.IsName("sword_and_shield_impact_1")
+			||  info2.IsName ("sword_and_shield_block_idle") || info2.IsName("sword_and_shield_impact_1");
 	}
 
 }

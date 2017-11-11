@@ -12,6 +12,7 @@ public class DevCombat : MonoBehaviour {
 	private Camera cam;
 	private GameObject currentEnemy;
 	private AudioSource[] enemyAttackReactionSounds;
+	private DevCombatReactions devCombatReactionsScript;
 
 	private float[] strongHitCrossFadeTimes, quickAttackOffsets;
 	private string[] quickAttackStateNames;
@@ -34,6 +35,7 @@ public class DevCombat : MonoBehaviour {
 	};
 
 	void Start () {
+		devCombatReactionsScript = GetComponent<DevCombatReactions> ();
 		myAnimator = GetComponent<Animator>();
 		cam = Camera.main;
 		currentEnemy = GameObject.Find ("Brute2");
@@ -370,7 +372,7 @@ public class DevCombat : MonoBehaviour {
 	}
 
 	public bool notInCombatMove() {
-		return !isAttacking() && !myAnimator.GetBool ("isBlocking");
+		return !isAttacking () && !devCombatReactionsScript.isBlocking ();
 	}
 
 	public bool isAttacking() {

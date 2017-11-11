@@ -120,13 +120,14 @@ public class DevMovement : MonoBehaviour {
 		movingVert = !Mathf.Approximately (myAnimator.GetFloat ("VSpeed"), 0f);
 		movingHoriz = !Mathf.Approximately (myAnimator.GetFloat ("HorizSpeed"), 0f);
 
-		if (inCombatZone && weaponDrawn && !jumping () && !inCombatMove) {
-//			Debug.LogError ("");
-			combatMovement ();
-		} else {
-//			Debug.LogError ("Not in combat movement");
-//			mouseMovementScript.setInCombatZone(false);
-			nonCombatMovement ();
+		if (!devCombatScript.isAttacking ()) {
+			if (inCombatZone && weaponDrawn && !jumping ()) {
+				combatMovement ();
+			} else {
+				//			Debug.LogError ("Not in combat movement");
+				//			mouseMovementScript.setInCombatZone(false);
+				nonCombatMovement ();
+			}
 		}
 	}
 
@@ -299,8 +300,6 @@ public class DevMovement : MonoBehaviour {
 	/*void stopTurnLeft(){
 	myAnimator.SetBool ("TurnLeft", false);
 	}*/
-
-
 
 
 	#region sounds

@@ -229,7 +229,8 @@ public class MouseMovement : MonoBehaviour {
 		Vector3 axis = Vector3.Cross (transform.position - devHair.transform.position, Vector3.up);
 		transform.RotateAround (devHair.transform.position, axis, movementY);
 
-		distance = initialOffset.magnitude * (25f + total) / 55f;
+//		distance = initialOffset.magnitude * (25f + total) / 55f;
+		distance = initialOffset.magnitude * (35f + total) / 85f;
 	}
 	#endregion
 
@@ -250,7 +251,8 @@ public class MouseMovement : MonoBehaviour {
 		}
 		Vector3 axis = Vector3.Cross (transform.position - devHair.transform.position, Vector3.up);
 		transform.RotateAround (devHair.transform.position, axis, movementY);
-		distance = initialOffset.magnitude * (25f + total) / 55f;
+//		distance = initialOffset.magnitude * (25f + total) / 55f;
+		distance = initialOffset.magnitude * (35f + total) / 85f;
 	}
 		
 	private void HorizontalCombatRotation()
@@ -289,7 +291,8 @@ public class MouseMovement : MonoBehaviour {
 
 			player.transform.forward = Vector3.RotateTowards (player.transform.forward, rollAngle - player.transform.forward, 15f * Time.deltaTime, 0.0f); 
 		}
-		else if(devCombatScript.notInCombatMove()){
+//		else if(devCombatScript.notInCombatMove()){
+		else if(!devCombatScript.isAttacking()){
 			rollAngle = Vector3.zero;
 			//rotate character towards closest enemy
 			Invoke("adjustToEnemy", 0.1f);
