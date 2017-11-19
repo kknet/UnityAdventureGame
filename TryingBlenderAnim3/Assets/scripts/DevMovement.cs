@@ -7,6 +7,8 @@ public class DevMovement : MonoBehaviour {
 	#region imports you don't need to worry about
 	public bool doPathfinding;
 
+	public GameObject footDust;
+
 	#region AudioSource Imports
 	public AudioSource footstep1,
 					   footstep2,
@@ -355,6 +357,12 @@ public class DevMovement : MonoBehaviour {
 	#endregion
 
 	#region methods called by animation events
+	void spawnFootDust(){
+		Debug.Log ("foot dust in the house!");
+	ParticleSystem footDustParticle = (Instantiate (footDust, transform.position + (transform.forward*0.3f), transform.rotation)).GetComponent<ParticleSystem>();
+		footDustParticle.Play ();	
+	}
+
 	void onApplyTrans(){
 		applyJumpTrans = true;
 	}

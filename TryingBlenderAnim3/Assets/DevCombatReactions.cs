@@ -109,9 +109,19 @@ public class DevCombatReactions : MonoBehaviour {
 		myAnimator.CrossFade (reactAnimations [animationIndex - 1], crossFadeTimes [animationIndex - 1]);
 	}
 
+	private void stopBlockReact(){
+		myAnimator.SetBool ("blockReact", false);
+	}
+
+	private void stopRegReact(){
+		myAnimator.SetBool ("regReact", false);
+	}
+		
 	private IEnumerator callAnimation(int animationIndex){
 		if ((myAnimator.GetCurrentAnimatorStateInfo (0).IsName ("sword_and_shield_block_idle") || myAnimator.GetCurrentAnimatorStateInfo (1).IsName ("sword_and_shield_block_idle")) && rotationAllowsBlock()) {
+			myAnimator.SetBool ("blockReact", true);
 			StartCoroutine (callConcurrentAnimation (animationIndex));
+			Invoke ("stopBlockReact", 1.5f);
 //			yield return new WaitForSeconds (blockDelayTimes [animationIndex - 1]);
 //			myAnimator.CrossFade ("sword_and_shield_impact_1", 0.05f);
 
@@ -121,6 +131,8 @@ public class DevCombatReactions : MonoBehaviour {
 //			}
 		}
 		else {
+			myAnimator.SetBool ("regReact", true);
+			Invoke ("stopRegReact", 1.5f);
 			yield return new WaitForSeconds (callDelayTimes [animationIndex - 1]);
 			myAnimator.CrossFade (reactAnimations [animationIndex - 1], crossFadeTimes [animationIndex - 1]);
 			--health;

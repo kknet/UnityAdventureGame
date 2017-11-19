@@ -1,4 +1,4 @@
 sceneSetups:
-- path: Assets/Fight System.unity
+- path: Assets/Demo Level.unity
   isLoaded: 1
   isActive: 1
