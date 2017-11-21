@@ -66,8 +66,8 @@ public class MouseMovement : MonoBehaviour {
 		//		getNearestEnemy (); 
 
 
-
-		closestEnemy = closestEnemyObject.transform.position;
+		if(closestEnemyObject)
+			closestEnemy = closestEnemyObject.transform.position;
 
 		if ((Time.realtimeSinceStartup - lastEnemyCheckTime) > 1.0f) {
 			inCombatZone = (closestEnemy != Vector3.zero);

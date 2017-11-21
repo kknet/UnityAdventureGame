@@ -186,7 +186,7 @@ ModelImporter:
       bodyMask: 01000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000
       curves: []
       events:
-      - time: 0.23809524
+      - time: 0.1171275
         functionName: spawnFootDust
         data: 
         objectReferenceParameter: {instanceID: 0}
@@ -200,7 +200,7 @@ ModelImporter:
         floatParameter: 0
         intParameter: 0
         messageOptions: 0
-      - time: 0.6926407
+      - time: 0.56936884
         functionName: spawnFootDust
         data: 
         objectReferenceParameter: {instanceID: 0}

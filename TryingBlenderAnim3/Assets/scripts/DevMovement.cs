@@ -54,11 +54,12 @@ public class DevMovement : MonoBehaviour {
 
 		mouseMovementScript = Camera.main.GetComponent<MouseMovement>();
 		devCombatScript = player.GetComponent<DevCombat> ();
-		closestNodesScript = terrain.GetComponent<ClosestNodes> ();
-		gridGraphScript = terrain.GetComponent<MapPathfind>();
-
 		desiredRot = Camera.main.transform.eulerAngles.y;
-		initDevCell ();
+		if (doPathfinding) {
+			closestNodesScript = terrain.GetComponent<ClosestNodes> ();
+			gridGraphScript = terrain.GetComponent<MapPathfind> ();
+			initDevCell ();
+		}
 	}
 
 	void Update () {
@@ -359,7 +360,7 @@ public class DevMovement : MonoBehaviour {
 	#region methods called by animation events
 	void spawnFootDust(){
 		Debug.Log ("foot dust in the house!");
-	ParticleSystem footDustParticle = (Instantiate (footDust, transform.position + (transform.forward*0.3f), transform.rotation)).GetComponent<ParticleSystem>();
+		ParticleSystem footDustParticle = (Instantiate (footDust, transform.position + (transform.forward*-0.1f), transform.rotation)).GetComponent<ParticleSystem>();
 		footDustParticle.Play ();	
 	}
 
