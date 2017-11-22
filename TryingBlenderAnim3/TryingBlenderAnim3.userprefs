@@ -2,8 +2,8 @@
   <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" PreferredExecutionTarget="Unity.Instance.Unity Editor" />
   <MonoDevelop.Ide.Workbench ActiveDocument="Assets\scripts\DevMovement.cs">
     <Files>
-      <File FileName="Assets\scripts\DevMovement.cs" Line="363" Column="105" />
-      <File FileName="Assets\scripts\MouseMovement.cs" Line="57" Column="54" />
+      <File FileName="Assets\scripts\DevMovement.cs" Line="362" Column="1" />
+      <File FileName="Assets\scripts\MouseMovement.cs" Line="1" Column="1" />
       <File FileName="Assets\scripts\DevCombat.cs" Line="1" Column="1" />
       <File FileName="Assets\scripts\EnemyCombatReactions.cs" Line="1" Column="1" />
       <File FileName="Assets\DevCombatReactions.cs" Line="1" Column="1" />
