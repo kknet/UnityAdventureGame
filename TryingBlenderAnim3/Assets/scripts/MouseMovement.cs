@@ -4,7 +4,9 @@ public class MouseMovement : MonoBehaviour {
 
 	#region globals
 	public float sensitivityX, 
-				 sensitivityY;
+				 sensitivityY,
+				 movementY,
+				 movementX;
 
 	public GameObject devHair;
 
@@ -82,7 +84,7 @@ public class MouseMovement : MonoBehaviour {
 			VerticalRotation ();
 			HorizontalRotation ();		
 		}
-		currentOffset = (transform.position - player.transform.position).normalized * distance;
+		currentOffset = (transform.position - devHair.transform.position).normalized * distance;
 	}
 	#endregion
 
@@ -142,9 +144,24 @@ public class MouseMovement : MonoBehaviour {
 	#endregion
 
 	#region NonCombatCamera
+
+	private bool adjustToWalls(float total){
+		float initDist = (initialOffset.magnitude * (35f + total) / 85f);
+		RaycastHit hitInfo;
+		if (Physics.Linecast (transform.position, devHair.transform.position, out hitInfo) && !hitInfo.collider.transform.root.gameObject.name.Equals("DevDrake")
+			&& initDist > (distance - hitInfo.distance)) {
+
+			distance = (distance - hitInfo.distance);
+			return true;
+		} else {
+			distance = Mathf.MoveTowards(distance, initDist, 1.0f);
+			return false;
+		}
+	}
+
 	private void HorizontalRotation(){
 		bool idle = devMovementScript.isIdle ();
-		float movementX = Input.GetAxisRaw ("Mouse X") * sensitivityX * Time.deltaTime;
+		movementX = Input.GetAxisRaw ("Mouse X") * sensitivityX * Time.deltaTime;
 		bool combating = !devCombatScript.notInCombatMove ();
 		bool counterZero = (devMovementScript.getAdjustCounter() == 0);
 		bool camMoved = !Mathf.Approximately (movementX, 0f);
@@ -212,7 +229,7 @@ public class MouseMovement : MonoBehaviour {
 	}
 
 	private void VerticalRotation()  {
-		float movementY = Input.GetAxisRaw ("Mouse Y") * sensitivityY * Time.deltaTime;
+		movementY = Mathf.MoveTowards(movementY, Input.GetAxisRaw ("Mouse Y") * sensitivityY * Time.deltaTime, 1.0f);
 		if (movementY > 180f)
 			movementY -= 360f;
 		else if (movementY < -180f)
@@ -226,12 +243,27 @@ public class MouseMovement : MonoBehaviour {
 			movementY = 2f - transform.rotation.eulerAngles.x;
 			total = movementY + transform.rotation.eulerAngles.x;
 		}
-		Vector3 axis = Vector3.Cross (transform.position - devHair.transform.position, Vector3.up);
-		transform.RotateAround (devHair.transform.position, axis, movementY);
 
-//		distance = initialOffset.magnitude * (25f + total) / 55f;
-		distance = initialOffset.magnitude * (35f + total) / 85f;
+		Vector3 axis;
+		bool wallCollisions = adjustToWalls (total);
+		if (wallCollisions) {
+			Debug.Log ("Collided");
+			total = 30f;
+			movementY = total - transform.rotation.eulerAngles.x;
+			axis = Vector3.Cross (transform.position - devHair.transform.position, Vector3.up);
+			transform.RotateAround (devHair.transform.position, axis, movementY);
+		}
+		else {
+			Debug.Log ("NOT");
+			axis = Vector3.Cross (transform.position - devHair.transform.position, Vector3.up);
+			transform.RotateAround (devHair.transform.position, axis, movementY);
+		}
 	}
+
+	private void VerticalRotationForWalls()  {
+	}
+
+
 	#endregion
 
 	#region Combat Camera
@@ -298,7 +330,7 @@ public class MouseMovement : MonoBehaviour {
 			Invoke("adjustToEnemy", 0.1f);
 		}
 		//rotate camera around character according to mouse input
-		float movementX = Input.GetAxisRaw ("Mouse X") * sensitivityX * Time.deltaTime;
+		movementX = Input.GetAxisRaw ("Mouse X") * sensitivityX * Time.deltaTime;
 		transform.RotateAround (player.transform.position, Vector3.up, movementX);
 	}
 
