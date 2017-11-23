@@ -361,18 +361,19 @@ void stopFootstepSound(){
 
 #region methods called by animation events
 void spawnFootDust(int doLeftFoot){
-	//ParticleSystem footDustParticle = (Instantiate(footDust, transform.position+(0.2f*transform.forward)-(0f*transform.up), transform.rotation)).GetComponent<ParticleSystem>();
-
-	ParticleSystem footDustParticle = null;
+	GameObject footDustClone = null;
 	Vector3 dustPos = Vector3.zero;
 	if (doLeftFoot==0) {
 		dustPos = leftFoot.position - (0.25f * leftFoot.right) - (0.2f * transform.forward) - (0.1f * transform.up);
 	} else {
 		dustPos = rightFoot.position + (0.25f * rightFoot.right) - (0.2f * transform.forward) - (0.1f * transform.up);
 	}
-	footDustParticle = (Instantiate (footDust, dustPos, transform.rotation)).GetComponent<ParticleSystem> ();
-	footDustParticle.Play ();
+	footDustClone = Instantiate (footDust, dustPos, transform.rotation);
+	footDustClone.GetComponent<ParticleSystem> ().Play ();
+
+	Destroy (footDustClone, 2.0f);
 }
+
 void onApplyTrans(){
 	applyJumpTrans = true;
 }
