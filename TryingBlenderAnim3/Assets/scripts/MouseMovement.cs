@@ -10,7 +10,6 @@ public class MouseMovement : MonoBehaviour {
 
 	public GameObject devHair;
 
-
 	private bool firstTimeAdjust, 
 				 jumping, 
 				 triggeredDraw,
@@ -29,7 +28,9 @@ public class MouseMovement : MonoBehaviour {
 				  combatExitTime,
 				  enemyLockOnStart,
 				  lastCombatTime,
-				  lastEnemyCheckTime;
+				  lastEnemyCheckTime,
+				  lastLineCastTime,
+				  lineCastPeriod;
 
 	private GameObject player, 
 					   closestEnemyObject;
@@ -59,6 +60,7 @@ public class MouseMovement : MonoBehaviour {
 		devCombatScript = player.GetComponent<DevCombat>();
 		closestEnemyObject = GameObject.Find ("Brute2");
 		haveDevCombatOffset = true;
+		lineCastPeriod = 1f;
 	}
 
 	private void Update(){
@@ -145,20 +147,26 @@ public class MouseMovement : MonoBehaviour {
 
 	#region NonCombatCamera
 
-	private bool adjustToWalls(float total){
-		float initDist = (initialOffset.magnitude * (35f + total) / 85f);
+	private bool adjustToWalls(float total, float movementY){
+		float desiredDist = (initialOffset.magnitude * (35f + total) / 85f);
+		Vector3 desiredOffset = (transform.position - player.transform.position).normalized * desiredDist;
+		Vector3 desiredCamPos = player.transform.position + desiredOffset;
+
+
 		RaycastHit hitInfo;
-		if (Physics.Linecast (transform.position, devHair.transform.position, out hitInfo) && !hitInfo.collider.transform.root.gameObject.name.Equals("DevDrake")
-			&& initDist > (distance - hitInfo.distance)) {
-
-			distance = (distance - hitInfo.distance);
+		bool didHit = Physics.Linecast (desiredCamPos, player.transform.position, out hitInfo) && !hitInfo.collider.transform.root.gameObject.name.Equals ("DevDrake");
+		float unblockedDist = didHit ? desiredDist - hitInfo.distance : 0f;
+		if (didHit) {
+			Debug.Log ("Collided");
+			if (Time.time - lastLineCastTime > lineCastPeriod) {
+				lastLineCastTime = Time.time;
+				distance = unblockedDist;
+			}		
 			return true;
-		} else {
-			distance = Mathf.MoveTowards(distance, initDist, 1.0f);
-			return false;
 		}
+		return false;
 	}
-
+		
 	private void HorizontalRotation(){
 		bool idle = devMovementScript.isIdle ();
 		movementX = Input.GetAxisRaw ("Mouse X") * sensitivityX * Time.deltaTime;
@@ -229,6 +237,14 @@ public class MouseMovement : MonoBehaviour {
 	}
 
 	private void VerticalRotation()  {
+		Vector3 axis;
+
+		if (adjustToWalls (transform.rotation.eulerAngles.x + movementY, movementY)) {
+			axis = Vector3.Cross (transform.position - devHair.transform.position, Vector3.up);
+			transform.RotateAround (devHair.transform.position, axis, 40f-transform.eulerAngles.x);
+			return;
+		}
+
 		movementY = Mathf.MoveTowards(movementY, Input.GetAxisRaw ("Mouse Y") * sensitivityY * Time.deltaTime, 1.0f);
 		if (movementY > 180f)
 			movementY -= 360f;
@@ -236,34 +252,19 @@ public class MouseMovement : MonoBehaviour {
 			movementY += 360f;
 
 		float total = movementY + transform.rotation.eulerAngles.x;
-		if (total > 30f) {
-			movementY = 30f - transform.rotation.eulerAngles.x;
+		if (total > 40f) {
+			movementY = 40f - transform.rotation.eulerAngles.x;
 			total = movementY + transform.rotation.eulerAngles.x;
 		} else if (total < 2f) {
 			movementY = 2f - transform.rotation.eulerAngles.x;
 			total = movementY + transform.rotation.eulerAngles.x;
 		}
 
-		Vector3 axis;
-		bool wallCollisions = adjustToWalls (total);
-		if (wallCollisions) {
-			Debug.Log ("Collided");
-			total = 30f;
-			movementY = total - transform.rotation.eulerAngles.x;
-			axis = Vector3.Cross (transform.position - devHair.transform.position, Vector3.up);
-			transform.RotateAround (devHair.transform.position, axis, movementY);
-		}
-		else {
-			Debug.Log ("NOT");
-			axis = Vector3.Cross (transform.position - devHair.transform.position, Vector3.up);
-			transform.RotateAround (devHair.transform.position, axis, movementY);
-		}
+		axis = Vector3.Cross (transform.position - devHair.transform.position, Vector3.up);
+		transform.RotateAround (devHair.transform.position, axis, movementY);
+		distance = Mathf.MoveTowards (distance, (initialOffset.magnitude * (35f + total) / 85f), 0.1f);
 	}
-
-	private void VerticalRotationForWalls()  {
-	}
-
-
+	
 	#endregion
 
 	#region Combat Camera
