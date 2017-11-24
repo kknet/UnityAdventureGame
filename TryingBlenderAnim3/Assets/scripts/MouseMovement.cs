@@ -148,7 +148,7 @@ public class MouseMovement : MonoBehaviour {
 	#region Non-Combat Camera
 
 	private bool adjustToWalls(float total, float movementY){
-		float desiredDist = (initialOffset.magnitude * (25f + total) / 85f);
+		float desiredDist = (initialOffset.magnitude*3) * (20f + total) / 110f;
 		Vector3 desiredOffset = (transform.position - devHair.transform.position).normalized * desiredDist;
 		Vector3 desiredCamPos = player.transform.position + desiredOffset;
 
@@ -170,7 +170,7 @@ public class MouseMovement : MonoBehaviour {
 
 		if (adjustToWalls (transform.rotation.eulerAngles.x + movementY, movementY)) {
 			axis = Vector3.Cross (transform.position - devHair.transform.position, Vector3.up);
-			transform.RotateAround (devHair.transform.position, axis, 40f-transform.eulerAngles.x);
+			transform.RotateAround (devHair.transform.position, axis, 30f-transform.eulerAngles.x);
 			return;
 		}
 
@@ -181,8 +181,8 @@ public class MouseMovement : MonoBehaviour {
 			movementY += 360f;
 
 		float total = movementY + transform.rotation.eulerAngles.x;
-		if (total > 40f) {
-			movementY = 40f - transform.rotation.eulerAngles.x;
+		if (total > 30f) {
+			movementY = 30f - transform.rotation.eulerAngles.x;
 			total = movementY + transform.rotation.eulerAngles.x;
 		} else if (total < 2f) {
 			movementY = 2f - transform.rotation.eulerAngles.x;
@@ -191,7 +191,7 @@ public class MouseMovement : MonoBehaviour {
 
 		axis = Vector3.Cross (transform.position - devHair.transform.position, Vector3.up);
 		transform.RotateAround (devHair.transform.position, axis, movementY);
-		distance = Mathf.MoveTowards (distance, (initialOffset.magnitude * (25f + total) / 85f), 0.1f);
+		distance = Mathf.MoveTowards (distance, ((initialOffset.magnitude*3) * (20f + total) / 110f), 0.1f);
 	}
 
 	private void HorizontalRotation(){
