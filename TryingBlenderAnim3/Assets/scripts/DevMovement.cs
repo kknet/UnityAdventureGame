@@ -366,7 +366,7 @@ void spawnFootDust(int doLeftFoot){
 	if (doLeftFoot==0) {
 		dustPos = leftFoot.position - (0.25f * leftFoot.right) - (0.2f * transform.forward) - (0.1f * transform.up);
 	} else {
-		dustPos = rightFoot.position + (0.25f * rightFoot.right) - (0.2f * transform.forward) - (0.1f * transform.up);
+		dustPos = rightFoot.position + (0.2f * rightFoot.right) - (0.25f * transform.forward) - (0.3f * transform.up);
 	}
 	footDustClone = Instantiate (footDust, dustPos, transform.rotation);
 	footDustClone.GetComponent<ParticleSystem> ().Play ();
