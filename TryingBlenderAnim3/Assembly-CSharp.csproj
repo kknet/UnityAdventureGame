@@ -173,6 +173,7 @@
      <Compile Include="Assets\torch\scene\script\Torchslider2.cs" />
      <Compile Include="Assets\torch\scripts\Torchelight.cs" />
      <Compile Include="Assets\TriggerFall.cs" />
+     <Compile Include="Assets\TriggerLedge.cs" />
      <None Include="Assets\PostProcessing\Resources\Shaders\DepthOfField.shader" />
      <None Include="Assets\Environment\NatureStarterKit2\Standard Assets\Effects\GlassRefraction\Shaders\GlassStainedBumpDistort.shader" />
      <None Include="Assets\Environment\NatureStarterKit2\Standard Assets\Effects\ImageEffects\Shaders\_BloomAndFlares\BlendOneOne.shader" />

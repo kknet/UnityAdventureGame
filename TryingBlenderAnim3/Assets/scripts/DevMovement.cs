@@ -395,6 +395,10 @@ void stopFrontFlip()
 }
 #endregion
 
+public void setHanging(){
+	myAnimator.SetBool ("hanging", true);
+}
+
 public void impactMoveBack(){
 	transform.Translate (Vector3.back * 0.5f * Time.deltaTime);
 }
