@@ -157,7 +157,7 @@ public class MouseMovement : MonoBehaviour {
 		bool didHit = Physics.Linecast (desiredCamPos, player.transform.position, out hitInfo) && !hitInfo.collider.transform.root.gameObject.name.Equals ("DevDrake");
 		float unblockedDist = didHit ? desiredDist - hitInfo.distance : 0f;
 		if (didHit) {
-			Debug.Log ("Collided");
+//			Debug.Log ("Collided");
 				lastLineCastTime = Time.time;
 				distance = unblockedDist * 0.5f;
 			return true;
