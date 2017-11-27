@@ -3,6 +3,8 @@ using UnityEngine;
 public class MouseMovement : MonoBehaviour {
 
 	#region globals
+	public bool CollisionZoomEnabled;
+
 	public float sensitivityX, 
 				 sensitivityY,
 				 movementY,
@@ -148,6 +150,9 @@ public class MouseMovement : MonoBehaviour {
 	#region Non-Combat Camera
 
 	private bool adjustToWalls(float total, float movementY){
+		if (!CollisionZoomEnabled)
+			return false;
+
 		float desiredDist = (initialOffset.magnitude*3) * (20f + total) / 110f;
 		Vector3 desiredOffset = (transform.position - devHair.transform.position).normalized * desiredDist;
 		Vector3 desiredCamPos = player.transform.position + desiredOffset;

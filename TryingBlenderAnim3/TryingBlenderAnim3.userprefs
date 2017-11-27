@@ -1,13 +1,13 @@
 ﻿<Properties StartupItem="Assembly-CSharp.csproj">
-  <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" />
-  <MonoDevelop.Ide.Workbench ActiveDocument="Assets\TriggerFall.cs">
+  <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" PreferredExecutionTarget="Unity.Instance.Unity Editor" />
+  <MonoDevelop.Ide.Workbench ActiveDocument="Assets\scripts\MouseMovement.cs">
     <Files>
       <File FileName="Assets\scripts\DevMovement.cs" Line="1" Column="1" />
-      <File FileName="Assets\scripts\MouseMovement.cs" Line="160" Column="29" />
+      <File FileName="Assets\scripts\MouseMovement.cs" Line="154" Column="17" />
       <File FileName="Assets\scripts\EnemyCombatReactions.cs" Line="1" Column="1" />
       <File FileName="Assets\DevCombatReactions.cs" Line="1" Column="1" />
       <File FileName="Assets\EnemyCombatAI.cs" Line="1" Column="1" />
-      <File FileName="Assets\TriggerFall.cs" Line="15" Column="26" />
+      <File FileName="Assets\TriggerFall.cs" Line="1" Column="1" />
     </Files>
   </MonoDevelop.Ide.Workbench>
   <MonoDevelop.Ide.DebuggingService.Breakpoints>
