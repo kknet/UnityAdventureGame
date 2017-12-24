@@ -472,6 +472,15 @@ public bool turning(){
 private bool camRotChanged(){
 	return !Mathf.Approximately (Camera.main.transform.eulerAngles.y, desiredRot);
 }
+
+public bool isDropToFreehang(){
+	AnimatorStateInfo anim = myAnimator.GetCurrentAnimatorStateInfo (0);
+	return anim.IsName ("Drop To Freehang");
+}
+
+public bool isHanging(){
+	return myAnimator.GetBool ("hanging");
+}
 #endregion
 
 #region getters
