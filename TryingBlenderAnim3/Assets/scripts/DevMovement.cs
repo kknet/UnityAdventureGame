@@ -5,7 +5,8 @@ using UnityEngine;
 public class DevMovement : MonoBehaviour {
 
 #region imports you don't need to worry about
-public bool doPathfinding;
+public bool doPathfinding,
+			hangDrop;
 
 public GameObject footDust;
 public Transform leftFoot, rightFoot;
@@ -360,6 +361,18 @@ void stopFootstepSound(){
 #endregion
 
 #region methods called by animation events
+//0:17 or 17
+public void startHangDrop(){
+	hangDrop = true;
+}
+
+//1:09 or 69
+//69-17 = 52 = duration
+public void finishHangDrop(){
+//	hangDrop = false;
+}
+
+
 void spawnFootDust(int doLeftFoot){
 	GameObject footDustClone = null;
 	Vector3 dustPos = Vector3.zero;

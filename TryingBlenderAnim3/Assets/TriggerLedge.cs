@@ -7,6 +7,7 @@ public class TriggerLedge : MonoBehaviour {
 	public GameObject dev;
 	public DevMovement devMovementScript;
 	private GameObject offsetCorrector;
+//	private float duration = 52;
 
 	void Start(){
 		dev = GameObject.Find ("DevDrake");
@@ -15,12 +16,16 @@ public class TriggerLedge : MonoBehaviour {
 	}
 
 	void Update(){
-//		if (devMovementScript.isHanging()) {
-//			Vector3 goalPos = new Vector3 (offsetCorrector.transform.position.x, dev.transform.position.y, dev.transform.position.z); 
-//			Debug.Log (goalPos + " " + dev.transform.position);
-//			dev.transform.position = Vector3.Lerp (dev.transform.position, goalPos, 0.01f);
-//
-//		}
+		if (devMovementScript.hangDrop) {
+			StartCoroutine (doHangDrop());
+		}
+	}
+
+	IEnumerator doHangDrop(){
+		yield return null;
+		Vector3 goalPos = new Vector3 (offsetCorrector.transform.position.x, offsetCorrector.transform.position.y, dev.transform.position.z); 
+		Debug.Log (goalPos + " " + dev.transform.position);
+		dev.transform.position = Vector3.Lerp (dev.transform.position, goalPos, 0.05f);
 	}
 
 	void OnTriggerStay(Collider other){
