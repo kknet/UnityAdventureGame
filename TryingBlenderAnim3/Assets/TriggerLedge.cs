@@ -75,8 +75,8 @@ public class TriggerLedge : MonoBehaviour {
 
 	void OnTriggerEnter(Collider other){
 		if (other.gameObject.transform.root.gameObject.name.Equals("DevDrake")) {
+			devMovementScript.hangDropStage = 0;
 			devMovementScript.isInHangDrop = true;
-			dev.GetComponent<Animator> ().CrossFade ("Drop To Freehang Start", 0.1f);
 //			devMovementScript.setHanging ();
 //			StartCoroutine(doHangStart());
 		}

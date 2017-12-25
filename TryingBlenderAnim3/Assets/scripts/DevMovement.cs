@@ -9,6 +9,8 @@ public bool doPathfinding,
 			hangDrop,
 			isInHangDrop;
 
+public int hangDropStage;
+
 public GameObject footDust;
 public Transform leftFoot, rightFoot;
 
@@ -67,8 +69,20 @@ public void Start () {
 }
 
 void Update () {
-	if (isInHangDrop)
-		return;
+		if (isInHangDrop) {
+			if (hangDropStage == 0) {
+				myAnimator.SetFloat ("VSpeed", Mathf.MoveTowards (myAnimator.GetFloat ("VSpeed"), 0f, 0.2f)); 
+				myAnimator.SetFloat ("HorizSpeed", Mathf.MoveTowards (myAnimator.GetFloat ("HorizSpeed"), 0f, 0.2f)); 
+				if (Mathf.Approximately (myAnimator.GetFloat ("VSpeed"), 0f) && Mathf.Approximately (myAnimator.GetFloat ("HorizSpeed"), 0f)) {
+					++hangDropStage;
+				}
+			}
+			if (hangDropStage == 1){	
+				myAnimator.CrossFade ("Drop To Freehang Start", 0.05f);
+				++hangDropStage;
+			}
+			return;
+		}
 
 	if(doPathfinding)
 		setDevCell ();

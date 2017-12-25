@@ -207,8 +207,9 @@ public class MouseMovement : MonoBehaviour {
 		bool camMoved = !Mathf.Approximately (movementX, 0f);
 		AnimatorStateInfo anim = myAnimator.GetCurrentAnimatorStateInfo (0);
 		bool jumping = anim.IsTag("Jumps");
+		bool hanging = myAnimator.GetBool ("hanging");
 
-		if (combating || idle || jumping) {
+		if (combating || idle || jumping || hanging) {
 			transform.RotateAround (player.transform.position + new Vector3(0.0f, 3.0f, 0.0f), Vector3.up, movementX);
 			firstTimeAdjust = true;
 			return;
