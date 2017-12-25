@@ -133,7 +133,7 @@ ModelImporter:
     4300010: Bottoms
     4300012: Hair
     4300014: Tops
-    7400000: Drop To Freehang
+    7400000: Drop To Freehang Start
     9500000: //RootNode
     13700000: Body
     13700002: Bottoms
@@ -201,7 +201,7 @@ ModelImporter:
     extraUserProperties: []
     clipAnimations:
     - serializedVersion: 16
-      name: Drop To Freehang
+      name: Drop To Freehang Start
       takeName: mixamo.com
       firstFrame: 0
       lastFrame: 72
@@ -214,7 +214,7 @@ ModelImporter:
       loopTime: 0
       loopBlend: 0
       loopBlendOrientation: 1
-      loopBlendPositionY: 0
+      loopBlendPositionY: 1
       loopBlendPositionXZ: 1
       keepOriginalOrientation: 1
       keepOriginalPositionY: 0
@@ -224,7 +224,7 @@ ModelImporter:
       bodyMask: 01000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000
       curves: []
       events:
-      - time: 0.24791291
+      - time: 0.41872036
         functionName: startHangDrop
         data: 
         objectReferenceParameter: {instanceID: 0}

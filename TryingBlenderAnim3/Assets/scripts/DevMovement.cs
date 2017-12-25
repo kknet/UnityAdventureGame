@@ -6,7 +6,8 @@ public class DevMovement : MonoBehaviour {
 
 #region imports you don't need to worry about
 public bool doPathfinding,
-			hangDrop;
+			hangDrop,
+			isInHangDrop;
 
 public GameObject footDust;
 public Transform leftFoot, rightFoot;
@@ -66,6 +67,9 @@ public void Start () {
 }
 
 void Update () {
+	if (isInHangDrop)
+		return;
+
 	if(doPathfinding)
 		setDevCell ();
 	
@@ -76,6 +80,7 @@ void Update () {
 		impactMoveBack ();
 	if (rolling ())
 		transform.Translate (Vector3.forward * Time.deltaTime * rollDistanceMultiplier);
+
 
 	moveCharacter ();
 
