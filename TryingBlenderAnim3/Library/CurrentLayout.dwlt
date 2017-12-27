@@ -106,10 +106,10 @@ MonoBehaviour:
     y: 30
     width: 1280
     height: 932
-  m_MinSize: {x: 507, y: 492}
-  m_MaxSize: {x: 14002, y: 14042}
+  m_MinSize: {x: 509, y: 492}
+  m_MaxSize: {x: 14004, y: 14042}
   vertical: 0
-  controlID: 355
+  controlID: 1404
 --- !u!114 &6
 MonoBehaviour:
   m_ObjectHideFlags: 52
@@ -133,7 +133,7 @@ MonoBehaviour:
   m_MinSize: {x: 232, y: 492}
   m_MaxSize: {x: 10002, y: 14042}
   vertical: 1
-  controlID: 356
+  controlID: 1405
 --- !u!114 &7
 MonoBehaviour:
   m_ObjectHideFlags: 52
@@ -161,7 +161,7 @@ MonoBehaviour:
   - {fileID: 12}
   - {fileID: 13}
   m_Selected: 1
-  m_LastSelected: 3
+  m_LastSelected: 2
 --- !u!114 &8
 MonoBehaviour:
   m_ObjectHideFlags: 52
@@ -188,7 +188,7 @@ MonoBehaviour:
   - {fileID: 15}
   - {fileID: 16}
   m_Selected: 1
-  m_LastSelected: 2
+  m_LastSelected: 0
 --- !u!114 &9
 MonoBehaviour:
   m_ObjectHideFlags: 52
@@ -428,14 +428,14 @@ MonoBehaviour:
     - {fileID: 1107435292077171328, guid: 9ea4f799bd9a9dd49b201833f1096038, type: 2}
     - {fileID: 1102098222659713398, guid: 9ea4f799bd9a9dd49b201833f1096038, type: 2}
     m_ValueSerializationHelper:
-    - e00: 0.5949248
+    - e00: 0.98331946
       e01: 0
       e02: 0
-      e03: -127.78195
+      e03: -367.35992
       e10: 0
-      e11: 0.5949248
+      e11: 0.98331946
       e12: 0
-      e13: 287.60104
+      e13: 319.8634
       e20: 0
       e21: 0
       e22: 1
@@ -518,7 +518,7 @@ MonoBehaviour:
   m_PersistentViewDataDictionary: {fileID: 0}
   m_TreeViewState:
     scrollPos: {x: 0, y: 0}
-    m_SelectedIDs: 
+    m_SelectedIDs: b2770000
     m_LastClickedID: 0
     m_ExpandedIDs: 9efbffff00000000
     m_RenameOverlay:
@@ -674,7 +674,7 @@ MonoBehaviour:
       m_Icon: {fileID: 0}
       m_ResourceFile: 
     m_NewAssetIndexInList: -1
-    m_ScrollPosition: {x: 0, y: 176}
+    m_ScrollPosition: {x: 0, y: 269}
     m_GridSize: 64
   m_DirectoriesAreaWidth: 115
 --- !u!114 &16

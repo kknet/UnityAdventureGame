@@ -515,7 +515,9 @@ public bool isDropToFreehang(){
 }
 
 public bool isHanging(){
-	return myAnimator.GetBool ("hanging");
+	AnimatorStateInfo anim = myAnimator.GetCurrentAnimatorStateInfo (0);
+	return anim.IsName ("Drop To Freehang Start") || anim.IsName ("Hanging Idle") || 
+		anim.IsName ("Left Shimmy") || anim.IsName ("Right Shimmy") || anim.IsName ("Freehang Climb");
 }
 #endregion
 
