@@ -71,14 +71,18 @@ public void Start () {
 void Update () {
 		if (isInHangDrop) {
 			if (hangDropStage == 0) {
-				myAnimator.SetFloat ("VSpeed", Mathf.MoveTowards (myAnimator.GetFloat ("VSpeed"), 0f, 0.2f)); 
-				myAnimator.SetFloat ("HorizSpeed", Mathf.MoveTowards (myAnimator.GetFloat ("HorizSpeed"), 0f, 0.2f)); 
+//				myAnimator.SetFloat ("VSpeed", 0f); 
+//				myAnimator.SetFloat ("HorizSpeed", 0f); 
+//				++hangDropStage;
+
+				myAnimator.SetFloat ("VSpeed", Mathf.MoveTowards (myAnimator.GetFloat ("VSpeed"), 0f, 4.0f*Time.deltaTime)); 
+				myAnimator.SetFloat ("HorizSpeed", Mathf.MoveTowards (myAnimator.GetFloat ("HorizSpeed"), 0f, 4.0f*Time.deltaTime)); 
 				if (Mathf.Approximately (myAnimator.GetFloat ("VSpeed"), 0f) && Mathf.Approximately (myAnimator.GetFloat ("HorizSpeed"), 0f)) {
 					++hangDropStage;
 				}
 			}
 			if (hangDropStage == 1){	
-				myAnimator.CrossFade ("Drop To Freehang Start", 0.05f);
+				myAnimator.CrossFade ("Drop To Freehang Start", 0.1f);
 				++hangDropStage;
 			}
 			return;
