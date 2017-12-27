@@ -2,13 +2,13 @@
   <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" PreferredExecutionTarget="Unity.Instance.Unity Editor" />
   <MonoDevelop.Ide.Workbench ActiveDocument="Assets\scripts\DevMovement.cs">
     <Files>
-      <File FileName="Assets\scripts\DevMovement.cs" Line="80" Column="29" />
-      <File FileName="Assets\scripts\MouseMovement.cs" Line="212" Column="49" />
+      <File FileName="Assets\scripts\DevMovement.cs" Line="99" Column="4" />
+      <File FileName="Assets\scripts\MouseMovement.cs" Line="1" Column="1" />
       <File FileName="Assets\scripts\EnemyCombatReactions.cs" Line="1" Column="1" />
       <File FileName="Assets\DevCombatReactions.cs" Line="1" Column="1" />
       <File FileName="Assets\EnemyCombatAI.cs" Line="1" Column="1" />
       <File FileName="Assets\TriggerFall.cs" Line="1" Column="1" />
-      <File FileName="Assets\TriggerLedge.cs" Line="79" Column="42" />
+      <File FileName="Assets\TriggerLedge.cs" Line="16" Column="70" />
     </Files>
   </MonoDevelop.Ide.Workbench>
   <MonoDevelop.Ide.DebuggingService.Breakpoints>

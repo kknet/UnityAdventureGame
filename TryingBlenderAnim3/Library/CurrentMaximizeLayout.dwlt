@@ -20,10 +20,10 @@ MonoBehaviour:
     y: 30
     width: 1280
     height: 932
-  m_MinSize: {x: 509, y: 492}
-  m_MaxSize: {x: 14004, y: 14042}
+  m_MinSize: {x: 477, y: 342}
+  m_MaxSize: {x: 8002, y: 8042}
   vertical: 0
-  controlID: 1243
+  controlID: 18744
 --- !u!114 &2
 MonoBehaviour:
   m_ObjectHideFlags: 52
@@ -121,10 +121,10 @@ MonoBehaviour:
     y: 0
     width: 886
     height: 932
-  m_MinSize: {x: 232, y: 492}
-  m_MaxSize: {x: 10002, y: 14042}
+  m_MinSize: {x: 202, y: 342}
+  m_MaxSize: {x: 4002, y: 8042}
   vertical: 1
-  controlID: 1244
+  controlID: 18745
 --- !u!114 &4
 MonoBehaviour:
   m_ObjectHideFlags: 52
@@ -290,14 +290,14 @@ MonoBehaviour:
     - {fileID: 1107435292077171328, guid: 9ea4f799bd9a9dd49b201833f1096038, type: 2}
     - {fileID: 1102098222659713398, guid: 9ea4f799bd9a9dd49b201833f1096038, type: 2}
     m_ValueSerializationHelper:
-    - e00: 0.98331946
+    - e00: 0.5949248
       e01: 0
       e02: 0
-      e03: -367.35992
+      e03: -62.781963
       e10: 0
-      e11: 0.98331946
+      e11: 0.5949248
       e12: 0
-      e13: 319.8634
+      e13: 287.60104
       e20: 0
       e21: 0
       e22: 1
@@ -376,14 +376,14 @@ MonoBehaviour:
     y: 608
     width: 886
     height: 324
-  m_MinSize: {x: 232, y: 271}
-  m_MaxSize: {x: 10002, y: 10021}
-  m_ActualView: {fileID: 10}
+  m_MinSize: {x: 102, y: 121}
+  m_MaxSize: {x: 4002, y: 4021}
+  m_ActualView: {fileID: 11}
   m_Panes:
   - {fileID: 9}
   - {fileID: 10}
   - {fileID: 11}
-  m_Selected: 1
+  m_Selected: 2
   m_LastSelected: 0
 --- !u!114 &9
 MonoBehaviour:
@@ -414,9 +414,9 @@ MonoBehaviour:
   m_PersistentViewDataDictionary: {fileID: 0}
   m_TreeViewState:
     scrollPos: {x: 0, y: 0}
-    m_SelectedIDs: b2770000
+    m_SelectedIDs: ba2a0000
     m_LastClickedID: 0
-    m_ExpandedIDs: 9efbffff00000000
+    m_ExpandedIDs: a0f6ffff00000000
     m_RenameOverlay:
       m_UserAcceptedRename: 0
       m_Name: 
@@ -487,10 +487,10 @@ MonoBehaviour:
   m_LastProjectPath: C:\Users\rsa\Documents\GitHub\UnityAdventureGame\UnityAdventureGame\TryingBlenderAnim3
   m_IsLocked: 0
   m_FolderTreeState:
-    scrollPos: {x: 0, y: 169}
-    m_SelectedIDs: a45e0000
-    m_LastClickedID: 24228
-    m_ExpandedIDs: 00000000022a0000262e00001c3000002a3400003e35000042350000b63900007640000088400000a640000008420000b0490000f850000018530000365400003c55000050590000e85a0000285c0000665c000018620000a6640000ee650000bc680000406900004e6b0000d46b0000f0770000f2770000f477000000ca9a3bffffff7f
+    scrollPos: {x: 0, y: 111}
+    m_SelectedIDs: 64600000
+    m_LastClickedID: 24676
+    m_ExpandedIDs: 00000000ce2b0000f02f0000e6310000f63500000a3700000e3700007c3b00003c4200004e4200006c420000ca430000744b0000b6520000d6540000f4550000fa560000105b0000a65c0000e65d0000245e0000d663000064660000a86700006e6a0000f26a0000026d0000826d0000cc780000ce780000d078000000ca9a3bffffff7f
     m_RenameOverlay:
       m_UserAcceptedRename: 0
       m_Name: 
@@ -518,7 +518,7 @@ MonoBehaviour:
     scrollPos: {x: 0, y: 0}
     m_SelectedIDs: 
     m_LastClickedID: 0
-    m_ExpandedIDs: 00000000022a0000262e00001c3000002a3400003e35000042350000b63900007640000088400000a640000008420000b0490000f850000018530000365400003c55000050590000e85a0000285c0000665c000018620000a6640000ee650000bc680000406900004e6b0000d46b0000f0770000f2770000f477000000ca9a3bffffff7f
+    m_ExpandedIDs: 00000000ce2b0000f02f0000e6310000f63500000a3700000e3700007c3b00003c4200004e4200006c420000ca430000744b0000b6520000d6540000f4550000fa560000105b0000a65c0000e65d0000245e0000d663000064660000a86700006e6a0000f26a0000026d0000826d0000cc780000ce780000d078000000ca9a3bffffff7f
     m_RenameOverlay:
       m_UserAcceptedRename: 0
       m_Name: 
@@ -543,9 +543,9 @@ MonoBehaviour:
       m_Icon: {fileID: 0}
       m_ResourceFile: 
   m_ListAreaState:
-    m_SelectedInstanceIDs: b2770000
-    m_LastClickedInstanceID: 30642
-    m_HadKeyboardFocusLastEvent: 0
+    m_SelectedInstanceIDs: ba2a0000
+    m_LastClickedInstanceID: 10938
+    m_HadKeyboardFocusLastEvent: 1
     m_ExpandedInstanceIDs: 
     m_RenameOverlay:
       m_UserAcceptedRename: 0
@@ -570,7 +570,7 @@ MonoBehaviour:
       m_Icon: {fileID: 0}
       m_ResourceFile: 
     m_NewAssetIndexInList: -1
-    m_ScrollPosition: {x: 0, y: 269}
+    m_ScrollPosition: {x: 0, y: 317}
     m_GridSize: 64
   m_DirectoriesAreaWidth: 115
 --- !u!114 &11
@@ -618,8 +618,8 @@ MonoBehaviour:
     y: 0
     width: 394
     height: 932
-  m_MinSize: {x: 277, y: 71}
-  m_MaxSize: {x: 4002, y: 4021}
+  m_MinSize: {x: 275, y: 50}
+  m_MaxSize: {x: 4000, y: 4000}
   m_ActualView: {fileID: 13}
   m_Panes:
   - {fileID: 13}

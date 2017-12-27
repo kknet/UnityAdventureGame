@@ -75,15 +75,25 @@ void Update () {
 //				myAnimator.SetFloat ("HorizSpeed", 0f); 
 //				++hangDropStage;
 
-				myAnimator.SetFloat ("VSpeed", Mathf.MoveTowards (myAnimator.GetFloat ("VSpeed"), 0f, 4.0f*Time.deltaTime)); 
-				myAnimator.SetFloat ("HorizSpeed", Mathf.MoveTowards (myAnimator.GetFloat ("HorizSpeed"), 0f, 4.0f*Time.deltaTime)); 
+				myAnimator.SetFloat ("VSpeed", Mathf.MoveTowards (myAnimator.GetFloat ("VSpeed"), 0f, 4.0f * Time.deltaTime)); 
+				myAnimator.SetFloat ("HorizSpeed", Mathf.MoveTowards (myAnimator.GetFloat ("HorizSpeed"), 0f, 4.0f * Time.deltaTime)); 
 				if (Mathf.Approximately (myAnimator.GetFloat ("VSpeed"), 0f) && Mathf.Approximately (myAnimator.GetFloat ("HorizSpeed"), 0f)) {
 					++hangDropStage;
 				}
 			}
-			if (hangDropStage == 1){	
+			if (hangDropStage == 1) {	
 				myAnimator.CrossFade ("Drop To Freehang Start", 0.1f);
 				++hangDropStage;
+				isInHangDrop = false;
+			}
+			return;
+		} else if(isHanging()){
+			if (Input.GetKeyDown (KeyCode.D) || Input.GetKey (KeyCode.D)) {
+				myAnimator.SetBool ("shimmyRight", true);
+				myAnimator.SetBool ("shimmyLeft", false);
+			} else if (Input.GetKeyDown (KeyCode.A) || Input.GetKey (KeyCode.A)) {
+				myAnimator.SetBool ("shimmyRight", false);
+				myAnimator.SetBool ("shimmyLeft", true);
 			}
 			return;
 		}
@@ -519,6 +529,7 @@ public bool isHanging(){
 	return anim.IsName ("Drop To Freehang Start") || anim.IsName ("Hanging Idle") || 
 		anim.IsName ("Left Shimmy") || anim.IsName ("Right Shimmy") || anim.IsName ("Freehang Climb");
 }
+
 #endregion
 
 #region getters
