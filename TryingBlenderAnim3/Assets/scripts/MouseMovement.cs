@@ -66,11 +66,19 @@ public class MouseMovement : MonoBehaviour {
 	}
 
 	private void Update(){
-		transform.position = devHair.transform.position + currentOffset;
 
 		//GET NEAREST ENEMY DOESN'T EXACTLY WORK!
 		//		getNearestEnemy (); 
 
+		if (!devMovementScript.doCombat) {
+			transform.position = devHair.transform.position + currentOffset;
+			inCombatZone = false;
+			closestEnemy = Vector3.zero;
+			VerticalRotation ();
+			HorizontalRotation ();		
+			currentOffset = (transform.position - devHair.transform.position).normalized * distance;
+			return;
+		}
 
 		if(closestEnemyObject)
 			closestEnemy = closestEnemyObject.transform.position;
@@ -202,14 +210,13 @@ public class MouseMovement : MonoBehaviour {
 	private void HorizontalRotation(){
 		bool idle = devMovementScript.isIdle ();
 		movementX = Input.GetAxisRaw ("Mouse X") * sensitivityX * Time.deltaTime;
-		bool combating = !devCombatScript.notInCombatMove ();
 		bool counterZero = (devMovementScript.getAdjustCounter() == 0);
 		bool camMoved = !Mathf.Approximately (movementX, 0f);
 		AnimatorStateInfo anim = myAnimator.GetCurrentAnimatorStateInfo (0);
 		bool jumping = anim.IsTag("Jumps");
 		bool hanging = myAnimator.GetBool ("hanging");
 
-		if (combating || idle || jumping || hanging) {
+		if (idle || jumping || hanging) {
 			transform.RotateAround (player.transform.position + new Vector3(0.0f, 3.0f, 0.0f), Vector3.up, movementX);
 			firstTimeAdjust = true;
 			return;

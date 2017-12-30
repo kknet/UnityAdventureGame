@@ -11,6 +11,8 @@ public class DevCombatReactions : MonoBehaviour {
 	private Animator myAnimator;
 	private float maxHealth;
 
+	private bool doCombat;
+
 	private Color green, yellow, red;
 
 	private string[] reactAnimations = {
@@ -47,6 +49,9 @@ public class DevCombatReactions : MonoBehaviour {
 
 	// Use this for initialization
 	void Start () {
+		doCombat = GetComponent<DevMovement> ().doCombat;
+		if (!doCombat)
+			return;
 		myAnimator = this.gameObject.GetComponent<Animator> ();
 		dev = GameObject.Find ("DevDrake");
 		maxHealth = health;
@@ -69,6 +74,8 @@ public class DevCombatReactions : MonoBehaviour {
 
 	// Update is called once per frame
 	void Update () {
+		if (!doCombat)
+			return;
 		if (health <= 0) {
 			myAnimator.SetBool ("Dead", true);
 		}

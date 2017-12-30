@@ -70,6 +70,7 @@ public class EnemyAI : MonoBehaviour {
 			repathAll ();
 
 		doneStarting = true;
+//		doPathfinding = Dev.GetComponent<DevMovement> ().doPathfinding;
 	}
 
 	public mapNode getDevCell(){
@@ -121,7 +122,7 @@ public class EnemyAI : MonoBehaviour {
 		//		if (GetComponent<ManageHealth> ().isDead ())
 		//			this.gameObject.SetActive (false);
 		moveToDev ();
-
+		Debug.Log ("Got here");
 	}
 		
 	//keep track of this agent's current location

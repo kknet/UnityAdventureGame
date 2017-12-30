@@ -7,7 +7,8 @@ public class DevMovement : MonoBehaviour {
 #region imports you don't need to worry about
 public bool doPathfinding,
 			hangDrop,
-			isInHangDrop;
+			isInHangDrop,
+			doCombat;
 
 public int hangDropStage;
 
@@ -71,10 +72,6 @@ public void Start () {
 void Update () {
 		if (isInHangDrop) {
 			if (hangDropStage == 0) {
-//				myAnimator.SetFloat ("VSpeed", 0f); 
-//				myAnimator.SetFloat ("HorizSpeed", 0f); 
-//				++hangDropStage;
-
 				myAnimator.SetFloat ("VSpeed", Mathf.MoveTowards (myAnimator.GetFloat ("VSpeed"), 0f, 4.0f * Time.deltaTime)); 
 				myAnimator.SetFloat ("HorizSpeed", Mathf.MoveTowards (myAnimator.GetFloat ("HorizSpeed"), 0f, 4.0f * Time.deltaTime)); 
 				if (Mathf.Approximately (myAnimator.GetFloat ("VSpeed"), 0f) && Mathf.Approximately (myAnimator.GetFloat ("HorizSpeed"), 0f)) {
@@ -153,6 +150,11 @@ void Update () {
 
 #region Non-combat and Combat Movement
 private void moveCharacter(){
+	if (!doCombat) {
+		nonCombatMovement ();
+		return;
+	}
+
 	bool inCombatZone = mouseMovementScript.getInCombatZone();
 	bool weaponDrawn = myAnimator.GetBool ("WeaponDrawn");
 	bool inCombatMove = !devCombatScript.notInCombatMove ();
@@ -163,8 +165,6 @@ private void moveCharacter(){
 		if (inCombatZone && weaponDrawn && !jumping ()) {
 			combatMovement ();
 		} else {
-			//			Debug.LogError ("Not in combat movement");
-			//			mouseMovementScript.setInCombatZone(false);
 			nonCombatMovement ();
 		}
 	}

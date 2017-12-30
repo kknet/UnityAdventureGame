@@ -35,6 +35,8 @@ public class DevCombat : MonoBehaviour {
 	};
 
 	void Start () {
+		if (!GetComponent<DevMovement> ().doCombat)
+			return;
 		devCombatReactionsScript = GetComponent<DevCombatReactions> ();
 		myAnimator = GetComponent<Animator>();
 		cam = Camera.main;
@@ -50,6 +52,8 @@ public class DevCombat : MonoBehaviour {
 		jumpAttackStartingOffset = 3.7f;
 	}
 	void Update () {
+		if (!GetComponent<DevMovement> ().doCombat)
+			return;
 		handleAttacking ();
 		handleInput ();
 	}
