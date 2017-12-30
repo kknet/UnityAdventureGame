@@ -14,16 +14,19 @@ public class EnemyMain : MonoBehaviour {
 
 	// Use this for initialization
 	public void Init () {
-		enemyAI = GetComponent<EnemyAI> ();
-		manageHealth = GetComponent<ManageHealth> ();
-		aStarMovement = GetComponent<AStarMovement> ();
-		enemyCombatAI = GetComponent<EnemyCombatAI> ();
-		enemyCombatReactions = GetComponent<EnemyCombatReactions> ();
-
-		enemyAI.Init ();
-		aStarMovement.Init ();
-		enemyCombatAI.Init ();
-		enemyCombatReactions.Init ();
+		if (doPathfinding) {
+			enemyAI = GetComponent<EnemyAI> ();
+			aStarMovement = GetComponent<AStarMovement> ();
+			enemyAI.Init ();
+			aStarMovement.Init ();
+		}
+		if (doCombat) {
+			manageHealth = GetComponent<ManageHealth> ();
+			enemyCombatAI = GetComponent<EnemyCombatAI> ();
+			enemyCombatReactions = GetComponent<EnemyCombatReactions> ();
+			enemyCombatAI.Init ();
+			enemyCombatReactions.Init ();
+		}
 	}
 
 	public void initCell(){
