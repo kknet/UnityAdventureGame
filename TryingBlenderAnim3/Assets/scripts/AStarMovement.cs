@@ -19,7 +19,7 @@ public class AStarMovement : MonoBehaviour {
 	GameObject terrain;
 	public bool doneStarting = false;
 
-	public void Start(){
+	public void Init(){
 		terrain = GameObject.Find ("Terrain");
 		numNodesPerSide = terrain.GetComponent<MapPathfind> ().nodesPerSide;
 		enemyID = GetComponent<EnemyAI> ().enemyID;
@@ -45,8 +45,10 @@ public class AStarMovement : MonoBehaviour {
 		terrain.GetComponent<MapPathfind> ().markSpots ();
 
 		List<mapNode> walkableNodes = new List<mapNode> ();
-		if (terrain == null)
-			Start ();
+		if (terrain == null) {
+			Debug.LogAssertion ("Messed up");
+//			Init ();
+		}
 //		else if (terrain.GetComponent<MapPathfind> () == null)
 //			Debug.LogError ("mapPathfind is null");
 //		else if (terrain.GetComponent<MapPathfind>().grid == null)

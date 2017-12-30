@@ -24,7 +24,7 @@ public class EnemyCombatAI : MonoBehaviour {
 
 	#endregion
 	// Use this for initialization
-	void Start () {
+	public void Init () {
 		enemyAnim = this.gameObject.GetComponent<Animator> ();
 		dev = GameObject.Find ("DevDrake");
 		enemyAnim.SetBool ("enemyBlock", setBlocking);
@@ -38,7 +38,7 @@ public class EnemyCombatAI : MonoBehaviour {
 	}
 
 	// Update is called once per frame
-	void Update () {
+	public void FrameUpdate () {
 		handleTestingInput ();
 
 		if(setLookAtDev && !notInCombatMove())

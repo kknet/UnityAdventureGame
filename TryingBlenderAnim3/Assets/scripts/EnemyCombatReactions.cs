@@ -11,10 +11,6 @@ public class EnemyCombatReactions : MonoBehaviour {
 	private float maxHealth;
 	private GameObject dev;
 	private Animator enemyAnim;
-
-	private bool doCombat = true;
-
-
 	private string[] reactAnimations = {
 		"standing_react_large_from_right",
 		"standing_react_large_from_left",
@@ -44,19 +40,14 @@ public class EnemyCombatReactions : MonoBehaviour {
 	};
 		
 	// Use this for initialization
-	void Start () {
-		doCombat = GameObject.Find("DevDrake").GetComponent<DevMovement> ().doCombat;
-		if (!doCombat)
-			return;
+	public void Init () {
 		enemyAnim = this.gameObject.GetComponent<Animator> ();
 		dev = GameObject.Find ("DevDrake");
 		maxHealth = health;
 	}
 	
 	// Update is called once per frame
-	void Update () {
-		if (!doCombat)
-			return;
+	public void FrameUpdate () {
 		if (health <= 0) {
 			enemyAnim.SetBool ("Dead", true);
 		}

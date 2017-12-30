@@ -48,7 +48,7 @@ public class MouseMovement : MonoBehaviour {
 	#endregion
 
 	#region Start and Update
-	private void Start () {
+	public void Init () {
 		player = GameObject.Find ("DevDrake");
 		if(player == null) {
 			Debug.LogError ("Assign a player for the camera in Unity's inspector");
@@ -65,7 +65,7 @@ public class MouseMovement : MonoBehaviour {
 		lineCastPeriod = 1f;
 	}
 
-	private void Update(){
+	public void FrameUpdate(){
 
 		//GET NEAREST ENEMY DOESN'T EXACTLY WORK!
 		//		getNearestEnemy (); 

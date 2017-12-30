@@ -10,7 +10,7 @@ public class ClosestNodes : MonoBehaviour {
 	public bool makingNewPaths = false;
 	public bool doneStarting = false;
 
-	public void Start(){
+	public void Init(){
 		terrain = GameObject.Find ("Terrain");
 		Dev = GameObject.Find ("DevDrake");
 		doneStarting = true;

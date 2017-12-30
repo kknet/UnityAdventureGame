@@ -34,7 +34,7 @@ public class DevCombat : MonoBehaviour {
 		quick
 	};
 
-	void Start () {
+	public void Init () {
 		if (!GetComponent<DevMovement> ().doCombat)
 			return;
 		devCombatReactionsScript = GetComponent<DevCombatReactions> ();
@@ -51,7 +51,7 @@ public class DevCombat : MonoBehaviour {
 		twoButtonPressTimeMax = 0.1f;
 		jumpAttackStartingOffset = 3.7f;
 	}
-	void Update () {
+	public void FrameUpdate () {
 		if (!GetComponent<DevMovement> ().doCombat)
 			return;
 		handleAttacking ();

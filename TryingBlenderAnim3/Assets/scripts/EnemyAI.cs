@@ -37,7 +37,7 @@ public class EnemyAI : MonoBehaviour {
 	public bool doPathfinding;
 
 	// Use this for initialization
-	void Start () {
+	public void Init () {
 		doneStarting = false;
 		terrain = GameObject.Find ("Terrain");
 		inPosition = false;
@@ -46,37 +46,31 @@ public class EnemyAI : MonoBehaviour {
 		rotSpeed = 12f;
 		moveSpeed = 4f;
 
-		if (!terrain.GetComponent<MapPathfind>().doneBuilding) {
-			terrain.GetComponent<MapPathfind> ().Start ();
-		}
-		if (!terrain.GetComponent<ClosestNodes>().doneStarting) {
-			terrain.GetComponent<ClosestNodes>().Start ();
-		}
-		GetComponent<AStarMovement> ().Start ();
 		start = terrain.GetComponent<MapPathfind> ().containingCell (transform.position);
 		resting = false;
 		restStartTime = Time.time;
 		enemies = GameObject.FindGameObjectsWithTag("Enemy");
-		bool allDone = true;
-		foreach(GameObject enemy in enemies){
-			if(!enemy.Equals(this)){
-				if(!enemy.GetComponent<EnemyAI>().doneStarting){
-					allDone = false;
-					break;
-				}
-			}
-		}
-		if (allDone)
-			repathAll ();
+//		bool allDone = true;
+//		foreach(GameObject enemy in enemies){
+//			if(!enemy.Equals(this)){
+//				if(!enemy.GetComponent<EnemyAI>().doneStarting){
+//					allDone = false;
+//					break;
+//				}
+//			}
+//		}
+//		if (allDone)
+//			repathAll ();
 
-		doneStarting = true;
-//		doPathfinding = Dev.GetComponent<DevMovement> ().doPathfinding;
+//		doneStarting = true;
+		repathAll();
+		doPathfinding = Dev.GetComponent<DevMovement> ().doPathfinding;
 	}
 
 	public mapNode getDevCell(){
 		mapNode ret = terrain.GetComponent<MapPathfind> ().devCell;
 		if (ret == null) {
-			Dev.GetComponent<DevMovement> ().initDevCell ();
+			Debug.LogAssertion ("Why doesn't it already have the value of dev cell?");
 			ret = terrain.GetComponent<MapPathfind> ().devCell;
 		}
 		return ret;
@@ -104,7 +98,7 @@ public class EnemyAI : MonoBehaviour {
 	}
 
 	// Update is called once per frame
-	void Update () {
+	public void FrameUpdate () {
 		if (!doPathfinding)
 			return;
 

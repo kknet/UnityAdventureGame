@@ -73,6 +73,8 @@ public class mapNode {
 	}
 
 	public bool equalTo(mapNode other){
+		if (other == null)
+			return false;
 		KeyValuePair<int, int> b = other.getIndices ();
 		return (zIndex == b.Key) && (xIndex == b.Value);
 	}

@@ -22,7 +22,7 @@ public class MapPathfind : MonoBehaviour {
 	public SortedList<int, GameObject> enemies;
 
 	// Use this for initialization
-	public void Start () {
+	public void Init () {
 		doneBuilding = false;
 		Dev = GameObject.Find ("DevDrake");
 		ter = this.GetComponent<Terrain> ();
@@ -31,12 +31,11 @@ public class MapPathfind : MonoBehaviour {
 		wid = dimensions [0];
 		cellSize = 2f;
 		numNodes = ((int)(len * wid/cellSize));
-		nodesPerSide = (int) Mathf.Sqrt (numNodes);
+		nodesPerSide = (int) Mathf.Sqrt (numNodes*1.0f);
 		min = transform.position;
 		max = new Vector3 (transform.position.x + wid, transform.position.y, transform.position.z + len);
 		buildGridGraph ();
 		sortEnemiesByID ();
-		GetComponent<TrackObstacles> ().markTreesAsFull ();
 		doneBuilding = true;
 	}
 

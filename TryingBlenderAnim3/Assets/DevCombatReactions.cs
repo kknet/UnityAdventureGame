@@ -10,9 +10,6 @@ public class DevCombatReactions : MonoBehaviour {
 	private GameObject dev;
 	private Animator myAnimator;
 	private float maxHealth;
-
-	private bool doCombat;
-
 	private Color green, yellow, red;
 
 	private string[] reactAnimations = {
@@ -48,13 +45,20 @@ public class DevCombatReactions : MonoBehaviour {
 	};
 
 	// Use this for initialization
-	void Start () {
-		doCombat = GetComponent<DevMovement> ().doCombat;
-		if (!doCombat)
-			return;
+	public void Init () {
 		myAnimator = this.gameObject.GetComponent<Animator> ();
 		dev = GameObject.Find ("DevDrake");
 		maxHealth = health;
+	}
+
+	// Update is called once per frame
+	public void FrameUpdate () {
+		if (health <= 0) {
+			myAnimator.SetBool ("Dead", true);
+		}
+		updateHealthBar ();
+		//		bool collision = Physics.Raycast (transform.position + transform.up + (transform.forward * 0.3f), transform.forward, 0.5f);
+
 	}
 
 	private void updateHealthBar(){
@@ -72,17 +76,7 @@ public class DevCombatReactions : MonoBehaviour {
 		healthBar.color = blendColor;
 	}
 
-	// Update is called once per frame
-	void Update () {
-		if (!doCombat)
-			return;
-		if (health <= 0) {
-			myAnimator.SetBool ("Dead", true);
-		}
-		updateHealthBar ();
-		//		bool collision = Physics.Raycast (transform.position + transform.up + (transform.forward * 0.3f), transform.forward, 0.5f);
 
-	}
 
 	private float Clamp(float f){
 		if (f > 180f)

@@ -52,8 +52,11 @@
   </ItemGroup>
   <ItemGroup>
      <Compile Include="Assets\CameraAdjust.cs" />
+     <Compile Include="Assets\DevCellTracking.cs" />
      <Compile Include="Assets\DevCombatReactions.cs" />
+     <Compile Include="Assets\DevMain.cs" />
      <Compile Include="Assets\EnemyCombatAI.cs" />
+     <Compile Include="Assets\EnemyMain.cs" />
      <Compile Include="Assets\Environment\NatureStarterKit2\Standard Assets\Effects\ImageEffects\Scripts\Antialiasing.cs" />
      <Compile Include="Assets\Environment\NatureStarterKit2\Standard Assets\Effects\ImageEffects\Scripts\Bloom.cs" />
      <Compile Include="Assets\Environment\NatureStarterKit2\Standard Assets\Effects\ImageEffects\Scripts\BloomAndFlares.cs" />
