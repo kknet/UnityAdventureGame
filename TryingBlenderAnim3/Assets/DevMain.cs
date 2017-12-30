@@ -32,20 +32,20 @@ public class DevMain : MonoBehaviour {
 		devMovement.Init ();
 		mouseMovement.Init ();
 
-		if (doCombat) {
-			devCombat = GetComponent<DevCombat> ();
-			devCombatReactions = GetComponent<DevCombatReactions> ();
-			devCombat.Init ();
-			devCombatReactions.Init ();
-		}
-
-
 		foreach(EnemyMain curEnemyMain in enemyMains){
 			if (doCombat)
 				curEnemyMain.setCombat (true);
 			if (doPathfinding)
 				curEnemyMain.setPathfinding (true);
 			curEnemyMain.Init ();
+		}
+
+
+		if (doCombat) {
+			devCombat = GetComponent<DevCombat> ();
+			devCombatReactions = GetComponent<DevCombatReactions> ();
+			devCombat.Init ();
+			devCombatReactions.Init ();
 		}
 
 		if (doPathfinding) {
@@ -61,10 +61,13 @@ public class DevMain : MonoBehaviour {
 			closestNodes.Init ();
 			trackObstacles.Init ();
 			devCellTracking.Init ();
+
+
+			foreach (EnemyMain curEnemyMain in enemyMains) {
+				curEnemyMain.initCell ();
+			}
+			enemyMains [0].repathAll ();
 		}
-
-
-
 	}
 	
 	void Update () {		

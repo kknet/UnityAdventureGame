@@ -34,7 +34,7 @@ public class EnemyAI : MonoBehaviour {
 	private bool allReady = false;
 	public bool moving = false;
 
-	public bool doPathfinding;
+//	public bool doPathfinding;
 
 	// Use this for initialization
 	public void Init () {
@@ -46,10 +46,10 @@ public class EnemyAI : MonoBehaviour {
 		rotSpeed = 12f;
 		moveSpeed = 4f;
 
-		start = terrain.GetComponent<MapPathfind> ().containingCell (transform.position);
 		resting = false;
 		restStartTime = Time.time;
 		enemies = GameObject.FindGameObjectsWithTag("Enemy");
+//		start = terrain.GetComponent<MapPathfind> ().containingCell (transform.position);
 //		bool allDone = true;
 //		foreach(GameObject enemy in enemies){
 //			if(!enemy.Equals(this)){
@@ -61,10 +61,12 @@ public class EnemyAI : MonoBehaviour {
 //		}
 //		if (allDone)
 //			repathAll ();
-
 //		doneStarting = true;
-		repathAll();
-		doPathfinding = Dev.GetComponent<DevMovement> ().doPathfinding;
+//		doPathfinding = Dev.GetComponent<DevMovement> ().doPathfinding;
+	}
+
+	public void initCell(){
+		start = terrain.GetComponent<MapPathfind> ().containingCell (transform.position);
 	}
 
 	public mapNode getDevCell(){
@@ -99,8 +101,8 @@ public class EnemyAI : MonoBehaviour {
 
 	// Update is called once per frame
 	public void FrameUpdate () {
-		if (!doPathfinding)
-			return;
+//		if (!doPathfinding)
+//			return;
 
 
 		checkIfAllReady ();

@@ -25,6 +25,14 @@ public class EnemyMain : MonoBehaviour {
 		enemyCombatAI.Init ();
 		enemyCombatReactions.Init ();
 	}
+
+	public void initCell(){
+		enemyAI.initCell ();
+	}
+
+	public void repathAll(){
+		enemyAI.repathAll ();
+	}
 	
 	// Update is called once per frame
 	public void FrameUpdate () {
