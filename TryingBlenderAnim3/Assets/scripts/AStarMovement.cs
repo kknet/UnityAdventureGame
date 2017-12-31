@@ -35,7 +35,7 @@ public class AStarMovement : MonoBehaviour {
 			path.Add (curNode);
 			curNode = nodeParents [curNode];
 			if (curNode.hasOtherOwner (enemyID))
-				Debug.LogError ("Doesn't work!");
+				Debug.Log ("Doesn't work!");
 			curNode.setFull (enemyID);
 		}
 		return new Queue<mapNode> (path);

@@ -8,12 +8,92 @@ public class ClosestNodes : MonoBehaviour {
 	GameObject Dev;
 
 	private bool makingNewPaths = false;
-//	public bool doneStarting = false;ma
 
 	public void Init(){
 		terrain = GameObject.Find ("Terrain");
 		Dev = GameObject.Find ("DevDrake");
-//		doneStarting = true;
+	}
+
+	#region major methods
+
+
+	/*The difference between regenClosestPathsLong(A) and regentPathsLongQuick(B) is that A sorts enemies based on their proximity to their closest destination node, 
+	while B just assigns as it goes through the enemies list. */
+	public void regenClosestPathsLong () {
+		if (makingNewPaths)
+			return;
+
+		GameObject[] enemies = getEnemies ();
+		foreach (GameObject enemy in enemies) {
+			enemy.GetComponent<EnemyAI> ().start.setEmpty ();
+			enemy.GetComponent<EnemyAI> ().cleanOldPath ();
+		}
+
+		//for every single enemy: figure out the distance from the enemy to each surroundingNeighbor
+		List<nodeList> enemyNodeLists = calculateEnemyDistances();
+		nodeDistComparer comparer = new nodeDistComparer ();
+		for (int idx = 0; idx < enemyNodeLists.Count; ++idx) {
+			enemyNodeLists [idx].sort ();
+		}
+
+		//assign neighbors to enemies, prioritizing enemies that are closest to their chosen neighbors
+		List<KeyValuePair<int, mapNode>> finalDests = assignClosestNeighbors (enemyNodeLists);
+
+		foreach (KeyValuePair<int, mapNode> enemyNodePair in finalDests) {
+			GameObject thisEnemy = terrain.GetComponent<MapPathfind> ().getEnemyByID (enemyNodePair.Key);
+			thisEnemy.GetComponent<EnemyAI> ().finalDest = enemyNodePair.Value;
+			thisEnemy.GetComponent<EnemyAI> ().setNewPath ();
+		}
+	}
+
+	public void regenPathsLongQuick()
+	{
+		//This method sets up new path generation for all enemies through just one call.
+		//So you only want this method to be called once (and only by one enemy).
+		//Therefore if makingNewPaths is set to true already, then someone else already called this method.
+		//Otherwise, you should mark makingNewPaths as true to prevent other enemies from calling this method redundantly
+		if (makingNewPaths)
+			return;
+		makingNewPaths = true;
+
+		List<KeyValuePair<GameObject, mapNode>> enemyDests = new List<KeyValuePair<GameObject, mapNode>> ();
+		List<mapNode> neighborCircle = new List<mapNode>(terrain.GetComponent<MapPathfind> ().getSpacedDevCombatCircle (2, 0));
+		List<GameObject> enemies = new List<GameObject>(terrain.GetComponent<MapPathfind> ().enemies.Values);
+
+		/*for a given enemy, find the closest available destination node*/
+		for (int enemyIdx = 0; enemyIdx < enemies.Count; ++enemyIdx) {
+			mapNode chosenNode = null;
+			float minDist = float.MaxValue;
+			GameObject thisEnemy = enemies [enemyIdx];
+
+			for (int nodeIdx = 0; nodeIdx < neighborCircle.Count; ++nodeIdx) {
+				mapNode thisNode = neighborCircle [nodeIdx];
+				float thisDist = thisEnemy.GetComponent<EnemyAI> ().start.distance (thisNode);
+				if (thisDist < minDist) {
+					minDist = thisDist;
+					chosenNode = thisNode;
+				}
+			}
+			enemyDests.Add (new KeyValuePair<GameObject, mapNode> (thisEnemy, chosenNode));
+			neighborCircle.Remove (chosenNode);
+		}
+
+		/*then just assign those nodes as destinations*/
+		for(int idx = 0; idx < enemyDests.Count; ++idx){
+			KeyValuePair<GameObject, mapNode> pair = enemyDests [idx];
+			assignDest (pair.Key, pair.Value, idx);
+		}
+
+		makingNewPaths = false;
+	}
+	#endregion
+		
+	#region helpers
+	public void assignDest(GameObject enemy, mapNode dest, float timeIncrement){
+		enemy.GetComponent<EnemyAI> ().cleanOldPath ();
+		enemy.GetComponent<EnemyAI> ().finalDest = dest;
+		enemy.GetComponent<EnemyAI> ().pathGenTime = Time.realtimeSinceStartup + (0.5f * timeIncrement);
+		enemy.GetComponent<EnemyAI> ().moveTime = Time.realtimeSinceStartup + (0.5f * timeIncrement);
 	}
 
 	public GameObject[] enemiesClosestToDev() {
@@ -209,87 +289,8 @@ public class ClosestNodes : MonoBehaviour {
 
 		return finalDests;
 	}
+	#endregion
 
-
-	public void regenClosestPathsLong () {
-		if (makingNewPaths)
-			return;
-		
-		GameObject[] enemies = getEnemies ();
-		foreach (GameObject enemy in enemies) {
-			enemy.GetComponent<EnemyAI> ().start.setEmpty ();
-			enemy.GetComponent<EnemyAI> ().cleanOldPath ();
-		}
-
-		//for every single enemy: figure out the distance from the enemy to each surroundingNeighbor
-		List<nodeList> enemyNodeLists = calculateEnemyDistances();
-		nodeDistComparer comparer = new nodeDistComparer ();
-		for (int idx = 0; idx < enemyNodeLists.Count; ++idx) {
-			enemyNodeLists [idx].sort ();
-		}
-			
-		//assign neighbors to enemies, prioritizing enemies that are closest to their chosen neighbors
-		List<KeyValuePair<int, mapNode>> finalDests = assignClosestNeighbors (enemyNodeLists);
-
-		foreach (KeyValuePair<int, mapNode> enemyNodePair in finalDests) {
-			GameObject thisEnemy = terrain.GetComponent<MapPathfind> ().getEnemyByID (enemyNodePair.Key);
-			thisEnemy.GetComponent<EnemyAI> ().finalDest = enemyNodePair.Value;
-			thisEnemy.GetComponent<EnemyAI> ().setNewPath ();
-		}
-	}
-
-	public void regenPathsLongQuick()
-	{
-//		Debug.Log ("got before!");
-		if (makingNewPaths)
-			return;
-
-//		Debug.Log ("got past!");
-
-		makingNewPaths = true;
-
-		List<KeyValuePair<GameObject, mapNode>> enemyDests = new List<KeyValuePair<GameObject, mapNode>> ();
-		List<mapNode> neighborCircle = new List<mapNode>(terrain.GetComponent<MapPathfind> ().getSpacedDevCombatCircle (2, 0));
-		List<GameObject> enemies = new List<GameObject>(terrain.GetComponent<MapPathfind> ().enemies.Values);
-
-//		foreach (GameObject enemy in enemies) {
-//		}
-
-		while (neighborCircle.Count > 0) {
-			for (int enemyIdx = 0; enemyIdx < enemies.Count; ++enemyIdx) {
-				mapNode chosenNode = null;
-				float minDist = float.MaxValue;
-				GameObject thisEnemy = enemies [enemyIdx];
-				for (int nodeIdx = 0; nodeIdx < neighborCircle.Count; ++nodeIdx) {
-					mapNode thisNode = neighborCircle [nodeIdx];
-					float thisDist = thisEnemy.GetComponent<EnemyAI> ().start.distance (thisNode);
-					if (thisDist < minDist) {
-						minDist = thisDist;
-						chosenNode = thisNode;
-					}
-				}
-				enemyDests.Add (new KeyValuePair<GameObject, mapNode> (thisEnemy, chosenNode));
-				enemies.Remove (thisEnemy);
-				neighborCircle.Remove (chosenNode);
-			}
-		}
-
-		for(int idx = 0; idx < enemyDests.Count; ++idx){
-			KeyValuePair<GameObject, mapNode> pair = enemyDests [idx];
-			assignDest (pair.Key, pair.Value, idx);
-		}
-
-		makingNewPaths = false;
-	}
-
-	public void assignDest(GameObject enemy, mapNode dest, float timeIncrement){
-		
-		enemy.GetComponent<EnemyAI> ().cleanOldPath ();
-		enemy.GetComponent<EnemyAI> ().finalDest = dest;
-		enemy.GetComponent<EnemyAI> ().pathGenTime = Time.realtimeSinceStartup + (0.5f * timeIncrement);
-		enemy.GetComponent<EnemyAI> ().moveTime = Time.realtimeSinceStartup + (0.5f * timeIncrement);
-
-	}
 
 
 
@@ -297,6 +298,7 @@ public class ClosestNodes : MonoBehaviour {
 
 
 
+#region other crap
 
 public class nodeList {
 	int enemyID;
@@ -376,3 +378,5 @@ public class enemyDistComparer: IComparer<KeyValuePair<GameObject, float>>{
 		return 0;
 	}
 }
+
+#endregion

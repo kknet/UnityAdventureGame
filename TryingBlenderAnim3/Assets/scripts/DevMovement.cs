@@ -121,13 +121,13 @@
 		}
 
 		if(Input.GetButtonDown("Jump") && movingVert && adjustCounter == 0 
-			&& devCombatScript.notInCombatMove())
+			&& (!doCombat || devCombatScript.notInCombatMove()))
 		{
 			myAnimator.SetBool("Jumping", true);
 			Invoke ("stopJumping", 0.8f);
 		}
 		else if(Input.GetButtonDown("FrontFlip") && movingVert && adjustCounter == 0
-			&& devCombatScript.notInCombatMove())
+				&& (!doCombat || devCombatScript.notInCombatMove()))
 		{
 			myAnimator.SetBool ("shouldFrontFlip", true);
 			Invoke ("stopFrontFlip", 2.1f);
