@@ -5,6 +5,8 @@ using UnityEngine;
 public class MapPathfind : MonoBehaviour {
 
 	public mapNode[][] grid;
+
+	[HideInInspector]
 	public float cellSize;
 	public Vector3 min;
 	public Vector3 max;

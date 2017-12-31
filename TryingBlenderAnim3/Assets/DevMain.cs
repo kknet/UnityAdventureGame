@@ -5,7 +5,7 @@ using UnityEngine;
 public class DevMain : MonoBehaviour {
 
 	#region imports to set in the inspector
-	public bool doCombat, doPathfinding;
+	public bool doCombat, doPathfinding, doEnemies;
 	public GameObject terrain;
 	#endregion
 
@@ -25,21 +25,25 @@ public class DevMain : MonoBehaviour {
 	#endregion
 
 	void Start () {
+		if (doPathfinding || doCombat)
+			doEnemies = true;
 		devMovement = GetComponent<DevMovement> ();
 		mouseMovement = Camera.main.GetComponent<MouseMovement> ();
-		enemyMains = GameObject.Find ("Enemies").GetComponentsInChildren<EnemyMain> ();
-			
+
+		devMovement.doCombat = doCombat;
 		devMovement.Init ();
 		mouseMovement.Init ();
 
-		foreach(EnemyMain curEnemyMain in enemyMains){
-			if (doCombat)
-				curEnemyMain.setCombat (true);
-			if (doPathfinding)
-				curEnemyMain.setPathfinding (true);
-			curEnemyMain.Init ();
+		if (doEnemies) {
+			enemyMains = GameObject.Find ("Enemies").GetComponentsInChildren<EnemyMain> ();
+			foreach(EnemyMain curEnemyMain in enemyMains){
+				if (doCombat)
+					curEnemyMain.setCombat (true);
+				if (doPathfinding)
+					curEnemyMain.setPathfinding (true);
+				curEnemyMain.Init ();
+			}
 		}
-
 
 		if (doCombat) {
 			devCombat = GetComponent<DevCombat> ();
@@ -73,8 +77,11 @@ public class DevMain : MonoBehaviour {
 	void Update () {		
 		devMovement.FrameUpdate ();
 		mouseMovement.FrameUpdate ();
-		foreach(EnemyMain curEnemyMain in enemyMains){
-			curEnemyMain.FrameUpdate ();
+
+		if (doEnemies) {
+			foreach(EnemyMain curEnemyMain in enemyMains){
+				curEnemyMain.FrameUpdate ();
+			}
 		}
 
 		if (doCombat) {

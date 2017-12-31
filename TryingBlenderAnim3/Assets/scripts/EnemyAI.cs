@@ -118,7 +118,6 @@ public class EnemyAI : MonoBehaviour {
 		//		if (GetComponent<ManageHealth> ().isDead ())
 		//			this.gameObject.SetActive (false);
 		moveToDev ();
-		Debug.Log ("Got here");
 	}
 		
 	//keep track of this agent's current location

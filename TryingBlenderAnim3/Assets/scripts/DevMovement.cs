@@ -136,7 +136,7 @@
 		//rotate dev horizontally IF dev is moving and in a non-combat zone, 
 		//but is not currently adjusting to a camera shift, jumping, flipping, or attacking/blocking
 		if(!inCombatZone && adjustCounter == 0 && (movingVert || movingHoriz)) {
-			if (!anim.IsTag("Jumps") && !myAnimator.GetBool ("Jumping") && !myAnimator.GetBool ("shouldFrontFlip") && devCombatScript.notInCombatMove()) {
+			if (!anim.IsTag("Jumps") && !myAnimator.GetBool ("Jumping") && !myAnimator.GetBool ("shouldFrontFlip") && (!doCombat || devCombatScript.notInCombatMove())) {
 				transform.Rotate (Vector3.up * Input.GetAxisRaw("Mouse X") * Time.deltaTime * mouseMovementScript.sensitivityX);
 			}
 		}
@@ -145,6 +145,9 @@
 
 	#region Non-combat and Combat Movement
 	private void moveCharacter(){
+		movingVert = !Mathf.Approximately (myAnimator.GetFloat ("VSpeed"), 0f);
+		movingHoriz = !Mathf.Approximately (myAnimator.GetFloat ("HorizSpeed"), 0f);
+
 		if (!doCombat) {
 			nonCombatMovement ();
 			return;
@@ -153,8 +156,6 @@
 		bool inCombatZone = mouseMovementScript.getInCombatZone();
 		bool weaponDrawn = myAnimator.GetBool ("WeaponDrawn");
 		bool inCombatMove = !devCombatScript.notInCombatMove ();
-		movingVert = !Mathf.Approximately (myAnimator.GetFloat ("VSpeed"), 0f);
-		movingHoriz = !Mathf.Approximately (myAnimator.GetFloat ("HorizSpeed"), 0f);
 
 		if (!devCombatScript.isAttacking ()) {
 			if (inCombatZone && weaponDrawn && !jumping ()) {
@@ -319,6 +320,7 @@
 	}
 
 	void stopFootstepSound(){
+	Debug.Log ("Running sound");
 		if (footstep1.isPlaying)
 			footstep1.Stop ();
 		if (footstep2.isPlaying)

@@ -7,13 +7,13 @@ public class ClosestNodes : MonoBehaviour {
 	GameObject terrain;
 	GameObject Dev;
 
-	public bool makingNewPaths = false;
-	public bool doneStarting = false;
+	private bool makingNewPaths = false;
+//	public bool doneStarting = false;ma
 
 	public void Init(){
 		terrain = GameObject.Find ("Terrain");
 		Dev = GameObject.Find ("DevDrake");
-		doneStarting = true;
+//		doneStarting = true;
 	}
 
 	public GameObject[] enemiesClosestToDev() {
@@ -240,11 +240,11 @@ public class ClosestNodes : MonoBehaviour {
 
 	public void regenPathsLongQuick()
 	{
-		Debug.Log ("got before!");
+//		Debug.Log ("got before!");
 		if (makingNewPaths)
 			return;
 
-		Debug.Log ("got past!");
+//		Debug.Log ("got past!");
 
 		makingNewPaths = true;
 
