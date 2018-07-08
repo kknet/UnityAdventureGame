@@ -3,17 +3,18 @@ using System.Collections;
 
 [RequireComponent(typeof(Animator))]
 
-public class RootMotionScript : MonoBehaviour {
+public class RootMotionScript : MonoBehaviour
+{
 
-	void OnAnimatorMove()
-	{
-		Animator animator = GetComponent<Animator>(); 
+    void OnAnimatorMove()
+    {
+        Animator animator = GetComponent<Animator>();
 
-		if (animator)
-		{
-			Vector3 newPosition = transform.position;
-			newPosition.z -= animator.GetFloat("RunSpeed") * Time.deltaTime; 
-			transform.position = newPosition;
-		}
-	}
+        if (animator)
+        {
+            Vector3 newPosition = transform.position;
+            newPosition.z -= animator.GetFloat("RunSpeed") * Time.deltaTime;
+            transform.position = newPosition;
+        }
+    }
 }
