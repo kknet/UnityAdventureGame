@@ -43,18 +43,6 @@ public class CharacterController : MonoBehaviour
     #endregion
 
     #region things to tweak in inspector
-
-    [Tooltip("Particle effect for walking. Don't change!")]
-    [SerializeField]
-    public GameObject footDust;
-
-    [Tooltip("Feet transforms used for particle effect postioning. Don't change!")]
-    [SerializeField]
-    public Transform leftFoot, rightFoot;
-
-    [Tooltip("Hand transforms used for particle effect postioning. Don't change!")]
-    public Transform leftHand, rightHand;
-
     //[Tooltip("Targets on player's body with weights for stealth detection raycasts.")]
     //public List<WeightedDetectionTarget> detectionTargets = new List<WeightedDetectionTarget>();
 
@@ -64,11 +52,8 @@ public class CharacterController : MonoBehaviour
     #endregion 
 
     #region things to tweak only in code
-    float m_MovingTurnSpeed = 980f;
-    float m_GravityMultiplier = 2f;
-    float m_RunCycleLegOffset = 0.2f; //specific to the character in sample assets, will need to be modified to work with others
-    float m_MoveSpeedMultiplier = 4.5f;
-    float m_AnimSpeedMultiplier = 5f;
+    float m_MovingTurnSpeed = 360f;
+    float m_MoveSpeedMultiplier = 8.5f;
     float m_WallJumpCheckDistance = 0.5f;
     float m_GroundCheckDistance = 0.2f;
     int lerpFrames = 60;
@@ -166,7 +151,7 @@ public class CharacterController : MonoBehaviour
             m_Capsule.material.bounciness = 0f;
         }
         else
-            m_Animator.SetFloat("Forward", Mathf.MoveTowards(m_Animator.GetFloat("Forward"), m_ForwardAmount, 0.05f));
+            m_Animator.SetFloat("Forward", Mathf.MoveTowards(m_Animator.GetFloat("Forward"), m_ForwardAmount, 0.03f));
 
         if (m_jump)
         {
@@ -257,7 +242,7 @@ public class CharacterController : MonoBehaviour
                     {
                         jumpAmountGoal = -0.1f;
                         m_Animator.SetFloat("JumpAmount", -0.1f);
-                        spawnFootDust(2);
+                        CharacterEvents.spawnFootDust(2);
                         prevJumpState = jumpState;
                         jumpState = JumpState.notJumping;
                     }
@@ -317,69 +302,6 @@ public class CharacterController : MonoBehaviour
     public bool jumping()
     {
         return jumpState != JumpState.notJumping;
-    }
-
-    void spawnFootDust(int doLeftFoot)
-    {
-        GameObject footDustClone = null;
-        Vector3 dustPos = Vector3.zero;
-
-        if (doLeftFoot == 3) //glide particles
-        {
-            float fwd = (0.7f * Mathf.Min(m_ForwardAmount, 1f) - 0.1f);
-            dustPos = leftFoot.position;
-            footDustClone = Instantiate(footDust, dustPos, transform.rotation);
-            footDustClone.GetComponent<ParticleSystem>().Play();
-            Destroy(footDustClone, 2.0f);
-
-            dustPos = rightFoot.position;
-            footDustClone = Instantiate(footDust, dustPos, transform.rotation);
-            footDustClone.GetComponent<ParticleSystem>().Play();
-            Destroy(footDustClone, 2.0f);
-
-            dustPos = leftHand.position;
-            footDustClone = Instantiate(footDust, dustPos, transform.rotation);
-            footDustClone.GetComponent<ParticleSystem>().Play();
-            Destroy(footDustClone, 2.0f);
-
-            dustPos = rightHand.position;
-            footDustClone = Instantiate(footDust, dustPos, transform.rotation);
-            footDustClone.GetComponent<ParticleSystem>().Play();
-            Destroy(footDustClone, 2.0f);
-
-        }
-
-        if (doLeftFoot == 2) //jump land
-        {
-            float fwd = (0.7f * Mathf.Min(m_ForwardAmount, 1f) - 0.1f);
-            dustPos = leftFoot.position + (0.01f * leftFoot.right) + (fwd * transform.forward) - (0.2f * transform.up);
-            footDustClone = Instantiate(footDust, dustPos, transform.rotation);
-            footDustClone.GetComponent<ParticleSystem>().Play();
-            Destroy(footDustClone, 2.0f);
-
-            dustPos = rightFoot.position + (-0.01f * rightFoot.right) + (fwd * transform.forward) - (0.2f * transform.up);
-            footDustClone = Instantiate(footDust, dustPos, transform.rotation);
-            footDustClone.GetComponent<ParticleSystem>().Play();
-            Destroy(footDustClone, 2.0f);
-        }
-
-
-        bool walking = m_ForwardAmount < 0.9f || !m_grounded;
-        if (walking)
-            return;
-
-        if (doLeftFoot == 0)
-        {
-            dustPos = leftFoot.position + (0.01f * leftFoot.right) - (0.0f * transform.forward) + (0f * transform.up);
-        }
-        else if (doLeftFoot == 1)
-        {
-            dustPos = rightFoot.position + (-0.01f * rightFoot.right) - (0.0f * transform.forward) + (0f * transform.up);
-        }
-        footDustClone = Instantiate(footDust, dustPos, transform.rotation);
-        footDustClone.GetComponent<ParticleSystem>().Play();
-
-        Destroy(footDustClone, 2.0f);
     }
 
     //lerp the player each frame to face a wall

@@ -25,7 +25,7 @@ public class DevMain : MonoBehaviour
     public static GameObject Player;
     #endregion
 
-    private void Awake()
+    void Awake()
     {
         Player = gameObject;
         inputController = GetComponent<InputController>();

@@ -12,8 +12,16 @@ public class CharacterEvents : MonoBehaviour
                        land,
                        flipJump;
 
+    [Tooltip("Particle effect for walking. Don't change!")]
+    [SerializeField]
     public GameObject footDust;
+
+    [Tooltip("Feet transforms used for particle effect postioning. Don't change!")]
+    [SerializeField]
     public Transform leftFoot, rightFoot;
+
+    [Tooltip("Hand transforms used for particle effect postioning. Don't change!")]
+    public Transform leftHand, rightHand;
 
     private Animator m_Animator;
 

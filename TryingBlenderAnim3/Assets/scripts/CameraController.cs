@@ -12,7 +12,6 @@ public class CameraController : MonoBehaviour
     public Transform target;
     public bool CameraAssist;
     public bool cameraCollisionZoom;
-    public bool aimingCam;
     public bool autoAdjustCam;
     public bool drawGizmos;
 
@@ -34,19 +33,20 @@ public class CameraController : MonoBehaviour
 
     Vector3 targetPos, camPos, desiredCamPos;
     Vector3 velocityCamSmooth = Vector3.zero;
-    Vector3 verticalPosOffsetNormal = (Vector3.up * 0.6f);
-    float normalDistance = 3f;
-    float climbingDistance = 6f;
+    //Vector3 verticalPosOffsetNormal = (Vector3.up * 0.6f);
+    Vector3 verticalPosOffsetNormal = (Vector3.up * 1.3f);
+    float normalDistance = 6f;
+    float climbingDistance = 12f;
     float distance;
     float controllerSensitivityMultiplier = 3f;
-    [SerializeField] float mouseSensitivityX = 15f;
-    [SerializeField] float mouseSensitivityY = 6f;
+    [SerializeField] float mouseSensitivityX = 20f;
+    [SerializeField] float mouseSensitivityY = 10f;
     float yMinLimit = -40f;
     float yMaxLimit = 80f;
-    float smoothTime = 20f;
+    float smoothTime = 10f;
     float positionSmoothTime;
-    float normalDistanceSmoothTime = 15f;
-    float climbingDistanceSmoothTime = 20f;
+    float normalDistanceSmoothTime = 20f;
+    float climbingDistanceSmoothTime = 30f;
     float rotationYAxis = 0.0f;
     float rotationXAxis = 0.0f;
     float velocityX = 0.0f;
@@ -166,7 +166,7 @@ public class CameraController : MonoBehaviour
             if (colliding)
             {
                 lastCamClipTime = Time.fixedTime;
-                if (rotationXAxis < -8f)
+                if (rotationXAxis < 0f)
                     zoomedDistance *= 0.2f;
                 distance = zoomedDistance;
                 negDistance = new Vector3(0.0f, 0.0f, -distance);
@@ -261,9 +261,9 @@ public class CameraController : MonoBehaviour
         }
 
         if (CameraAssist)
-            velocityX += h * 0.8f;
-        else
             velocityX += h * 0.4f;
+        else
+            velocityX += h * 0.2f;
 
         rotationYAxis += velocityX;
         rotationXAxis -= velocityY;
@@ -353,7 +353,7 @@ public class CollisionHandler
             float distance = Vector3.Distance(clipPoints[i], fromPosition);
             if (Physics.Raycast(origin, direction, out hit, distance))
             {
-                if (!hit.collider.transform.root.gameObject.Equals(Player.transform.parent.gameObject))
+                if (!hit.collider.transform.root.gameObject.Equals(Player.gameObject))
                     return true;
             }
         }
@@ -372,7 +372,7 @@ public class CollisionHandler
             if (Physics.Raycast(ray, out hit))
             {
 
-                if (hit.collider.transform.root.gameObject.Equals(Player.transform.parent.gameObject))
+                if (hit.collider.transform.root.gameObject.Equals(Player.gameObject))
                     continue;
                 if (distance == -1)
                     distance = hit.distance;

@@ -8,11 +8,11 @@ using UnityEngine.UI;
 public class InputController : MonoBehaviour
 {
 
-    private CharacterController m_Character; // A reference to the RobotCharacter on the object
+    private CharacterController characterController; // A reference to the RobotCharacter on the object
     private Transform m_Cam;                  // A reference to the main camera in the scenes transform
     private static Vector3 m_CamForward;             // The current forward direction of the camera
     private Vector3 m_Move;
-    private CameraController camScript;
+    private CameraController cameraController;
 
     private bool prevDisabledInput;
     private float reenabledInputStartTime;
@@ -22,20 +22,23 @@ public class InputController : MonoBehaviour
     private GameObject blockCameraPanel;
 
     public static ControlsManager controlsManager;
-    public bool combatEnabled;
+    [HideInInspector] public bool combatEnabled;
 
     public void Init()
     {
         combatEnabled = false;
         inputEnabled = true;
         cameraEnabled = true;
-        controlsManager = new ControlsManager();
-        controlsManager.Init();
         prevDisabledInput = false;
 
-        m_Character = GetComponent<CharacterController>();
         m_Cam = Camera.main.transform;
-        camScript = Camera.main.GetComponent<CameraController>();
+        controlsManager = new ControlsManager();
+        characterController = GetComponent<CharacterController>();
+        cameraController = m_Cam.GetComponent<CameraController>();
+
+        controlsManager.Init();
+        characterController.Init();
+        cameraController.Init();
     }
 
     public void FrameUpdate()
@@ -50,15 +53,15 @@ public class InputController : MonoBehaviour
 
     public void PhysicsUpdate()
     {
-        if (m_Character == null)
+        if (characterController == null)
             return;
 
         if (!inputEnabled)
         {
-            m_Character.m_ForwardAmount = 0f;
+            characterController.m_ForwardAmount = 0f;
             GetComponent<Animator>().SetFloat("Forward", 0f);
-            m_Character.Move(Vector3.zero, false, false);
-            if (cameraEnabled) camScript.PhysicsUpdate();
+            characterController.Move(Vector3.zero, false, false);
+            if (cameraEnabled) cameraController.PhysicsUpdate();
             return;
         }
 
@@ -77,13 +80,13 @@ public class InputController : MonoBehaviour
             m_Move = v * Vector3.forward + h * Vector3.right; // we use world-relative directions in the case of no main camera
         }
 
-        bool walking = walk && !m_Character.jumping() && !m_Character.rolling();
-        if (walking) m_Move *= 0.5f;
+        bool walking = walk && !characterController.jumping() && !characterController.rolling();
+        if (walking) m_Move *= 0.33f;
 
 
         // pass all parameters to the character control script
-        m_Character.Move(m_Move, false, false);
-        camScript.PhysicsUpdate();
+        characterController.Move(m_Move, false, false);
+        cameraController.PhysicsUpdate();
     }
 
     IEnumerator BufferedJump()
@@ -92,9 +95,9 @@ public class InputController : MonoBehaviour
         int limit = 10;
         while (count < limit)
         {
-            if (m_Character.m_grounded && !m_Character.m_jump && !m_Character.jumping())
+            if (characterController.m_grounded && !characterController.m_jump && !characterController.jumping())
             {
-                m_Character.m_jump = true;
+                characterController.m_jump = true;
                 break;
             }
             else
