@@ -391,6 +391,7 @@
     <Compile Include="Assets\scripts\ManageHealth.cs" />
     <Compile Include="Assets\scripts\mapNode.cs" />
     <Compile Include="Assets\scripts\MapPathfind.cs" />
+    <Compile Include="Assets\scripts\MouseMovement.cs" />
     <Compile Include="Assets\scripts\MoveDuringJumpAttack.cs" />
     <Compile Include="Assets\scripts\OldCharacterController.cs" />
     <Compile Include="Assets\scripts\PersonHit.cs" />

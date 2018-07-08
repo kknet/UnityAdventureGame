@@ -4,6 +4,7 @@ using UnityStandardAssets.CrossPlatformInput;
 
 public class CameraController : MonoBehaviour
 {
+    #region variables etc
     public static CameraController camScript;
     [HideInInspector] public GameObject Player;
 
@@ -56,6 +57,7 @@ public class CameraController : MonoBehaviour
     int noRotationXCount = 0;
     int noRotationXThreshold = 5;
     int noRotationYThreshold = 5;
+    #endregion
 
     #region cameraSettings
     public void setMouseSensitivityX(float value)
@@ -88,13 +90,9 @@ public class CameraController : MonoBehaviour
     }
     #endregion
 
-    private void Awake()
-    {
-        camScript = GetComponent<CameraController>();
-    }
-
     public void Init()
     {
+        camScript = GetComponent<CameraController>();
         Player = DevMain.Player;
         cam = Camera.main;
         cam.nearClipPlane = 0.01f;
@@ -123,54 +121,11 @@ public class CameraController : MonoBehaviour
         positionSmoothTime = smoothTime * 2f;
     }
 
-    private void handleAutoReset()
-    {
-        bool moving = characterScript.moving();
-        bool noRotationY = (Mathf.Abs(velocityY) < 0.01);
-        if (moving && noRotationY)
-            rotationXAxis = Mathf.Lerp(rotationXAxis, 10f, Time.fixedDeltaTime * smoothTime * 0.2f);
-    }
-
-    private float initialDistance()
-    {
-        //if (characterScript.m_climbingWall)
-        //    return climbingDistance;
-        //else
-        return normalDistance;
-    }
-
-    private float distanceSmoothTime()
-    {
-        //if (characterScript.m_climbingWall)
-        //    return climbingDistanceSmoothTime;
-        //else
-        return normalDistanceSmoothTime;
-    }
-
-
-    public float cameraXRotationDif()
-    {
-        float dif = Mathf.Abs(target.eulerAngles.y - transform.eulerAngles.y);
-        if (dif > 180) dif = 360 - dif;
-        return dif;
-    }
-
-    private bool handleManualReset()
-    {
-        if (DevMain.controlsManager.GetButtonDown(ControlsManager.ButtonType.ResetCam))
-        {
-            rotationYAxis = target.eulerAngles.y;
-            rotationXAxis = 10f;
-            return true;
-        }
-        return false;
-    }
-
-    public void FrameUpdate()
+    public void PhysicsUpdate()
     {
         moveCamera();
 
-        if (DevMain.controlsManager.RecentDevice.Equals(ControlsManager.InputDevice.keyboard))
+        if (InputController.controlsManager.RecentDevice.Equals(ControlsManager.InputDevice.keyboard))
             Cursor.visible = true;
         else
             Cursor.visible = false;
@@ -243,13 +198,55 @@ public class CameraController : MonoBehaviour
         velocityY = Mathf.Lerp(velocityY, 0, Time.fixedDeltaTime * smoothTime * 2f);
     }
 
+    private void handleAutoReset()
+    {
+        bool moving = characterScript.running();
+        bool noRotationY = (Mathf.Abs(velocityY) < 0.01);
+        if (moving && noRotationY)
+            rotationXAxis = Mathf.Lerp(rotationXAxis, 10f, Time.fixedDeltaTime * smoothTime * 0.2f);
+    }
+
+    private float initialDistance()
+    {
+        //if (characterScript.m_climbingWall)
+        //    return climbingDistance;
+        //else
+        return normalDistance;
+    }
+
+    private float distanceSmoothTime()
+    {
+        //if (characterScript.m_climbingWall)
+        //    return climbingDistanceSmoothTime;
+        //else
+        return normalDistanceSmoothTime;
+    }
+
+    public float cameraXRotationDif()
+    {
+        float dif = Mathf.Abs(target.eulerAngles.y - transform.eulerAngles.y);
+        if (dif > 180) dif = 360 - dif;
+        return dif;
+    }
+
+    private bool handleManualReset()
+    {
+        if (InputController.controlsManager.GetButtonDown(ControlsManager.ButtonType.ResetCam))
+        {
+            rotationYAxis = target.eulerAngles.y;
+            rotationXAxis = 10f;
+            return true;
+        }
+        return false;
+    }
+
     Quaternion updateRotation()
     {
-        float controllerMouseX = DevMain.controlsManager.controller.GetAxis(ControlsManager.ButtonType.MouseX);
-        float controllerMouseY = DevMain.controlsManager.controller.GetAxis(ControlsManager.ButtonType.MouseY);
-        float mouseXOverall = DevMain.controlsManager.GetAxis(ControlsManager.ButtonType.MouseX);
-        float mouseYOverall = DevMain.controlsManager.GetAxis(ControlsManager.ButtonType.MouseY);
-        float h = DevMain.controlsManager.GetAxis(ControlsManager.ButtonType.Horizontal);
+        float controllerMouseX = InputController.controlsManager.controller.GetAxis(ControlsManager.ButtonType.MouseX);
+        float controllerMouseY = InputController.controlsManager.controller.GetAxis(ControlsManager.ButtonType.MouseY);
+        float mouseXOverall = InputController.controlsManager.GetAxis(ControlsManager.ButtonType.MouseX);
+        float mouseYOverall = InputController.controlsManager.GetAxis(ControlsManager.ButtonType.MouseY);
+        float h = InputController.controlsManager.GetAxis(ControlsManager.ButtonType.Horizontal);
 
         bool usingControllerXY = Mathf.Abs(controllerMouseX) > 0.05f || Mathf.Abs(controllerMouseY) > 0.05f;
         if (usingControllerXY)

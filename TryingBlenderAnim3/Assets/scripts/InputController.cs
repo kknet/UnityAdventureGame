@@ -22,9 +22,11 @@ public class InputController : MonoBehaviour
     private GameObject blockCameraPanel;
 
     public static ControlsManager controlsManager;
+    public bool combatEnabled;
 
-    private void Awake()
+    public void Init()
     {
+        combatEnabled = false;
         inputEnabled = true;
         cameraEnabled = true;
         controlsManager = new ControlsManager();
@@ -36,22 +38,7 @@ public class InputController : MonoBehaviour
         camScript = Camera.main.GetComponent<CameraController>();
     }
 
-    public void EnableInput()
-    {
-        inputEnabled = true;
-    }
-
-    public void DisableInput()
-    {
-        inputEnabled = false;
-    }
-
-    public void DisableCamera()
-    {
-        cameraEnabled = false;
-    }
-
-    private void FrameUpdate()
+    public void FrameUpdate()
     {
         if (!inputEnabled) return;
 
@@ -61,12 +48,7 @@ public class InputController : MonoBehaviour
             StartCoroutine(BufferedJump()); //allows you to press jump slightly (10 frames) before you hit the ground.
     }
 
-    private Vector3 defaultMoveCalculation(float h, float v)
-    {
-        return v * m_CamForward + h * m_Cam.right;
-    }
-
-    private void FixedUpdate()
+    public void PhysicsUpdate()
     {
         if (m_Character == null)
             return;
@@ -76,7 +58,7 @@ public class InputController : MonoBehaviour
             m_Character.m_ForwardAmount = 0f;
             GetComponent<Animator>().SetFloat("Forward", 0f);
             m_Character.Move(Vector3.zero, false, false);
-            if (cameraEnabled) camScript.cameraUpdate();
+            if (cameraEnabled) camScript.PhysicsUpdate();
             return;
         }
 
@@ -95,13 +77,13 @@ public class InputController : MonoBehaviour
             m_Move = v * Vector3.forward + h * Vector3.right; // we use world-relative directions in the case of no main camera
         }
 
-        bool walking = walk && !m_Character.jumping() && !m_Character.m_rolling;
+        bool walking = walk && !m_Character.jumping() && !m_Character.rolling();
         if (walking) m_Move *= 0.5f;
 
 
         // pass all parameters to the character control script
         m_Character.Move(m_Move, false, false);
-        camScript.cameraUpdate();
+        camScript.PhysicsUpdate();
     }
 
     IEnumerator BufferedJump()
@@ -110,7 +92,7 @@ public class InputController : MonoBehaviour
         int limit = 10;
         while (count < limit)
         {
-            if (m_Character.m_grounded && !m_Character.m_jump && !m_Character.jumping() && !m_Character.inOoze)
+            if (m_Character.m_grounded && !m_Character.m_jump && !m_Character.jumping())
             {
                 m_Character.m_jump = true;
                 break;
@@ -121,5 +103,26 @@ public class InputController : MonoBehaviour
                 yield return new WaitForEndOfFrame();
             }
         }
+    }
+
+
+    public void EnableInput()
+    {
+        inputEnabled = true;
+    }
+
+    public void DisableInput()
+    {
+        inputEnabled = false;
+    }
+
+    public void DisableCamera()
+    {
+        cameraEnabled = false;
+    }
+
+    private Vector3 defaultMoveCalculation(float h, float v)
+    {
+        return v * m_CamForward + h * m_Cam.right;
     }
 }

@@ -9,6 +9,7 @@ public class DevCombat : MonoBehaviour
     public AudioSource quickAttack, quickAttack2, quickAttack3;
     public AudioSource strongHit;
 
+    private GameObject[] enemies;
     private Animator myAnimator;
     private Camera cam;
     private GameObject currentEnemy;
@@ -45,6 +46,7 @@ public class DevCombat : MonoBehaviour
         currentType = AttackType.none;
         quickAttackStateNames = new string[] { "quick_1", "quick_2", "quick_3" };
         enemyAttackReactionSounds = new AudioSource[] { quickAttack, quickAttack2, quickAttack3, quickAttack3 };
+        enemies = GameObject.FindGameObjectsWithTag("Enemy");
 
         /*variables to tweak*/
         strongHitCrossFadeTimes = new float[] { 0.2f, 0.2f, 0.05f };
@@ -413,6 +415,11 @@ public class DevCombat : MonoBehaviour
     #endregion
 
     #region getters
+
+    public GameObject[] getEnemies()
+    {
+        return enemies;
+    }
 
     public GameObject getCurrentEnemy()
     {

@@ -22,7 +22,7 @@ public class OldCharacterController : MonoBehaviour
     #endregion
 
     #region other imports (scripts, gameobjs, etc)
-    private MouseMovement mouseMovementScript;
+    //private MouseMovement mouseMovementScript;
     private DevCombat devCombatScript;
     private MapPathfind gridGraphScript;
     private ClosestNodes closestNodesScript;
@@ -56,7 +56,7 @@ public class OldCharacterController : MonoBehaviour
         CamTransform = Camera.main.transform;
         myAnimator = GetComponent<Animator>();
 
-        mouseMovementScript = Camera.main.GetComponent<MouseMovement>();
+        //mouseMovementScript = Camera.main.GetComponent<MouseMovement>();
         devCombatScript = player.GetComponent<DevCombat>();
         desiredRot = Camera.main.transform.eulerAngles.y;
         if (doPathfinding)
@@ -101,7 +101,7 @@ public class OldCharacterController : MonoBehaviour
             transform.Translate(Vector3.forward * Time.deltaTime * 2f);
         }
 
-        if (DevMain.controlsManager.GetButtonDown(ControlsManager.ButtonType.Jump) && movingVert &&
+        if (Input.GetButtonDown("Jump") && movingVert &&
             adjustCounter == 0 && (!doCombat || devCombatScript.notInCombatMove()))
         {
             myAnimator.SetBool("Jumping", true);
@@ -113,8 +113,6 @@ public class OldCharacterController : MonoBehaviour
             myAnimator.SetBool("shouldFrontFlip", true);
             Invoke("stopFrontFlip", 2.1f);
         }
-
-        RotatePlayer();
     }
     #endregion
 
@@ -130,7 +128,7 @@ public class OldCharacterController : MonoBehaviour
             return;
         }
 
-        bool inCombatZone = mouseMovementScript.getInCombatZone();
+        //bool inCombatZone = mouseMovementScript.getInCombatZone();
         bool weaponDrawn = myAnimator.GetBool("WeaponDrawn");
         bool inCombatMove = !devCombatScript.notInCombatMove();
 
@@ -150,11 +148,11 @@ public class OldCharacterController : MonoBehaviour
     private void nonCombatMovement()
     {
         AnimatorStateInfo anim = myAnimator.GetCurrentAnimatorStateInfo(0);
-        if ((Time.time - mouseMovementScript.getCombatExitTime()) < 1f)
-        {
-            myAnimator.SetFloat("VSpeed", 0f);
-            myAnimator.SetFloat("HorizSpeed", 0f);
-        }
+        //if ((Time.time - mouseMovementScript.getCombatExitTime()) < 1f)
+        //{
+        //    myAnimator.SetFloat("VSpeed", 0f);
+        //    myAnimator.SetFloat("HorizSpeed", 0f);
+        //}
         if (anim.IsTag("Running"))
         {
             float doIt = 1f;
@@ -362,14 +360,6 @@ public class OldCharacterController : MonoBehaviour
     public void impactMoveBack()
     {
         transform.Translate(Vector3.back * 0.5f * Time.deltaTime);
-    }
-
-    void RotatePlayer()
-    {
-        AnimatorStateInfo anim = myAnimator.GetCurrentAnimatorStateInfo(0);
-        if (!inCombatZone && !anim.IsTag("Jumps") && !myAnimator.GetBool("Jumping") &&
-                !myAnimator.GetBool("shouldFrontFlip") && (!doCombat || devCombatScript.notInCombatMove()))
-            transform.Rotate(0, m_TurnAmount * turnSpeed * Time.fixedDeltaTime, 0);
     }
 
     //public void adjustToCam(float dif, bool firstTimeAdjust)

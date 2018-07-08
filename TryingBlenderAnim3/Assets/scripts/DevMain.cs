@@ -11,9 +11,7 @@ public class DevMain : MonoBehaviour
     #endregion
 
     #region script imports
-    CameraController cameraController;
-    CharacterController devMovement;
-
+    InputController inputController;
     DevCellTracking devCellTracking;
     DevCombat devCombat;
     DevCombatReactions devCombatReactions;
@@ -24,32 +22,21 @@ public class DevMain : MonoBehaviour
     MapPathfind mapPathfind;
     ClosestNodes closestNodes;
 
-    bool inputEnabled, cameraEnabled;
-
-    public static ControlsManager controlsManager;
     public static GameObject Player;
     #endregion
 
     private void Awake()
     {
         Player = gameObject;
+        inputController = GetComponent<InputController>();
     }
 
     void Start()
     {
-        inputEnabled = true;
-        cameraEnabled = true;
-        controlsManager = new ControlsManager();
-        controlsManager.Init();
+        inputController.Init();
 
         if (doPathfinding || doCombat)
             doEnemies = true;
-        devMovement = GetComponent<CharacterController>();
-        cameraController = Camera.main.GetComponent<CameraController>();
-
-        devMovement.doCombat = doCombat;
-        devMovement.Init();
-        cameraController.Init();
 
         if (doEnemies)
         {
@@ -66,6 +53,7 @@ public class DevMain : MonoBehaviour
 
         if (doCombat)
         {
+            inputController.combatEnabled = doCombat;
             devCombat = GetComponent<DevCombat>();
             devCombatReactions = GetComponent<DevCombatReactions>();
             devCombat.Init();
@@ -99,8 +87,7 @@ public class DevMain : MonoBehaviour
 
     void Update()
     {
-        if (inputEnabled) devMovement.FrameUpdate();
-        if (cameraEnabled) cameraController.FrameUpdate();
+        inputController.FrameUpdate();
 
         if (doEnemies)
             foreach (EnemyMain curEnemyMain in enemyMains)
@@ -114,5 +101,10 @@ public class DevMain : MonoBehaviour
 
         if (doPathfinding)
             devCellTracking.FrameUpdate();
+    }
+
+    void FixedUpdate()
+    {
+        inputController.PhysicsUpdate();        
     }
 }

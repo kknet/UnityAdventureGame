@@ -88,7 +88,7 @@ public class CharacterController : MonoBehaviour
         //detectionTargets.Reverse();
     }
 
-    void Start()
+    public void Init()
     {
         m_Animator = GetComponent<Animator>();
         m_Rigidbody = GetComponent<Rigidbody>();
@@ -188,6 +188,12 @@ public class CharacterController : MonoBehaviour
     public bool running()
     {
         return Mathf.Abs(m_Animator.GetFloat("Forward")) > 0.01f;
+    }
+
+    public bool rolling()
+    {
+        AnimatorStateInfo anim = m_Animator.GetCurrentAnimatorStateInfo(0);
+        return anim.IsTag("roll");
     }
 
     private IEnumerator guaranteeStopJump()
