@@ -33,13 +33,13 @@ public class CharacterController : MonoBehaviour
     InputController InputController;
     CharacterEvents CharacterEvents;
 
-    [HideInInspector] public CapsuleCollider m_Capsule;
-    float lastGroundedTime;
     Rigidbody m_Rigidbody;
     Animator m_Animator;
     Vector3 m_GroundNormal;
-    float m_CapsuleHeight;
+    CapsuleCollider m_Capsule;
     Vector3 m_CapsuleCenter;
+    float m_CapsuleHeight;
+    float lastGroundedTime;
     #endregion
 
     #region things to tweak in inspector
@@ -52,10 +52,10 @@ public class CharacterController : MonoBehaviour
     #endregion 
 
     #region things to tweak only in code
-    float m_MovingTurnSpeed = 360f;
+    float m_MovingTurnSpeed = 180f;
     float m_MoveSpeedMultiplier = 8.5f;
     float m_WallJumpCheckDistance = 0.5f;
-    float m_GroundCheckDistance = 0.2f;
+    float m_GroundCheckDistance = 0.3f;
     int lerpFrames = 60;
     float lerpSmoothing = 16f;
 
@@ -87,6 +87,7 @@ public class CharacterController : MonoBehaviour
         lastGroundedTime = Time.time;
         InputController = GetComponent<InputController>();
         CharacterEvents = GetComponent<CharacterEvents>();
+        CharacterEvents.Init();
     }
 
     public void Move(Vector3 move, bool crouch, bool jump)
@@ -126,15 +127,15 @@ public class CharacterController : MonoBehaviour
             RotatePlayer();
 
         bool fallingDown = m_Rigidbody.velocity.y < 0f;
-        if (jumping() || fallingDown)
-            m_Rigidbody.AddForce(Physics.gravity * 1.25f);
+        //if (jumping() || fallingDown)
+        //    m_Rigidbody.AddForce(Physics.gravity * 1.25f);
 
         UpdateAnimator(move);
 
-        bool movingVert = !Mathf.Approximately(m_Animator.GetFloat("Vertical"), 0f);
-        bool movingHoriz = !Mathf.Approximately(m_Animator.GetFloat("Horizontal"), 0f);
-        if (!movingVert && !movingHoriz)
-            CharacterEvents.stopFootstepSound();
+        //bool movingVert = !Mathf.Approximately(m_Animator.GetFloat("Forward"), 0f);
+        //bool movingHoriz = !Mathf.Approximately(m_Animator.GetFloat("Horizontal"), 0f);
+        //if (!movingVert && !movingHoriz)
+        //    CharacterEvents.stopFootstepSound();
     }
 
     void UpdateAnimator(Vector3 move)
@@ -146,12 +147,19 @@ public class CharacterController : MonoBehaviour
         if (jumping() && checkJumpIntoWall())
         {
             m_Animator.SetFloat("Forward", 0f);
-            m_Capsule.material.dynamicFriction = 0f;
-            m_Capsule.material.staticFriction = 0f;
-            m_Capsule.material.bounciness = 0f;
+            //m_Capsule.material.dynamicFriction = 0f;
+            //m_Capsule.material.staticFriction = 0f;
+            //m_Capsule.material.bounciness = 0f;
         }
         else
-            m_Animator.SetFloat("Forward", Mathf.MoveTowards(m_Animator.GetFloat("Forward"), m_ForwardAmount, 0.03f));
+        {
+            float smoothingSpeed;
+            if (m_ForwardAmount > m_Animator.GetFloat("Forward") && m_Animator.GetFloat("Forward") < 0.4f)
+                smoothingSpeed = 0.06f;
+            else
+                smoothingSpeed = 0.03f;
+            m_Animator.SetFloat("Forward", Mathf.MoveTowards(m_Animator.GetFloat("Forward"), m_ForwardAmount, smoothingSpeed));
+        }
 
         if (m_jump)
         {
@@ -207,7 +215,6 @@ public class CharacterController : MonoBehaviour
     {
         switch (jumpState)
         {
-
             case JumpState.waitingToRise:
                 {
                     AnimatorStateInfo animState = m_Animator.GetCurrentAnimatorStateInfo(0);
@@ -274,6 +281,13 @@ public class CharacterController : MonoBehaviour
 
         // 0.1f is a small offset to start the ray from inside the character
         // it is also good to note that the transform position in the sample assets is at the base of the character
+
+        Debug.DrawLine(posPlusY, posPlusY + (Vector3.down * m_GroundCheckDistance), Color.red);
+        Debug.DrawLine(posPlusY + zOffset, posPlusY + zOffset + (Vector3.down * m_GroundCheckDistance), Color.red);
+        Debug.DrawLine(posPlusY - zOffset, posPlusY - zOffset + (Vector3.down * m_GroundCheckDistance), Color.red);
+        Debug.DrawLine(posPlusY + xOffset, posPlusY + xOffset + (Vector3.down * m_GroundCheckDistance), Color.red);
+        Debug.DrawLine(posPlusY - xOffset, posPlusY - xOffset + (Vector3.down * m_GroundCheckDistance), Color.red);
+
 
         if (Physics.Raycast(posPlusY, Vector3.down, out hitInfo, m_GroundCheckDistance) ||
             Physics.Raycast(posPlusY + zOffset, Vector3.down, out hitInfo, m_GroundCheckDistance) ||

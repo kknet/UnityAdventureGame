@@ -32,11 +32,14 @@ public class WeaponToggle : MonoBehaviour
     //	bool isShieldOut;
 
     // Use this for initialization
-    void Start()
+    void Awake()
     {
+        //if (!GetComponent<DevMain>().doCombat)
+        //    return;
+
         weaponsTable = new Dictionary<string, GameObject>();
         allWeps = GameObject.FindGameObjectsWithTag("OurWeapons");
-        myAnimator = DevMain.Player.GetComponent<Animator>();
+        myAnimator = GetComponent<Animator>();
         //		ShieldIn = GameObject.Find ("ShieldIn");
         ShieldOut = GameObject.Find("ShieldOut");
         //		ShieldIn.SetActive (true);

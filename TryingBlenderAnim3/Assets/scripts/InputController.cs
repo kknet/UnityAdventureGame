@@ -81,7 +81,7 @@ public class InputController : MonoBehaviour
         }
 
         bool walking = walk && !characterController.jumping() && !characterController.rolling();
-        if (walking) m_Move *= 0.33f;
+        if (walking) m_Move *= 0.66f;
 
 
         // pass all parameters to the character control script
@@ -98,6 +98,7 @@ public class InputController : MonoBehaviour
             if (characterController.m_grounded && !characterController.m_jump && !characterController.jumping())
             {
                 characterController.m_jump = true;
+                Debug.LogWarning("Jumped");
                 break;
             }
             else

@@ -27,25 +27,27 @@ public class CharacterEvents : MonoBehaviour
 
     private int runCounter;
     private bool applyJumpTrans;
+    private AudioSource[] footSteps;
 
 
     public void Init()
     {
         m_Animator = GetComponent<Animator>();
+        footSteps = new AudioSource[]{footstep1, footstep2, footstep3, footstep4};
+    }
 
+    private float rand(float a, float b)
+    {
+        return UnityEngine.Random.Range(a, b);
     }
 
     #region sounds
     public void runningSound()
     {
-        if (runCounter == 0)
-            footstep1.Play();
-        else if (runCounter == 1)
-            footstep2.Play();
-        else if (runCounter == 2)
-            footstep3.Play();
-        else if (runCounter == 3)
-            footstep4.Play();
+        AudioSource chosenSource = footSteps[runCounter];
+        chosenSource.pitch = rand(0.7f, 0.9f);
+        chosenSource.Play();
+
         ++runCounter;
         if (runCounter == 4)
             runCounter = 0;
@@ -55,14 +57,11 @@ public class CharacterEvents : MonoBehaviour
     {
         if (!Mathf.Approximately(m_Animator.GetFloat("VSpeed"), 0f))
             return;
-        if (runCounter == 0)
-            footstep1.Play();
-        else if (runCounter == 1)
-            footstep2.Play();
-        else if (runCounter == 2)
-            footstep3.Play();
-        else if (runCounter == 3)
-            footstep4.Play();
+
+        AudioSource chosenSource = footSteps[runCounter];
+        chosenSource.pitch = rand(0.7f, 0.9f);
+        chosenSource.Play();
+
         ++runCounter;
         if (runCounter == 4)
             runCounter = 0;

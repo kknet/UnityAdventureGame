@@ -34,9 +34,9 @@ public class CameraController : MonoBehaviour
     Vector3 targetPos, camPos, desiredCamPos;
     Vector3 velocityCamSmooth = Vector3.zero;
     //Vector3 verticalPosOffsetNormal = (Vector3.up * 0.6f);
-    Vector3 verticalPosOffsetNormal = (Vector3.up * 1.3f);
-    float normalDistance = 6f;
-    float climbingDistance = 12f;
+    Vector3 verticalPosOffsetNormal = (Vector3.up * 1.6f);
+    float normalDistance = 5f;
+    float climbingDistance = 10f;
     float distance;
     float controllerSensitivityMultiplier = 3f;
     [SerializeField] float mouseSensitivityX = 20f;
