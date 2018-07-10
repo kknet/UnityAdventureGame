@@ -47,8 +47,9 @@ public class InputController : MonoBehaviour
 
         controlsManager.updateRecentInputDevice();
 
-        if (controlsManager.GetButtonDown(ControlsManager.ButtonType.Jump))
-            StartCoroutine(BufferedJump()); //allows you to press jump slightly (10 frames) before you hit the ground.
+        if(characterController.jumpEnabled)
+            if (controlsManager.GetButtonDown(ControlsManager.ButtonType.Jump))
+                StartCoroutine(BufferedJump()); //allows you to press jump slightly (10 frames) before you hit the ground.
     }
 
     public void PhysicsUpdate()

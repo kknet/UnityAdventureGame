@@ -65,6 +65,8 @@ public class CharacterController : MonoBehaviour
     float jumpAmountGoal = -0.1f;
     float jumpLandTime = 0f;
     float jumpStartTime = 0f;
+
+    public bool jumpEnabled = false;
     #endregion
 
     private void Awake()
@@ -141,10 +143,11 @@ public class CharacterController : MonoBehaviour
     void UpdateAnimator(Vector3 move)
     {
         CheckGroundStatus();
-        updateJumpState();
+
+        if(jumpEnabled) updateJumpState();
         m_Rigidbody.useGravity = true;
 
-        if (jumping() && checkJumpIntoWall())
+        if (jumpEnabled && jumping() && checkJumpIntoWall())
         {
             m_Animator.SetFloat("Forward", 0f);
             //m_Capsule.material.dynamicFriction = 0f;
