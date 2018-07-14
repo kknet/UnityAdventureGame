@@ -53,7 +53,8 @@ public class CharacterController : MonoBehaviour
 
     #region things to tweak only in code
     float m_MovingTurnSpeed = 180f;
-    float m_MoveSpeedMultiplier = 8.5f;
+    //float m_MoveSpeedMultiplier = 8.5f;
+    float m_MoveSpeedMultiplier = 10f;
     float m_WallJumpCheckDistance = 0.5f;
     float m_GroundCheckDistance = 0.3f;
     int lerpFrames = 60;
@@ -113,17 +114,22 @@ public class CharacterController : MonoBehaviour
         }
         else if (anim.IsTag("roll"))
             m_ForwardAmount = move.z * 1f;
-        else if (jumpState == JumpState.waitingToIdle && !checkJumpIntoWall())
+        else if (jumpEnabled && jumpState == JumpState.waitingToIdle && !checkJumpIntoWall())
             m_ForwardAmount = move.z * 1f;
-        else if ((jumping() && !checkJumpIntoWall()))
+        else if (jumpEnabled && jumping() && !checkJumpIntoWall())
             m_ForwardAmount = move.z * 2f;
-        else if (jumping() && checkJumpIntoWall())
+        else if (jumpEnabled && jumping() && checkJumpIntoWall())
         {
             m_ForwardAmount = 0f;
             move.z = 0f;
         }
         else
             m_ForwardAmount = move.z;
+
+        //should walk while rotating
+        if (Mathf.Abs(m_TurnAmount) > 0f)
+            if (m_ForwardAmount < 0.01f)
+                m_ForwardAmount = 0.33f;
 
         if (m_grounded || (!m_grounded && jumpState == JumpState.waitingToLand))
             RotatePlayer();
@@ -144,7 +150,7 @@ public class CharacterController : MonoBehaviour
     {
         CheckGroundStatus();
 
-        if(jumpEnabled) updateJumpState();
+        if (jumpEnabled) updateJumpState();
         m_Rigidbody.useGravity = true;
 
         if (jumpEnabled && jumping() && checkJumpIntoWall())
@@ -156,12 +162,7 @@ public class CharacterController : MonoBehaviour
         }
         else
         {
-            float smoothingSpeed;
-            if (m_ForwardAmount > m_Animator.GetFloat("Forward") && m_Animator.GetFloat("Forward") < 0.4f)
-                smoothingSpeed = 0.06f;
-            else
-                smoothingSpeed = 0.03f;
-            m_Animator.SetFloat("Forward", Mathf.MoveTowards(m_Animator.GetFloat("Forward"), m_ForwardAmount, smoothingSpeed));
+            m_Animator.SetFloat("Forward", Mathf.MoveTowards(m_Animator.GetFloat("Forward"), m_ForwardAmount, 1f * Time.fixedDeltaTime));
         }
 
         if (m_jump)
