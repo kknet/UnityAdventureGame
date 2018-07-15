@@ -24,6 +24,7 @@ public class CameraController : MonoBehaviour
     float aimGoalDistance = 1.4f;
     Vector3 currentOffset;
 
+    CameraBob cameraBob;
     CharacterController characterScript;
     Camera cam;
     Vector3 screenPoint;
@@ -33,17 +34,17 @@ public class CameraController : MonoBehaviour
 
     Vector3 targetPos, camPos, desiredCamPos;
     Vector3 velocityCamSmooth = Vector3.zero;
-    //Vector3 verticalPosOffsetNormal = (Vector3.up * 0.6f);
-    Vector3 verticalPosOffsetNormal = (Vector3.up * 1.6f);
-    float normalDistance = 5f;
-    float climbingDistance = 10f;
+    //Vector3 verticalPosOffsetNormal = (Vector3.up * 1.6f);
+    Vector3 verticalPosOffsetNormal = (Vector3.up * 1.4f);
+    float normalDistance = 1.6f;
+    float climbingDistance = 5f;
     float distance;
     float controllerSensitivityMultiplier = 3f;
     [SerializeField] float mouseSensitivityX = 20f;
     [SerializeField] float mouseSensitivityY = 10f;
     float yMinLimit = -40f;
     float yMaxLimit = 80f;
-    float smoothTime = 10f;
+    float smoothTime = 50f;
     float positionSmoothTime;
     float normalDistanceSmoothTime = 20f;
     float climbingDistanceSmoothTime = 30f;
@@ -92,6 +93,7 @@ public class CameraController : MonoBehaviour
 
     public void Init()
     {
+        cameraBob = GetComponent<CameraBob>();
         camScript = GetComponent<CameraController>();
         Player = DevMain.Player;
         cam = Camera.main;
@@ -107,7 +109,7 @@ public class CameraController : MonoBehaviour
         Vector3 negDistance = new Vector3(0.0f, 0.0f, -distance);
         float backPosCoefficient = Mathf.Clamp(-rotationXAxis / ((yMaxLimit - yMinLimit) / 2f), 0f, 1f);
         Vector3 backPosOffset = -transform.forward * 1.3f * backPosCoefficient;
-        targetPos = target.position + verticalPosOffsetNormal;
+        targetPos = target.position + verticalPosOffsetNormal + horizontalPosOffsetNormal();
         camPos = targetPos + rotation * negDistance + backPosOffset;
 
         if (cameraCollisionZoom)
@@ -120,6 +122,16 @@ public class CameraController : MonoBehaviour
 
         positionSmoothTime = smoothTime * 2f;
     }
+
+    bool cameraShouldBob()
+    {
+        return characterScript.m_ForwardAmount > 0.9f;
+    }
+
+    Vector3 horizontalPosOffsetNormal()
+    {
+        return transform.right * 0.3f;
+    } 
 
     public void PhysicsUpdate()
     {
@@ -141,8 +153,9 @@ public class CameraController : MonoBehaviour
         Vector3 negDistance = new Vector3(0.0f, 0.0f, -distance);
         float backPosCoefficient = Mathf.Clamp(-rotationXAxis / ((yMaxLimit - yMinLimit) / 2f), 0f, 1f);
         Vector3 backPosOffset = -transform.forward * 1.3f * backPosCoefficient;
-        targetPos = target.position + verticalPosOffsetNormal;
+        targetPos = target.position + verticalPosOffsetNormal + horizontalPosOffsetNormal();
         camPos = targetPos + rotation * negDistance + backPosOffset;
+        camPos = cameraBob.AddCameraBob(camPos, characterScript.m_ForwardAmount);
 
         Vector3 defaultNegDistance = new Vector3(0.0f, 0.0f, -initialDistance());
         desiredCamPos = targetPos + rotation * defaultNegDistance;

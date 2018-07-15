@@ -61,7 +61,7 @@ public class InputController : MonoBehaviour
         {
             characterController.m_ForwardAmount = 0f;
             GetComponent<Animator>().SetFloat("Forward", 0f);
-            characterController.Move(Vector3.zero, false, false);
+            characterController.Move(Vector3.zero);
             if (cameraEnabled) cameraController.PhysicsUpdate();
             return;
         }
@@ -86,7 +86,7 @@ public class InputController : MonoBehaviour
 
 
         // pass all parameters to the character control script
-        characterController.Move(m_Move, false, false);
+        characterController.Move(m_Move);
         cameraController.PhysicsUpdate();
     }
 

@@ -54,7 +54,7 @@ public class CharacterController : MonoBehaviour
     #region things to tweak only in code
     float m_MovingTurnSpeed = 180f;
     //float m_MoveSpeedMultiplier = 8.5f;
-    float m_MoveSpeedMultiplier = 10f;
+    float m_MoveSpeedMultiplier = 8f;
     float m_WallJumpCheckDistance = 0.5f;
     float m_GroundCheckDistance = 0.3f;
     int lerpFrames = 60;
@@ -93,7 +93,7 @@ public class CharacterController : MonoBehaviour
         CharacterEvents.Init();
     }
 
-    public void Move(Vector3 move, bool crouch, bool jump)
+    public void Move(Vector3 move)
     {
         AnimatorStateInfo anim = m_Animator.GetCurrentAnimatorStateInfo(0);
 
@@ -125,11 +125,6 @@ public class CharacterController : MonoBehaviour
         }
         else
             m_ForwardAmount = move.z;
-
-        //should walk while rotating
-        if (Mathf.Abs(m_TurnAmount) > 0f)
-            if (m_ForwardAmount < 0.01f)
-                m_ForwardAmount = 0.33f;
 
         if (m_grounded || (!m_grounded && jumpState == JumpState.waitingToLand))
             RotatePlayer();
