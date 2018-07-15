@@ -42,7 +42,7 @@ public class CameraController : MonoBehaviour
     float controllerSensitivityMultiplier = 3f;
     [SerializeField] float mouseSensitivityX = 20f;
     [SerializeField] float mouseSensitivityY = 10f;
-    float yMinLimit = -40f;
+    float yMinLimit = -30f;
     float yMaxLimit = 80f;
     float smoothTime = 50f;
     float positionSmoothTime;
@@ -155,7 +155,7 @@ public class CameraController : MonoBehaviour
         Vector3 backPosOffset = -transform.forward * 1.3f * backPosCoefficient;
         targetPos = target.position + verticalPosOffsetNormal + horizontalPosOffsetNormal();
         camPos = targetPos + rotation * negDistance + backPosOffset;
-        camPos = cameraBob.AddCameraBob(camPos, characterScript.m_ForwardAmount);
+        camPos = cameraBob.AddCameraBob(camPos, characterScript.m_Animator.GetFloat("Forward"));
 
         Vector3 defaultNegDistance = new Vector3(0.0f, 0.0f, -initialDistance());
         desiredCamPos = targetPos + rotation * defaultNegDistance;

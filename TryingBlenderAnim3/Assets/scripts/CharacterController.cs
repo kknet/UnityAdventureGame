@@ -33,8 +33,8 @@ public class CharacterController : MonoBehaviour
     InputController InputController;
     CharacterEvents CharacterEvents;
 
+    public Animator m_Animator;
     Rigidbody m_Rigidbody;
-    Animator m_Animator;
     Vector3 m_GroundNormal;
     CapsuleCollider m_Capsule;
     Vector3 m_CapsuleCenter;
@@ -157,7 +157,7 @@ public class CharacterController : MonoBehaviour
         }
         else
         {
-            m_Animator.SetFloat("Forward", Mathf.MoveTowards(m_Animator.GetFloat("Forward"), m_ForwardAmount, 1f * Time.fixedDeltaTime));
+            m_Animator.SetFloat("Forward", Mathf.MoveTowards(m_Animator.GetFloat("Forward"), m_ForwardAmount, 0.8f * Time.fixedDeltaTime));
         }
 
         if (m_jump)
@@ -166,7 +166,8 @@ public class CharacterController : MonoBehaviour
             jumpState = JumpState.waitingToRise;
         }
         else
-            transform.Translate(m_Animator.GetFloat("Forward") * Vector3.forward * Time.fixedDeltaTime * m_MoveSpeedMultiplier);
+            transform.Translate(Mathf.Pow(m_Animator.GetFloat("Forward"), 1.5f) * Vector3.forward * 
+                                Time.fixedDeltaTime * m_MoveSpeedMultiplier);
 
         bool fallingDown = m_Rigidbody.velocity.y < 0f && !m_grounded && !jumping();
         if (fallingDown) jumpState = JumpState.waitingToFall;
