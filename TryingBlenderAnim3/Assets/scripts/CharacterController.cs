@@ -126,6 +126,9 @@ public class CharacterController : MonoBehaviour
         else
             m_ForwardAmount = move.z;
 
+        if (m_TurnAmount > 0f && m_ForwardAmount < 0.33f)
+            m_ForwardAmount = 0.33f;
+
         if (m_grounded || (!m_grounded && jumpState == JumpState.waitingToLand))
             RotatePlayer();
 
@@ -166,8 +169,12 @@ public class CharacterController : MonoBehaviour
             jumpState = JumpState.waitingToRise;
         }
         else
-            transform.Translate(Mathf.Pow(m_Animator.GetFloat("Forward"), 1.5f) * Vector3.forward * 
+        {
+            float fwd = m_Animator.GetFloat("Forward");
+            float fwdMultiplier = fwd > 0f ? Mathf.Pow(fwd, 1.5f) : 0f;
+            transform.Translate(fwdMultiplier * Vector3.forward *
                                 Time.fixedDeltaTime * m_MoveSpeedMultiplier);
+        }
 
         bool fallingDown = m_Rigidbody.velocity.y < 0f && !m_grounded && !jumping();
         if (fallingDown) jumpState = JumpState.waitingToFall;
@@ -175,7 +182,8 @@ public class CharacterController : MonoBehaviour
 
     void RotatePlayer()
     {
-        transform.Rotate(0, m_TurnAmount * m_MovingTurnSpeed * Time.fixedDeltaTime, 0);
+        if(Mathf.Abs(m_Animator.GetFloat("Forward")) > 0f)
+            transform.Rotate(0, m_TurnAmount * m_MovingTurnSpeed * Time.fixedDeltaTime, 0);
     }
 
     public bool running()
