@@ -171,7 +171,7 @@ public class CharacterController : MonoBehaviour
         else
         {
             m_Animator.SetFloat("Forward", Mathf.MoveTowards(m_Animator.GetFloat("Forward"), m_ForwardAmount, 0.8f * Time.fixedDeltaTime));
-            m_Animator.SetFloat("HorizSpeed", Mathf.MoveTowards(m_Animator.GetFloat("HorizSpeed"), m_SideAmount, 0.8f * Time.fixedDeltaTime));
+            m_Animator.SetFloat("HorizSpeed", Mathf.MoveTowards(m_Animator.GetFloat("HorizSpeed"), m_SideAmount, 1.6f * Time.fixedDeltaTime));
         }
 
         if (m_jump)

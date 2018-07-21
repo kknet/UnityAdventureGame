@@ -60,11 +60,20 @@ public class EnemyCheckHit : MonoBehaviour
         Animator devAnimator = DevMain.Player.GetComponent<Animator>();
         animator.speed = 0f;
         devAnimator.speed = 0f;
-        yield return new WaitForSecondsRealtime(1f);
+        while (animator.speed > 0f)
+        {
+            animator.speed -= 0.1f;
+            devAnimator.speed -= 0.1f;
+            yield return null;
+        }
+
+
+        yield return new WaitForSecondsRealtime(0.2f);
         while (animator.speed < 1f)
         {
-            animator.speed += 0.02f;
-            devAnimator.speed += 0.02f;
+            animator.speed += 0.1f;
+            devAnimator.speed += 0.1f;
+            yield return null;
         }
     }
 
