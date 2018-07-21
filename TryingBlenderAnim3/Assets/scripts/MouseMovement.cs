@@ -41,7 +41,7 @@ public class MouseMovement : MonoBehaviour
     private Animator myAnimator;
 
     private CharacterController characterScript;
-    private DevCombat devCombatScript;
+    private OldDevCombat devCombatScript;
 
     [SerializeField]
     [HideInInspector]
@@ -63,7 +63,7 @@ public class MouseMovement : MonoBehaviour
         distance = initialOffset.magnitude;
         lastEnemyCheckTime = Time.realtimeSinceStartup;
         characterScript = player.GetComponent<CharacterController>();
-        devCombatScript = player.GetComponent<DevCombat>();
+        devCombatScript = player.GetComponent<OldDevCombat>();
         closestEnemyObject = GameObject.Find("Brute2");
         haveDevCombatOffset = true;
         lineCastPeriod = 1f;

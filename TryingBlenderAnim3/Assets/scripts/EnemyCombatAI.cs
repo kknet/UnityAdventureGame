@@ -4,9 +4,6 @@ using UnityEngine;
 
 public class EnemyCombatAI : MonoBehaviour
 {
-
-
-
     #region variables
 
     public bool setBlocking, setLookAtDev;

@@ -97,7 +97,7 @@ public class DevCombatReactions : MonoBehaviour
 
     public bool rotationAllowsBlock()
     {
-        float myAngle = GetComponent<DevCombat>().getCurrentEnemy().transform.eulerAngles.y; Clamp(myAngle);
+        float myAngle = GetComponent<OldDevCombat>().getCurrentEnemy().transform.eulerAngles.y; Clamp(myAngle);
         float devAngle = transform.eulerAngles.y; Clamp(devAngle);
         float rotDifference;
         if (myAngle > devAngle)

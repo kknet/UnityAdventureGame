@@ -273,7 +273,7 @@ public class MapPathfind : MonoBehaviour
     public mapNode[] getSpacedDevCombatCircle(int stepsOut, int offset)
     {
         mapNode[] combatCircle = calculateDevCombatCircle(stepsOut);
-        GameObject[] enemies = DevMain.Player.GetComponent<DevCombat>().getEnemies();
+        GameObject[] enemies = DevMain.Player.GetComponent<OldDevCombat>().getEnemies();
         int spacing = Mathf.FloorToInt(combatCircle.Length / enemies.Length);
         mapNode[] spacedCombatCircle = new mapNode[enemies.Length];
         for (int idx = 0; idx < enemies.Length - offset; ++idx)

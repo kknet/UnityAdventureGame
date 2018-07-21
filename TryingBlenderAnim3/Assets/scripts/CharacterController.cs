@@ -28,12 +28,17 @@ public class CharacterController : MonoBehaviour
     [HideInInspector]
     public float m_ForwardAmount;
     [HideInInspector]
+    public float m_SideAmount;
+    [HideInInspector]
     public float m_TurnAmount;
+    [HideInInspector]
+    public Animator m_Animator;
+
 
     InputController InputController;
     CharacterEvents CharacterEvents;
+    DevCombat DevCombat;
 
-    public Animator m_Animator;
     Rigidbody m_Rigidbody;
     Vector3 m_GroundNormal;
     CapsuleCollider m_Capsule;
@@ -53,7 +58,7 @@ public class CharacterController : MonoBehaviour
 
     #region things to tweak only in code
     float m_MovingTurnSpeed = 180f;
-    //float m_MoveSpeedMultiplier = 8.5f;
+    float m_CombatMoveSpeedMultiplier = 4f;
     float m_MoveSpeedMultiplier = 8f;
     float m_WallJumpCheckDistance = 0.5f;
     float m_GroundCheckDistance = 0.3f;
@@ -78,6 +83,7 @@ public class CharacterController : MonoBehaviour
 
     public void Init()
     {
+        DevCombat = GetComponent<DevCombat>();
         m_Animator = GetComponent<Animator>();
         m_Rigidbody = GetComponent<Rigidbody>();
         m_Capsule = GetComponent<CapsuleCollider>();
@@ -126,6 +132,10 @@ public class CharacterController : MonoBehaviour
         else
             m_ForwardAmount = move.z;
 
+        if (inCombatMode())
+            m_SideAmount = move.x;
+
+
         if (m_TurnAmount > 0f && m_ForwardAmount < 0.33f)
             m_ForwardAmount = 0.33f;
 
@@ -161,6 +171,7 @@ public class CharacterController : MonoBehaviour
         else
         {
             m_Animator.SetFloat("Forward", Mathf.MoveTowards(m_Animator.GetFloat("Forward"), m_ForwardAmount, 0.8f * Time.fixedDeltaTime));
+            m_Animator.SetFloat("HorizSpeed", Mathf.MoveTowards(m_Animator.GetFloat("HorizSpeed"), m_SideAmount, 0.8f * Time.fixedDeltaTime));
         }
 
         if (m_jump)
@@ -170,10 +181,21 @@ public class CharacterController : MonoBehaviour
         }
         else
         {
-            float fwd = m_Animator.GetFloat("Forward");
-            float fwdMultiplier = fwd > 0f ? Mathf.Pow(fwd, 1.5f) : 0f;
-            transform.Translate(fwdMultiplier * Vector3.forward *
-                                Time.fixedDeltaTime * m_MoveSpeedMultiplier);
+            if (inCombatMode())
+            {
+                float fwd = m_Animator.GetFloat("Forward");
+                float side = m_Animator.GetFloat("HorizSpeed");
+
+                transform.Translate(Vector3.forward * fwd * Time.fixedDeltaTime * m_CombatMoveSpeedMultiplier);
+                transform.Translate(Vector3.right * side * Time.fixedDeltaTime * m_CombatMoveSpeedMultiplier);
+            }
+            else
+            {
+                float fwd = m_Animator.GetFloat("Forward");
+                float fwdMultiplier = fwd > 0f ? Mathf.Pow(fwd, 1.5f) : 0f;
+                transform.Translate(fwdMultiplier * Vector3.forward *
+                                    Time.fixedDeltaTime * m_MoveSpeedMultiplier);
+            }
         }
 
         bool fallingDown = m_Rigidbody.velocity.y < 0f && !m_grounded && !jumping();
@@ -182,8 +204,17 @@ public class CharacterController : MonoBehaviour
 
     void RotatePlayer()
     {
-        if(Mathf.Abs(m_Animator.GetFloat("Forward")) > 0f)
-            transform.Rotate(0, m_TurnAmount * m_MovingTurnSpeed * Time.fixedDeltaTime, 0);
+        if (inCombatMode() && DevCombat.Locked)
+        {
+            Vector3 pos = DevCombat.TestEnemy.transform.position;
+            pos = new Vector3(pos.x, transform.position.y, pos.z);
+            transform.LookAt(pos, transform.up);
+        }
+        else
+        {
+            if (Mathf.Abs(m_Animator.GetFloat("Forward")) > 0f)
+                transform.Rotate(0, m_TurnAmount * m_MovingTurnSpeed * Time.fixedDeltaTime, 0);
+        }
     }
 
     public bool running()
@@ -324,6 +355,11 @@ public class CharacterController : MonoBehaviour
     public bool jumping()
     {
         return jumpState != JumpState.notJumping;
+    }
+
+    public bool inCombatMode()
+    {
+        return m_Animator.GetBool("WeaponDrawn");
     }
 
     //lerp the player each frame to face a wall

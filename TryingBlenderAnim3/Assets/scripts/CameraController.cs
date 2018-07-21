@@ -10,10 +10,11 @@ public class CameraController : MonoBehaviour
 
     public CollisionHandler collision;
     public Transform target;
-    public bool CameraAssist;
+    public bool cameraBobEnabled;
     public bool cameraCollisionZoom;
     public bool autoAdjustCam;
     public bool drawGizmos;
+    //public bool CameraAssist;
 
     [SerializeField]
     [HideInInspector]
@@ -71,10 +72,10 @@ public class CameraController : MonoBehaviour
         mouseSensitivityY = (value * 1f);
     }
 
-    public void setCameraAssist(bool value)
-    {
-        CameraAssist = value;
-    }
+    //public void setCameraAssist(bool value)
+    //{
+    //    CameraAssist = value;
+    //}
 
     public void setCameraInvertedX(bool value)
     {
@@ -155,11 +156,11 @@ public class CameraController : MonoBehaviour
         Vector3 backPosOffset = -transform.forward * 1.3f * backPosCoefficient;
         targetPos = target.position + verticalPosOffsetNormal + horizontalPosOffsetNormal();
         camPos = targetPos + rotation * negDistance + backPosOffset;
-        camPos = cameraBob.AddCameraBob(camPos, characterScript.m_Animator.GetFloat("Forward"));
+        if(cameraBobEnabled)
+            camPos = cameraBob.AddCameraBob(camPos, characterScript.m_Animator.GetFloat("Forward"));
 
         Vector3 defaultNegDistance = new Vector3(0.0f, 0.0f, -initialDistance());
         desiredCamPos = targetPos + rotation * defaultNegDistance;
-
 
         if (cameraCollisionZoom)
         {
@@ -273,9 +274,9 @@ public class CameraController : MonoBehaviour
             velocityY += mouseSensitivityY * mouseYOverall * 0.02f;
         }
 
-        if (CameraAssist)
-            velocityX += h * 0.4f;
-        else
+        //if (CameraAssist)
+        //    velocityX += h * 0.4f;
+        //else
             velocityX += h * 0.2f;
 
         rotationYAxis += velocityX;

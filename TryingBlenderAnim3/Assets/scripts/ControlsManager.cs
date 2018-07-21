@@ -9,7 +9,7 @@ public class ControlsManager
 
     public enum ButtonType
     {
-        Horizontal, Vertical, MouseX, MouseY, Jump, Walk, Climb, ResetCam, Interact, Pause, Back
+        Horizontal, Vertical, MouseX, MouseY, Jump, Walk, Climb, ResetCam, Interact, Pause, Back, Attack
     }
 
     public enum InputDevice
@@ -22,8 +22,8 @@ public class ControlsManager
     public InputValues[] values;
 
     private ButtonType[] axes = { ButtonType.Horizontal, ButtonType.Vertical, ButtonType.MouseX, ButtonType.MouseY };
-    private ButtonType[] buttons = { ButtonType.Jump, ButtonType.Walk, ButtonType.Climb, ButtonType.ResetCam, ButtonType.Interact, ButtonType.Pause, ButtonType.Back };
-    private string[] inputNames = { "Horizontal", "Vertical", "MouseX", "MouseY", "Jump", "Walk", "Climb", "ResetCam", "Interact", "Pause", "Back" };
+    private ButtonType[] buttons = { ButtonType.Jump, ButtonType.Walk, ButtonType.Climb, ButtonType.ResetCam, ButtonType.Interact, ButtonType.Pause, ButtonType.Back, ButtonType.Attack };
+    private string[] inputNames = { "Horizontal", "Vertical", "MouseX", "MouseY", "Jump", "Walk", "Climb", "ResetCam", "Interact", "Pause", "Back" , "Attack"};
     private string keyboardAppend = "K";
     private string controllerWinAppend = "Win";
     private string controllerMacAppend = "Mac";
@@ -74,12 +74,12 @@ public class ControlsManager
     public void Init()
     {
 
-        keyboard = new InputValues(keyboardAppend, inputNames[0], inputNames[1], inputNames[2], inputNames[3], inputNames[4], inputNames[5], inputNames[6], inputNames[7], inputNames[8], inputNames[9], inputNames[10]);
+        keyboard = new InputValues(keyboardAppend, inputNames[0], inputNames[1], inputNames[2], inputNames[3], inputNames[4], inputNames[5], inputNames[6], inputNames[7], inputNames[8], inputNames[9], inputNames[10], inputNames[11]);
 
         bool windows = (Application.platform.Equals(RuntimePlatform.WindowsPlayer) || Application.platform.Equals(RuntimePlatform.WindowsEditor));
         string platformExtension = windows ? controllerWinAppend : controllerMacAppend;
         controller = new InputValues(platformExtension, inputNames[0], inputNames[1],
-            inputNames[2], inputNames[3], inputNames[4], inputNames[5], inputNames[6], inputNames[7], inputNames[8], inputNames[9], inputNames[10]);
+            inputNames[2], inputNames[3], inputNames[4], inputNames[5], inputNames[6], inputNames[7], inputNames[8], inputNames[9], inputNames[10], inputNames[11]);
 
         values = new InputValues[2];
         values[0] = keyboard;
@@ -117,7 +117,7 @@ public class ControlsManager
         Dictionary<ButtonType, string> buttonToName;
 
         public InputValues(string append, string Horizontal, string Vertical, string MouseX, string MouseY,
-            string Jump, string Walk, string Climb, string ResetCam, string Interact, string Pause, string Back)
+            string Jump, string Walk, string Climb, string ResetCam, string Interact, string Pause, string Back, string Attack)
         {
             buttonToName = new Dictionary<ButtonType, string>();
 
@@ -132,6 +132,7 @@ public class ControlsManager
             buttonToName[ButtonType.Interact] = Interact + append;
             buttonToName[ButtonType.Pause] = Pause + append;
             buttonToName[ButtonType.Back] = Back + append;
+            buttonToName[ButtonType.Attack] = Attack + append;
         }
 
         public float GetAxis(ButtonType type)

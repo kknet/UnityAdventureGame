@@ -23,7 +23,7 @@ public class OldCharacterController : MonoBehaviour
 
     #region other imports (scripts, gameobjs, etc)
     //private MouseMovement mouseMovementScript;
-    private DevCombat devCombatScript;
+    private OldDevCombat devCombatScript;
     private MapPathfind gridGraphScript;
     private ClosestNodes closestNodesScript;
 
@@ -57,7 +57,7 @@ public class OldCharacterController : MonoBehaviour
         myAnimator = GetComponent<Animator>();
 
         //mouseMovementScript = Camera.main.GetComponent<MouseMovement>();
-        devCombatScript = player.GetComponent<DevCombat>();
+        devCombatScript = player.GetComponent<OldDevCombat>();
         desiredRot = Camera.main.transform.eulerAngles.y;
         if (doPathfinding)
         {
