@@ -12,6 +12,9 @@ public class DevCombat : MonoBehaviour
     public AudioSource quickAttack, quickAttack2, quickAttack3;
     public AudioSource strongHit;
 
+    [HideInInspector] public Quaternion rollRotation;
+
+    private CharacterController characterController;
     private GameObject[] enemies;
     private Animator myAnimator;
     private Camera cam;
@@ -29,7 +32,7 @@ public class DevCombat : MonoBehaviour
 
     private bool needToAttack, doneLerping, needsRunningAnimation;
 
-    [HideInInspector] public bool Locked;
+    //[HideInInspector] public bool Locked;
 
     AttackType currentType;
     #endregion
@@ -43,6 +46,7 @@ public class DevCombat : MonoBehaviour
 
     public void Init()
     {
+        characterController = GetComponent<CharacterController>();
         devCombatReactionsScript = GetComponent<DevCombatReactions>();
         myAnimator = GetComponent<Animator>();
         cam = Camera.main;
@@ -66,16 +70,17 @@ public class DevCombat : MonoBehaviour
 
     private void handleInput()
     {
-        bool EPressed = InputController.controlsManager.GetButtonDown(ControlsManager.ButtonType.Interact);
+        //bool EPressed = InputController.controlsManager.GetButtonDown(ControlsManager.ButtonType.Interact);
         bool leftMousePressed = InputController.controlsManager.GetButtonDown(ControlsManager.ButtonType.Attack);
         bool rightMouseHeld = Input.GetKey(KeyCode.Mouse1);
         bool rightMouseReleased = Input.GetKeyUp(KeyCode.Mouse1);
+        bool spaceBarPressed = InputController.controlsManager.GetButtonDown(ControlsManager.ButtonType.Jump);
 
         if (rightMouseReleased)
             myAnimator.SetBool("isBlocking", false);
 
-        if (EPressed)
-            Locked = !Locked;
+        //if (EPressed)
+        //    Locked = !Locked;
 
         if (leftMousePressedTime > 0f && (Time.time - leftMousePressedTime > twoButtonPressTimeMax)) //quick attack
         {
@@ -93,8 +98,21 @@ public class DevCombat : MonoBehaviour
             handleLeftMousePressed();
             Debug.LogWarning("Left Mouse Pressed!");
         }
+        else if (spaceBarPressed)
+        {
+            if (myAnimator.GetBool("WeaponDrawn"))
+            {
+                myAnimator.SetBool("roll", true);
+                Invoke("stopRolling", 1.0f);
+            }
+        }
     }
 
+    void stopRolling()
+    {
+        myAnimator.SetBool("roll", false);
+        rollRotation = Quaternion.identity;
+    }
 
     private void handleLeftMousePressed()
     {

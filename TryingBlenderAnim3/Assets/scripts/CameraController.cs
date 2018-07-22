@@ -7,6 +7,7 @@ public class CameraController : MonoBehaviour
     #region variables etc
     public static CameraController camScript;
     [HideInInspector] public GameObject Player;
+    [HideInInspector] public DevCombat devCombat;
 
     public CollisionHandler collision;
     public Transform target;
@@ -37,7 +38,8 @@ public class CameraController : MonoBehaviour
     Vector3 velocityCamSmooth = Vector3.zero;
     //Vector3 verticalPosOffsetNormal = (Vector3.up * 1.6f);
     Vector3 verticalPosOffsetNormal = (Vector3.up * 1.4f);
-    float normalDistance = 1.6f;
+    //float normalDistance = 1.6f;
+    float normalDistance = 1.2f;
     float climbingDistance = 5f;
     float distance;
     float controllerSensitivityMultiplier = 3f;
@@ -94,9 +96,10 @@ public class CameraController : MonoBehaviour
 
     public void Init()
     {
+        Player = DevMain.Player;
+        devCombat = Player.GetComponent<DevCombat>();
         cameraBob = GetComponent<CameraBob>();
         camScript = GetComponent<CameraController>();
-        Player = DevMain.Player;
         cam = Camera.main;
         cam.nearClipPlane = 0.01f;
         characterScript = Player.GetComponent<CharacterController>();
@@ -126,12 +129,13 @@ public class CameraController : MonoBehaviour
 
     bool cameraShouldBob()
     {
-        return characterScript.m_ForwardAmount > 0.9f;
+        return characterScript.m_ForwardAmount > 0.9f && !characterScript.inCombatMode();
     }
 
     Vector3 horizontalPosOffsetNormal()
     {
-        return transform.right * 0.3f;
+        //return transform.right * 0.3f;
+        return transform.right * 0.6f;
     } 
 
     public void PhysicsUpdate()
@@ -157,7 +161,7 @@ public class CameraController : MonoBehaviour
         targetPos = target.position + verticalPosOffsetNormal + horizontalPosOffsetNormal();
         camPos = targetPos + rotation * negDistance + backPosOffset;
         if(cameraBobEnabled)
-            camPos = cameraBob.AddCameraBob(camPos, characterScript.m_Animator.GetFloat("Forward"));
+            camPos = cameraBob.AddCameraBob(camPos, characterScript.m_Animator.GetFloat("Forward"), cameraShouldBob());
 
         Vector3 defaultNegDistance = new Vector3(0.0f, 0.0f, -initialDistance());
         desiredCamPos = targetPos + rotation * defaultNegDistance;
@@ -274,13 +278,29 @@ public class CameraController : MonoBehaviour
             velocityY += mouseSensitivityY * mouseYOverall * 0.02f;
         }
 
-        //if (CameraAssist)
-        //    velocityX += h * 0.4f;
-        //else
-            velocityX += h * 0.2f;
+        if (characterScript.inCombatMode() && !characterScript.rolling())
+        {
+            //if (characterScript.rolling())
+            //{
+            //    //Vector3 dir =  devCombat.TestEnemy.transform.position - Player.transform.position;
+            //    Vector3 dir =  devCombat.TestEnemy.transform.position - Player.transform.position;
+            //    rotationYAxis = Mathf.Lerp(rotationYAxis, dir.z, 3f * Time.fixedDeltaTime);
 
-        rotationYAxis += velocityX;
-        rotationXAxis -= velocityY;
+            //    rotationXAxis -= velocityY;
+            //}
+            //else
+            //{
+                rotationYAxis = Mathf.Lerp(rotationYAxis, Player.transform.eulerAngles.y, 3f * Time.fixedDeltaTime);
+
+                rotationXAxis -= velocityY;
+            //}
+        }
+        else
+        {
+            velocityX += h * 0.2f;
+            rotationYAxis += velocityX;
+            rotationXAxis -= velocityY;
+        }
 
         //------------restricting angle-----------//
         //if (characterScript.m_climbingWall)

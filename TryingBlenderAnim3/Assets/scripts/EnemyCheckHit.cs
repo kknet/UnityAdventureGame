@@ -62,17 +62,17 @@ public class EnemyCheckHit : MonoBehaviour
         devAnimator.speed = 0f;
         while (animator.speed > 0f)
         {
-            animator.speed -= 0.1f;
-            devAnimator.speed -= 0.1f;
+            animator.speed -= 0.05f;
+            devAnimator.speed -= 0.05f;
             yield return null;
         }
 
 
-        yield return new WaitForSecondsRealtime(0.2f);
+        yield return new WaitForSecondsRealtime(0.05f);
         while (animator.speed < 1f)
         {
-            animator.speed += 0.1f;
-            devAnimator.speed += 0.1f;
+            animator.speed += 0.05f;
+            devAnimator.speed += 0.05f;
             yield return null;
         }
     }

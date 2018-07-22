@@ -8,13 +8,13 @@ public class CameraBob : MonoBehaviour
     float maxBobSpeed = 12f;
     float maxBobAmount = 0.03f;
     float timer = Mathf.PI / 2;
+    float bobAmount, bobSpeed; 
     Vector3 camPos;
 
-    public Vector3 AddCameraBob(Vector3 restPosition, float curForwardAmount)
+    public Vector3 AddCameraBob(Vector3 restPosition, float curForwardAmount, bool cameraShouldBob)
     {
-        float bobAmount = maxBobAmount * curForwardAmount;
-        float bobSpeed = maxBobSpeed * curForwardAmount;
         camPos = Camera.main.transform.position;
+        updateBobAmountAndSpeed(curForwardAmount, cameraShouldBob);
 
         if (curForwardAmount > 0f) //moving
         {
@@ -34,5 +34,19 @@ public class CameraBob : MonoBehaviour
             timer = 0;
 
         return camPos;
+    }
+
+    void updateBobAmountAndSpeed(float curForwardAmount, bool cameraShouldBob)
+    {
+        if (cameraShouldBob)
+        {
+            bobAmount = Mathf.Lerp(bobAmount, maxBobAmount * curForwardAmount, 2f * Time.fixedDeltaTime);
+            bobSpeed = Mathf.Lerp(bobSpeed, maxBobSpeed * curForwardAmount, 2f * Time.fixedDeltaTime);
+        }
+        else
+        {
+            bobAmount = Mathf.Lerp(bobAmount, 0f, 2f * Time.fixedDeltaTime);
+            bobSpeed = Mathf.Lerp(bobSpeed, 0f, 2f * Time.fixedDeltaTime);
+        }
     }
 }

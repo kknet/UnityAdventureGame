@@ -51,6 +51,8 @@ public class CharacterController : MonoBehaviour
     //[Tooltip("Targets on player's body with weights for stealth detection raycasts.")]
     //public List<WeightedDetectionTarget> detectionTargets = new List<WeightedDetectionTarget>();
 
+    public GameObject spine, hips;
+
     [Tooltip("How much upwards force when jumping?")]
     [Range(7f, 15f)]
     public float m_JumpPower;
@@ -58,7 +60,8 @@ public class CharacterController : MonoBehaviour
 
     #region things to tweak only in code
     float m_MovingTurnSpeed = 180f;
-    float m_CombatMoveSpeedMultiplier = 4f;
+    float m_RollingTurnSpeed = 720f;
+    float m_CombatMoveSpeedMultiplier = 2f;
     float m_MoveSpeedMultiplier = 8f;
     float m_WallJumpCheckDistance = 0.5f;
     float m_GroundCheckDistance = 0.3f;
@@ -106,7 +109,15 @@ public class CharacterController : MonoBehaviour
         if (move.magnitude > 1f) move.Normalize();
         move = transform.InverseTransformDirection(move);
         move = Vector3.ProjectOnPlane(move, m_GroundNormal);
+
         m_TurnAmount = Mathf.Atan2(move.x, move.z);
+
+        if (inCombatMode() && InputController.controlsManager.GetButtonDown(ControlsManager.ButtonType.Jump))
+        {
+            Debug.Log("Got here: " + m_TurnAmount);
+
+            transform.Rotate(Vector3.up, Mathf.Rad2Deg * m_TurnAmount);
+        }
 
         if (anim.IsTag("equip"))
         {
@@ -170,8 +181,15 @@ public class CharacterController : MonoBehaviour
         }
         else
         {
-            m_Animator.SetFloat("Forward", Mathf.MoveTowards(m_Animator.GetFloat("Forward"), m_ForwardAmount, 0.8f * Time.fixedDeltaTime));
-            m_Animator.SetFloat("HorizSpeed", Mathf.MoveTowards(m_Animator.GetFloat("HorizSpeed"), m_SideAmount, 1.6f * Time.fixedDeltaTime));
+            if (inCombatMode())
+            {
+                m_Animator.SetFloat("Forward", Mathf.MoveTowards(m_Animator.GetFloat("Forward"), m_ForwardAmount, 2f * Time.fixedDeltaTime));
+                m_Animator.SetFloat("HorizSpeed", Mathf.MoveTowards(m_Animator.GetFloat("HorizSpeed"), m_SideAmount, 2f * Time.fixedDeltaTime));
+            }
+            else
+            {
+                m_Animator.SetFloat("Forward", Mathf.MoveTowards(m_Animator.GetFloat("Forward"), m_ForwardAmount, 0.8f * Time.fixedDeltaTime));
+            }
         }
 
         if (m_jump)
@@ -183,11 +201,23 @@ public class CharacterController : MonoBehaviour
         {
             if (inCombatMode())
             {
-                float fwd = m_Animator.GetFloat("Forward");
-                float side = m_Animator.GetFloat("HorizSpeed");
 
-                transform.Translate(Vector3.forward * fwd * Time.fixedDeltaTime * m_CombatMoveSpeedMultiplier);
-                transform.Translate(Vector3.right * side * Time.fixedDeltaTime * m_CombatMoveSpeedMultiplier);
+                if (rolling())
+                {
+                    transform.Translate(Vector3.forward * Time.fixedDeltaTime * m_MoveSpeedMultiplier);
+
+                    //float fwd = DevCombat.rollFwd;
+                    //float side = DevCombat.rollSide;
+                    //transform.Translate(Vector3.forward * fwd * Time.fixedDeltaTime * m_MoveSpeedMultiplier);
+                    //transform.Translate(Vector3.right * side * Time.fixedDeltaTime * m_MoveSpeedMultiplier);
+                }
+                else
+                {
+                    float fwd = m_Animator.GetFloat("Forward");
+                    float side = m_Animator.GetFloat("HorizSpeed");
+                    //transform.Translate(Vector3.forward * fwd * Time.fixedDeltaTime * m_CombatMoveSpeedMultiplier);
+                    //transform.Translate(Vector3.right * side * Time.fixedDeltaTime * m_CombatMoveSpeedMultiplier);
+                }
             }
             else
             {
@@ -204,11 +234,34 @@ public class CharacterController : MonoBehaviour
 
     void RotatePlayer()
     {
-        if (inCombatMode() && DevCombat.Locked)
+        if (inCombatMode()/* && DevCombat.Locked*/)
         {
-            Vector3 pos = DevCombat.TestEnemy.transform.position;
-            pos = new Vector3(pos.x, transform.position.y, pos.z);
-            transform.LookAt(pos, transform.up);
+            if (rolling())
+            {
+                //transform.forward = Vector3.Lerp(transform.forward, DevCombat.rollForward, 5f * Time.fixedDeltaTime);
+                //transform.rotation = DevCombat.rollRotation;
+            }
+            else
+            {
+                Vector3 enemyPos = DevCombat.TestEnemy.transform.position;
+                enemyPos = new Vector3(enemyPos.x, transform.position.y, enemyPos.z);
+
+                transform.forward = Vector3.Lerp(transform.forward, enemyPos - transform.position, Time.fixedDeltaTime * 5f);
+                //transform.LookAt(enemyPos, transform.up);
+            }
+            //if (m_Animator.GetFloat("Forward") > 0f || m_Animator.GetFloat("HorizSpeed") > 0f)
+            //{
+            //    transform.LookAt(enemyPos, transform.up);
+            //}
+            //else
+            //{
+            //    float angle = 20f;
+            //    float distance = 1f;            
+            //    Vector3 dir = transform.position - enemyPos;
+            //    Vector3 pivot = (dir.normalized * distance) + enemyPos;
+            //    Vector3 rotated = Quaternion.Euler(0f, angle, 0f) * (enemyPos - pivot) + pivot;
+            //    transform.LookAt(rotated, transform.up);
+            //}
         }
         else
         {
@@ -371,6 +424,15 @@ public class CharacterController : MonoBehaviour
             transform.forward = Vector3.Slerp(transform.forward, wallNormal, Time.fixedDeltaTime * lerpSmoothing);
             ++count;
             yield return null;
+        }
+    }
+
+    void LateUpdate()
+    {
+        if (inCombatMode() && !rolling())
+        {
+            hips.transform.Rotate(30f * transform.up);
+            spine.transform.Rotate(50f * transform.up);
         }
     }
 }
