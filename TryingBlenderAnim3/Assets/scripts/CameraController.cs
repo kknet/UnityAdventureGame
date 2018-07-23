@@ -17,15 +17,6 @@ public class CameraController : MonoBehaviour
     public bool drawGizmos;
     //public bool CameraAssist;
 
-    [SerializeField]
-    [HideInInspector]
-    Vector3 initialOffset;
-    [SerializeField]
-    [HideInInspector]
-    Vector3 aimingOffset;
-    float aimGoalDistance = 1.4f;
-    Vector3 currentOffset;
-
     CameraBob cameraBob;
     CharacterController characterScript;
     Camera cam;
@@ -36,11 +27,9 @@ public class CameraController : MonoBehaviour
 
     Vector3 targetPos, camPos, desiredCamPos;
     Vector3 velocityCamSmooth = Vector3.zero;
-    //Vector3 verticalPosOffsetNormal = (Vector3.up * 1.6f);
-    Vector3 verticalPosOffsetNormal = (Vector3.up * 1.4f);
-    //float normalDistance = 1.6f;
-    float normalDistance = 1.2f;
-    float climbingDistance = 5f;
+    Vector3 verticalPosOffsetNormal = (Vector3.up * 1.5f);
+    float normalDistance = 1.3f;
+    float combatDistance = 1f;
     float distance;
     float controllerSensitivityMultiplier = 3f;
     [SerializeField] float mouseSensitivityX = 20f;
@@ -49,8 +38,8 @@ public class CameraController : MonoBehaviour
     float yMaxLimit = 80f;
     float smoothTime = 50f;
     float positionSmoothTime;
-    float normalDistanceSmoothTime = 20f;
-    float climbingDistanceSmoothTime = 30f;
+    float normalDistanceSmoothTime = 1f;
+    float climbingDistanceSmoothTime = 3f;
     float rotationYAxis = 0.0f;
     float rotationXAxis = 0.0f;
     float velocityX = 0.0f;
@@ -134,9 +123,9 @@ public class CameraController : MonoBehaviour
 
     Vector3 horizontalPosOffsetNormal()
     {
-        //return transform.right * 0.3f;
         return transform.right * 0.6f;
-    } 
+        //return transform.right * 1.2f;
+    }
 
     public void PhysicsUpdate()
     {
@@ -194,7 +183,7 @@ public class CameraController : MonoBehaviour
             }
             else
             {
-                distance = Mathf.MoveTowards(distance, initialDistance(), Time.fixedDeltaTime * distanceSmoothTime() * 0.1f);
+                distance = Mathf.MoveTowards(distance, initialDistance(), Time.fixedDeltaTime * distanceSmoothTime());
             }
 
             if (Mathf.Approximately(distance, initialDistance()))
@@ -226,10 +215,10 @@ public class CameraController : MonoBehaviour
 
     private float initialDistance()
     {
-        //if (characterScript.m_climbingWall)
-        //    return climbingDistance;
-        //else
-        return normalDistance;
+        if (characterScript.inCombatMode())
+            return combatDistance;
+        else
+            return normalDistance;
     }
 
     private float distanceSmoothTime()
@@ -290,8 +279,7 @@ public class CameraController : MonoBehaviour
             //}
             //else
             //{
-                rotationYAxis = Mathf.Lerp(rotationYAxis, Player.transform.eulerAngles.y, 3f * Time.fixedDeltaTime);
-
+                rotationYAxis = Mathf.Lerp(rotationYAxis, Player.transform.eulerAngles.y, 5f * Time.fixedDeltaTime);
                 rotationXAxis -= velocityY;
             //}
         }

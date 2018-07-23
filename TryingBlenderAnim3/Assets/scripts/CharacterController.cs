@@ -51,7 +51,7 @@ public class CharacterController : MonoBehaviour
     //[Tooltip("Targets on player's body with weights for stealth detection raycasts.")]
     //public List<WeightedDetectionTarget> detectionTargets = new List<WeightedDetectionTarget>();
 
-    public GameObject spine, spine1, spine2, hips;
+    public GameObject spine, spine1, spine2, hips, leftShoulder, rightShoulder, leftLeg, rightLeg;
 
     [Tooltip("How much upwards force when jumping?")]
     [Range(7f, 15f)]
@@ -61,7 +61,7 @@ public class CharacterController : MonoBehaviour
     #region things to tweak only in code
     float m_MovingTurnSpeed = 180f;
     float m_RollingTurnSpeed = 720f;
-    float m_CombatMoveSpeedMultiplier = 1f;
+    float m_CombatMoveSpeedMultiplier = 1.5f;
     float m_MoveSpeedMultiplier = 8f;
     float m_WallJumpCheckDistance = 0.5f;
     float m_GroundCheckDistance = 0.3f;
@@ -186,8 +186,8 @@ public class CharacterController : MonoBehaviour
         {
             if (inCombatMode())
             {
-                m_Animator.SetFloat("Forward", Mathf.MoveTowards(m_Animator.GetFloat("Forward"), m_ForwardAmount, 2f * Time.fixedDeltaTime));
-                m_Animator.SetFloat("HorizSpeed", Mathf.MoveTowards(m_Animator.GetFloat("HorizSpeed"), m_SideAmount, 2f * Time.fixedDeltaTime));
+                m_Animator.SetFloat("Forward", Mathf.MoveTowards(m_Animator.GetFloat("Forward"), m_ForwardAmount, 5f * Time.fixedDeltaTime));
+                m_Animator.SetFloat("HorizSpeed", Mathf.MoveTowards(m_Animator.GetFloat("HorizSpeed"), m_SideAmount, 5f * Time.fixedDeltaTime));
             }
             else
             {
@@ -216,7 +216,6 @@ public class CharacterController : MonoBehaviour
                 }
                 else
                 {
-                    Time.timeScale = 1f;
                     float fwd = m_Animator.GetFloat("Forward");
                     float side = m_Animator.GetFloat("HorizSpeed");
                     transform.Translate(Vector3.forward * fwd * Time.fixedDeltaTime * m_CombatMoveSpeedMultiplier);
@@ -435,11 +434,10 @@ public class CharacterController : MonoBehaviour
     {
         if (inCombatMode() && !rolling())
         {
-            if(Mathf.Abs(m_SideAmount) > 0f)
-                hips.transform.Rotate(40f * transform.up);
             spine.transform.Rotate(15f * transform.up);
             spine1.transform.Rotate(15f * transform.up);
             spine2.transform.Rotate(15f * transform.up);
+            rightShoulder.transform.Rotate(20f * transform.up);
         }
     }
 }
