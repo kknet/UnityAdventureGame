@@ -51,7 +51,7 @@ public class CharacterController : MonoBehaviour
     //[Tooltip("Targets on player's body with weights for stealth detection raycasts.")]
     //public List<WeightedDetectionTarget> detectionTargets = new List<WeightedDetectionTarget>();
 
-    public GameObject spine, hips;
+    public GameObject spine, spine1, spine2, hips;
 
     [Tooltip("How much upwards force when jumping?")]
     [Range(7f, 15f)]
@@ -61,7 +61,7 @@ public class CharacterController : MonoBehaviour
     #region things to tweak only in code
     float m_MovingTurnSpeed = 180f;
     float m_RollingTurnSpeed = 720f;
-    float m_CombatMoveSpeedMultiplier = 2f;
+    float m_CombatMoveSpeedMultiplier = 1f;
     float m_MoveSpeedMultiplier = 8f;
     float m_WallJumpCheckDistance = 0.5f;
     float m_GroundCheckDistance = 0.3f;
@@ -144,10 +144,13 @@ public class CharacterController : MonoBehaviour
             m_ForwardAmount = move.z;
 
         if (inCombatMode())
-            m_SideAmount = move.x;
+        {
+            m_SideAmount = InputController.controlsManager.GetAxis(ControlsManager.ButtonType.Horizontal);
+            m_ForwardAmount = InputController.controlsManager.GetAxis(ControlsManager.ButtonType.Vertical);
+        }
 
 
-        if (m_TurnAmount > 0f && m_ForwardAmount < 0.33f)
+        if (!inCombatMode() && m_TurnAmount > 0f && m_ForwardAmount < 0.33f)
             m_ForwardAmount = 0.33f;
 
         if (m_grounded || (!m_grounded && jumpState == JumpState.waitingToLand))
@@ -213,10 +216,11 @@ public class CharacterController : MonoBehaviour
                 }
                 else
                 {
+                    Time.timeScale = 1f;
                     float fwd = m_Animator.GetFloat("Forward");
                     float side = m_Animator.GetFloat("HorizSpeed");
-                    //transform.Translate(Vector3.forward * fwd * Time.fixedDeltaTime * m_CombatMoveSpeedMultiplier);
-                    //transform.Translate(Vector3.right * side * Time.fixedDeltaTime * m_CombatMoveSpeedMultiplier);
+                    transform.Translate(Vector3.forward * fwd * Time.fixedDeltaTime * m_CombatMoveSpeedMultiplier);
+                    transform.Translate(Vector3.right * side * Time.fixedDeltaTime * m_CombatMoveSpeedMultiplier);
                 }
             }
             else
@@ -431,8 +435,11 @@ public class CharacterController : MonoBehaviour
     {
         if (inCombatMode() && !rolling())
         {
-            hips.transform.Rotate(30f * transform.up);
-            spine.transform.Rotate(50f * transform.up);
+            if(Mathf.Abs(m_SideAmount) > 0f)
+                hips.transform.Rotate(40f * transform.up);
+            spine.transform.Rotate(15f * transform.up);
+            spine1.transform.Rotate(15f * transform.up);
+            spine2.transform.Rotate(15f * transform.up);
         }
     }
 }
