@@ -17,6 +17,7 @@ public class CameraController : MonoBehaviour
     public bool drawGizmos;
     //public bool CameraAssist;
 
+    InputController inputController;
     CameraBob cameraBob;
     CharacterController characterScript;
     Camera cam;
@@ -86,6 +87,7 @@ public class CameraController : MonoBehaviour
     public void Init()
     {
         Player = DevMain.Player;
+        inputController = Player.GetComponent<InputController>();
         devCombat = Player.GetComponent<DevCombat>();
         cameraBob = GetComponent<CameraBob>();
         camScript = GetComponent<CameraController>();
@@ -126,7 +128,7 @@ public class CameraController : MonoBehaviour
         return transform.right * 0.6f;
         //return transform.right * 1.2f;
     }
-
+    
     public void PhysicsUpdate()
     {
         moveCamera();
@@ -279,8 +281,16 @@ public class CameraController : MonoBehaviour
             //}
             //else
             //{
-                rotationYAxis = Mathf.Lerp(rotationYAxis, Player.transform.eulerAngles.y, 5f * Time.fixedDeltaTime);
-                rotationXAxis -= velocityY;
+
+            float goalY = ClampAngle(Player.transform.eulerAngles.y, 0, 360f);
+            if (goalY > 180f) goalY = goalY - 360f;
+
+            if (inputController.IsInputEnabled())
+                rotationYAxis = goalY;
+            else
+                rotationYAxis = Mathf.Lerp(rotationYAxis, goalY, 4f * Time.fixedDeltaTime);
+
+            rotationXAxis -= velocityY;
             //}
         }
         else

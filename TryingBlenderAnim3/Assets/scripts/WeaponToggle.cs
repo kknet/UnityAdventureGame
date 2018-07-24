@@ -8,7 +8,11 @@ using UnityEngine;
 public class WeaponToggle : MonoBehaviour
 {
 
-    public Animator myAnimator;
+
+    InputController inputController;
+    CameraController cameraController;
+
+    [HideInInspector] public Animator myAnimator;
     public AudioSource Sheath;
     public AudioSource Unsheath;
 
@@ -37,6 +41,8 @@ public class WeaponToggle : MonoBehaviour
         //if (!GetComponent<DevMain>().doCombat)
         //    return;
 
+        cameraController = Camera.main.GetComponent<CameraController>();
+        inputController = GetComponent<InputController>();
         weaponsTable = new Dictionary<string, GameObject>();
         allWeps = GameObject.FindGameObjectsWithTag("OurWeapons");
         myAnimator = GetComponent<Animator>();
@@ -127,6 +133,15 @@ public class WeaponToggle : MonoBehaviour
         //		}
     }
 
+    IEnumerator WaitForCombatStart()
+    {
+        inputController.DisableInput();
+
+        yield return new WaitForSeconds(2f);
+
+        inputController.EnableInput();
+    }
+
     void StartSwitch()
     {
         myAnimator.SetBool("SwitchingWeps", true);
@@ -155,6 +170,7 @@ public class WeaponToggle : MonoBehaviour
 
     void StartShieldDraw()
     {
+        StartCoroutine(WaitForCombatStart());
         if (weaponOut == "")
         {
             myAnimator.SetBool("ShieldSheath", false);

@@ -143,7 +143,7 @@ public class CharacterController : MonoBehaviour
         else
             m_ForwardAmount = move.z;
 
-        if (inCombatMode())
+        if (inCombatMode() && InputController.IsInputEnabled())
         {
             m_SideAmount = InputController.controlsManager.GetAxis(ControlsManager.ButtonType.Horizontal);
             m_ForwardAmount = InputController.controlsManager.GetAxis(ControlsManager.ButtonType.Vertical);
@@ -200,11 +200,10 @@ public class CharacterController : MonoBehaviour
             prevJumpState = jumpState;
             jumpState = JumpState.waitingToRise;
         }
-        else
+        else if(InputController.IsInputEnabled())
         {
             if (inCombatMode())
             {
-
                 if (rolling())
                 {
                     transform.Translate(Vector3.forward * Time.fixedDeltaTime * m_MoveSpeedMultiplier);
@@ -248,8 +247,11 @@ public class CharacterController : MonoBehaviour
             {
                 Vector3 enemyPos = DevCombat.TestEnemy.transform.position;
                 enemyPos = new Vector3(enemyPos.x, transform.position.y, enemyPos.z);
+                Vector3 dir = enemyPos - transform.position;
+                dir.Normalize();
 
-                transform.forward = Vector3.Lerp(transform.forward, enemyPos - transform.position, Time.fixedDeltaTime * 5f);
+                transform.forward = Vector3.RotateTowards(transform.forward, dir, 0.5f, Time.fixedDeltaTime * 3f);
+                //transform.forward = Vector3.Lerp(transform.forward, dir, Time.fixedDeltaTime * 6f);
                 //transform.LookAt(enemyPos, transform.up);
             }
             //if (m_Animator.GetFloat("Forward") > 0f || m_Animator.GetFloat("HorizSpeed") > 0f)
@@ -415,7 +417,7 @@ public class CharacterController : MonoBehaviour
 
     public bool inCombatMode()
     {
-        return m_Animator.GetBool("WeaponDrawn");
+        return m_Animator.GetBool("WeaponDrawn") || m_Animator.GetBool("ShieldDraw");
     }
 
     //lerp the player each frame to face a wall

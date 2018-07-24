@@ -110,6 +110,10 @@ public class InputController : MonoBehaviour
         }
     }
 
+    public bool IsInputEnabled()
+    {
+        return inputEnabled;
+    }
 
     public void EnableInput()
     {
