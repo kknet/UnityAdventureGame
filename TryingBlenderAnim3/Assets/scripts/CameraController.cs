@@ -29,7 +29,7 @@ public class CameraController : MonoBehaviour
     Vector3 targetPos, camPos, desiredCamPos;
     Vector3 velocityCamSmooth = Vector3.zero;
     Vector3 verticalPosOffsetNormal = (Vector3.up * 1.5f);
-    float normalDistance = 1.3f;
+    float normalDistance = 1.2f;
     float combatDistance = 1f;
     float distance;
     float controllerSensitivityMultiplier = 3f;
@@ -288,9 +288,10 @@ public class CameraController : MonoBehaviour
             if (inputController.IsInputEnabled())
                 rotationYAxis = goalY;
             else
-                rotationYAxis = Mathf.Lerp(rotationYAxis, goalY, 4f * Time.fixedDeltaTime);
+                rotationYAxis = Mathf.Lerp(rotationYAxis, goalY, 5f * Time.fixedDeltaTime);
 
-            rotationXAxis -= velocityY;
+            rotationXAxis = 12f;
+            //rotationXAxis -= velocityY;
             //}
         }
         else

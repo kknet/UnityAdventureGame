@@ -61,7 +61,8 @@ public class CharacterController : MonoBehaviour
     #region things to tweak only in code
     float m_MovingTurnSpeed = 180f;
     float m_RollingTurnSpeed = 720f;
-    float m_CombatMoveSpeedMultiplier = 1.5f;
+    //float m_CombatMoveSpeedMultiplier = 1.5f;
+    float m_CombatMoveSpeedMultiplier = 2.5f;
     float m_MoveSpeedMultiplier = 8f;
     float m_WallJumpCheckDistance = 0.5f;
     float m_GroundCheckDistance = 0.3f;
@@ -250,7 +251,7 @@ public class CharacterController : MonoBehaviour
                 Vector3 dir = enemyPos - transform.position;
                 dir.Normalize();
 
-                transform.forward = Vector3.RotateTowards(transform.forward, dir, 0.5f, Time.fixedDeltaTime * 3f);
+                transform.forward = Vector3.RotateTowards(transform.forward, dir, 0.1f, Time.fixedDeltaTime * 3f);
                 //transform.forward = Vector3.Lerp(transform.forward, dir, Time.fixedDeltaTime * 6f);
                 //transform.LookAt(enemyPos, transform.up);
             }
