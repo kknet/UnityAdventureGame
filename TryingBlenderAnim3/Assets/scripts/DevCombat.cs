@@ -100,11 +100,11 @@ public class DevCombat : MonoBehaviour
         }
         else if (spaceBarPressed)
         {
-            if (myAnimator.GetBool("WeaponDrawn"))
-            {
-                myAnimator.SetBool("roll", true);
-                Invoke("stopRolling", 1.0f);
-            }
+            //if (myAnimator.GetBool("WeaponDrawn"))
+            //{
+            //    myAnimator.SetBool("roll", true);
+            //    Invoke("stopRolling", 1.0f);
+            //}
         }
     }
 

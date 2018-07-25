@@ -288,7 +288,7 @@ public class CameraController : MonoBehaviour
             if (inputController.IsInputEnabled())
                 rotationYAxis = goalY;
             else
-                rotationYAxis = Mathf.Lerp(rotationYAxis, goalY, 5f * Time.fixedDeltaTime);
+                rotationYAxis = Mathf.Lerp(rotationYAxis, goalY, 4f * Time.fixedDeltaTime);
 
             rotationXAxis = 12f;
             //rotationXAxis -= velocityY;

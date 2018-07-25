@@ -68,6 +68,9 @@ public class CharacterController : MonoBehaviour
     float m_GroundCheckDistance = 0.3f;
     int lerpFrames = 60;
     float lerpSmoothing = 16f;
+    float maxDodgeMultiplier = 5f;
+    float minDodgeMultiplier = 1f;
+    float dodgeMultiplier, dodgeMultiplierGoal;
 
     JumpState jumpState = JumpState.notJumping;
     JumpState prevJumpState = JumpState.notJumping;
@@ -97,6 +100,7 @@ public class CharacterController : MonoBehaviour
         m_Rigidbody.constraints = RigidbodyConstraints.FreezeRotationX | RigidbodyConstraints.FreezeRotationY | RigidbodyConstraints.FreezeRotationZ;
         m_jump = false;
         m_grounded = true;
+        dodgeMultiplierGoal = minDodgeMultiplier;
         lastGroundedTime = Time.time;
         InputController = GetComponent<InputController>();
         CharacterEvents = GetComponent<CharacterEvents>();
@@ -113,12 +117,12 @@ public class CharacterController : MonoBehaviour
 
         m_TurnAmount = Mathf.Atan2(move.x, move.z);
 
-        if (inCombatMode() && InputController.controlsManager.GetButtonDown(ControlsManager.ButtonType.Jump))
-        {
-            Debug.Log("Got here: " + m_TurnAmount);
+        //if (inCombatMode() && InputController.controlsManager.GetButtonDown(ControlsManager.ButtonType.Jump))
+        //{
+        //    Debug.Log("Got here: " + m_TurnAmount);
 
-            transform.Rotate(Vector3.up, Mathf.Rad2Deg * m_TurnAmount);
-        }
+        //    transform.Rotate(Vector3.up, Mathf.Rad2Deg * m_TurnAmount);
+        //}
 
         if (anim.IsTag("equip"))
         {
@@ -201,7 +205,7 @@ public class CharacterController : MonoBehaviour
             prevJumpState = jumpState;
             jumpState = JumpState.waitingToRise;
         }
-        else if(InputController.IsInputEnabled())
+        else if (InputController.IsInputEnabled())
         {
             if (inCombatMode())
             {
@@ -216,10 +220,19 @@ public class CharacterController : MonoBehaviour
                 }
                 else
                 {
+                    bool dodgePressed = InputController.controlsManager.GetButtonDown(ControlsManager.ButtonType.Jump);
+                    if (dodgePressed && dodgeMultiplier < 1.5f)
+                    {
+                        dodgeMultiplierGoal = maxDodgeMultiplier;
+                        Invoke("ResetDodge", 0.2f);
+                    }
+
+                    dodgeMultiplier = Mathf.Lerp(dodgeMultiplier, dodgeMultiplierGoal, 8f * Time.fixedDeltaTime);
                     float fwd = m_Animator.GetFloat("Forward");
                     float side = m_Animator.GetFloat("HorizSpeed");
-                    transform.Translate(Vector3.forward * fwd * Time.fixedDeltaTime * m_CombatMoveSpeedMultiplier);
-                    transform.Translate(Vector3.right * side * Time.fixedDeltaTime * m_CombatMoveSpeedMultiplier);
+
+                    transform.Translate(Vector3.forward * fwd * dodgeMultiplier * Time.fixedDeltaTime * m_CombatMoveSpeedMultiplier);
+                    transform.Translate(Vector3.right * side * dodgeMultiplier * Time.fixedDeltaTime * m_CombatMoveSpeedMultiplier);
                 }
             }
             else
@@ -252,7 +265,6 @@ public class CharacterController : MonoBehaviour
                 dir.Normalize();
 
                 transform.forward = Vector3.RotateTowards(transform.forward, dir, 0.1f, Time.fixedDeltaTime * 3f);
-                //transform.forward = Vector3.Lerp(transform.forward, dir, Time.fixedDeltaTime * 6f);
                 //transform.LookAt(enemyPos, transform.up);
             }
             //if (m_Animator.GetFloat("Forward") > 0f || m_Animator.GetFloat("HorizSpeed") > 0f)
@@ -363,6 +375,11 @@ public class CharacterController : MonoBehaviour
                 }
         }
         m_Animator.SetFloat("JumpAmount", Mathf.MoveTowards(m_Animator.GetFloat("JumpAmount"), jumpAmountGoal, 0.05f));
+    }
+
+    void ResetDodge()
+    {
+        dodgeMultiplierGoal = minDodgeMultiplier;
     }
 
     void CheckGroundStatus()

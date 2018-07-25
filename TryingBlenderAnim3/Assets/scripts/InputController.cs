@@ -70,6 +70,7 @@ public class InputController : MonoBehaviour
         float v = controlsManager.GetAxis(ControlsManager.ButtonType.Vertical);
         bool interact = controlsManager.GetButtonDown(ControlsManager.ButtonType.Interact);
         bool walk = controlsManager.GetButton(ControlsManager.ButtonType.Walk);
+        bool dodge = InputController.controlsManager.GetButton(ControlsManager.ButtonType.Jump) && characterController.inCombatMode();
 
         if (m_Cam != null)
         {
@@ -83,6 +84,7 @@ public class InputController : MonoBehaviour
 
         bool walking = walk && !characterController.jumping() && !characterController.rolling();
         if (walking) m_Move *= 0.66f;
+        else if (dodge) m_Move *= 2f;
 
 
         // pass all parameters to the character control script
