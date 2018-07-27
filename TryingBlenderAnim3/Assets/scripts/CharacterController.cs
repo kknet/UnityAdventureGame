@@ -61,16 +61,18 @@ public class CharacterController : MonoBehaviour
     #region things to tweak only in code
     float m_MovingTurnSpeed = 180f;
     float m_RollingTurnSpeed = 720f;
-    //float m_CombatMoveSpeedMultiplier = 1.5f;
     float m_CombatMoveSpeedMultiplier = 2.5f;
     float m_MoveSpeedMultiplier = 8f;
     float m_WallJumpCheckDistance = 0.5f;
     float m_GroundCheckDistance = 0.3f;
     int lerpFrames = 60;
     float lerpSmoothing = 16f;
-    float maxDodgeMultiplier = 5f;
+    float maxDodgeMultiplier = 2.5f;
     float minDodgeMultiplier = 1f;
     float dodgeMultiplier, dodgeMultiplierGoal;
+    float dodgeAnimSpeedMin = 0.05f;
+    float dodgeAnimSpeedMax = 1f;
+    float dodgeAnimSpeedGoal;
 
     JumpState jumpState = JumpState.notJumping;
     JumpState prevJumpState = JumpState.notJumping;
@@ -100,6 +102,7 @@ public class CharacterController : MonoBehaviour
         m_Rigidbody.constraints = RigidbodyConstraints.FreezeRotationX | RigidbodyConstraints.FreezeRotationY | RigidbodyConstraints.FreezeRotationZ;
         m_jump = false;
         m_grounded = true;
+        dodgeAnimSpeedGoal = dodgeAnimSpeedMax;
         dodgeMultiplierGoal = minDodgeMultiplier;
         lastGroundedTime = Time.time;
         InputController = GetComponent<InputController>();
@@ -175,6 +178,7 @@ public class CharacterController : MonoBehaviour
 
     void UpdateAnimator(Vector3 move)
     {
+        bool dodgePressed = InputController.controlsManager.GetButtonDown(ControlsManager.ButtonType.Jump);
         CheckGroundStatus();
 
         if (jumpEnabled) updateJumpState();
@@ -191,6 +195,13 @@ public class CharacterController : MonoBehaviour
         {
             if (inCombatMode())
             {
+                if (dodgePressed)
+                {
+                    m_ForwardAmount *= 2f;
+                    m_SideAmount *= 2f;
+                }
+
+
                 m_Animator.SetFloat("Forward", Mathf.MoveTowards(m_Animator.GetFloat("Forward"), m_ForwardAmount, 5f * Time.fixedDeltaTime));
                 m_Animator.SetFloat("HorizSpeed", Mathf.MoveTowards(m_Animator.GetFloat("HorizSpeed"), m_SideAmount, 5f * Time.fixedDeltaTime));
             }
@@ -220,19 +231,22 @@ public class CharacterController : MonoBehaviour
                 }
                 else
                 {
-                    bool dodgePressed = InputController.controlsManager.GetButtonDown(ControlsManager.ButtonType.Jump);
                     if (dodgePressed && dodgeMultiplier < 1.5f)
                     {
                         dodgeMultiplierGoal = maxDodgeMultiplier;
+                        dodgeAnimSpeedGoal = dodgeAnimSpeedMin;
+                        m_Animator.SetTrigger("Dodge");
                         Invoke("ResetDodge", 0.2f);
                     }
 
+                    m_Animator.speed = Mathf.Lerp(m_Animator.speed, dodgeAnimSpeedGoal, 20f * Time.fixedDeltaTime);
                     dodgeMultiplier = Mathf.Lerp(dodgeMultiplier, dodgeMultiplierGoal, 8f * Time.fixedDeltaTime);
-                    float fwd = m_Animator.GetFloat("Forward");
-                    float side = m_Animator.GetFloat("HorizSpeed");
+                    Vector3 fwd = m_Animator.GetFloat("Forward") * Vector3.forward * 0.8f;
+                    Vector3 side = m_Animator.GetFloat("HorizSpeed") * Vector3.right;
+                    Vector3 total = fwd + side;
+                    if (total.magnitude > 1f) total.Normalize();
 
-                    transform.Translate(Vector3.forward * fwd * dodgeMultiplier * Time.fixedDeltaTime * m_CombatMoveSpeedMultiplier);
-                    transform.Translate(Vector3.right * side * dodgeMultiplier * Time.fixedDeltaTime * m_CombatMoveSpeedMultiplier);
+                    transform.Translate(total * dodgeMultiplier * Time.fixedDeltaTime * m_CombatMoveSpeedMultiplier);
                 }
             }
             else
@@ -380,6 +394,7 @@ public class CharacterController : MonoBehaviour
     void ResetDodge()
     {
         dodgeMultiplierGoal = minDodgeMultiplier;
+        dodgeAnimSpeedGoal = dodgeAnimSpeedMax;
     }
 
     void CheckGroundStatus()
