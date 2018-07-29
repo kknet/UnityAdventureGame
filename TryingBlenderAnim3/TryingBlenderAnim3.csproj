@@ -426,6 +426,7 @@
     <Compile Include="Assets\scripts\StopHitStrong.cs" />
     <Compile Include="Assets\scripts\StopJumpAttack.cs" />
     <Compile Include="Assets\scripts\StopSuccess.cs" />
+    <Compile Include="Assets\scripts\TargetMatching.cs" />
     <Compile Include="Assets\scripts\TrackObstacles.cs" />
     <Compile Include="Assets\scripts\WeaponHitsStrong.cs" />
     <Compile Include="Assets\scripts\WeaponToggle.cs" />

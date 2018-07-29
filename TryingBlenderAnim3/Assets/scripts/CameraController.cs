@@ -30,7 +30,8 @@ public class CameraController : MonoBehaviour
     Vector3 velocityCamSmooth = Vector3.zero;
     Vector3 verticalPosOffsetNormal = (Vector3.up * 1.5f);
     float normalDistance = 1.2f;
-    float combatDistance = 1f;
+    //float combatDistance = 1f;
+    float combatDistance = 2f;
     float distance;
     float controllerSensitivityMultiplier = 3f;
     [SerializeField] float mouseSensitivityX = 20f;
@@ -125,8 +126,10 @@ public class CameraController : MonoBehaviour
 
     Vector3 horizontalPosOffsetNormal()
     {
-        return transform.right * 0.6f;
-        //return transform.right * 1.2f;
+        if(characterScript.inCombatMode())
+            return transform.right * 0.6f;
+        else
+            return transform.right * 0.6f;
     }
     
     public void PhysicsUpdate()
@@ -171,7 +174,7 @@ public class CameraController : MonoBehaviour
 
             collision.checkColliding(targetPos);
             float zoomedDistance = collision.colliding ? collision.getAdjustedDistanceWithRay(targetPos) : initialDistance();
-            bool colliding = collision.colliding && zoomedDistance < initialDistance();
+            bool colliding = !characterScript.inCombatMode() && collision.colliding && zoomedDistance < initialDistance();
             if (colliding)
             {
                 lastCamClipTime = Time.fixedTime;
@@ -271,28 +274,15 @@ public class CameraController : MonoBehaviour
 
         if (characterScript.inCombatMode() && !characterScript.rolling())
         {
-            //if (characterScript.rolling())
-            //{
-            //    //Vector3 dir =  devCombat.TestEnemy.transform.position - Player.transform.position;
-            //    Vector3 dir =  devCombat.TestEnemy.transform.position - Player.transform.position;
-            //    rotationYAxis = Mathf.Lerp(rotationYAxis, dir.z, 3f * Time.fixedDeltaTime);
-
-            //    rotationXAxis -= velocityY;
-            //}
-            //else
-            //{
-
             float goalY = ClampAngle(Player.transform.eulerAngles.y, 0, 360f);
             if (goalY > 180f) goalY = goalY - 360f;
 
             if (inputController.IsInputEnabled())
-                rotationYAxis = goalY;
+                rotationYAxis = Mathf.Lerp(rotationYAxis, goalY, 20f * Time.fixedDeltaTime);
             else
-                rotationYAxis = Mathf.Lerp(rotationYAxis, goalY, 4f * Time.fixedDeltaTime);
+                rotationYAxis = Mathf.Lerp(rotationYAxis, goalY, 5f * Time.fixedDeltaTime);
 
             rotationXAxis = 12f;
-            //rotationXAxis -= velocityY;
-            //}
         }
         else
         {

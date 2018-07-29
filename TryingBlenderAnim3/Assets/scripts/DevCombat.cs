@@ -68,6 +68,14 @@ public class DevCombat : MonoBehaviour
         CheckHit();
     }
 
+    public GameObject CurrentEnemy
+    {
+        get
+        {
+            return currentEnemy;
+        }
+    }
+
     private void handleInput()
     {
         //bool EPressed = InputController.controlsManager.GetButtonDown(ControlsManager.ButtonType.Interact);
