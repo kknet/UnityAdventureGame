@@ -255,7 +255,7 @@ public class CharacterController : MonoBehaviour
 
                         m_Animator.speed = Mathf.Lerp(m_Animator.speed, dodgeAnimSpeedGoal, 20f * Time.fixedDeltaTime);
                         dodgeMultiplier = Mathf.Lerp(dodgeMultiplier, dodgeMultiplierGoal, 8f * Time.fixedDeltaTime);
-                        Vector3 fwd = m_Animator.GetFloat("Forward") * Vector3.forward * 0.8f;
+                        Vector3 fwd = m_Animator.GetFloat("Forward") * Vector3.forward * 0.5f;
                         Vector3 side = m_Animator.GetFloat("HorizSpeed") * Vector3.right;
                         Vector3 total = fwd + side;
                         if (total.magnitude > 1f) total.Normalize();
@@ -459,12 +459,15 @@ public class CharacterController : MonoBehaviour
 
     void LateUpdate()
     {
-        if (inCombatMode() && !rolling())
-        {
-            spine.transform.Rotate(15f * transform.up);
-            spine1.transform.Rotate(15f * transform.up);
-            spine2.transform.Rotate(15f * transform.up);
-            rightShoulder.transform.Rotate(20f * transform.up);
-        }
+        bool rotationsEnabled = false;
+
+        if (rotationsEnabled)
+            if (inCombatMode() && !rolling())
+            {
+                spine.transform.Rotate(15f * transform.up);
+                spine1.transform.Rotate(15f * transform.up);
+                spine2.transform.Rotate(15f * transform.up);
+                rightShoulder.transform.Rotate(20f * transform.up);
+            }
     }
 }
