@@ -61,7 +61,7 @@ public class CharacterController : MonoBehaviour
     #region things to tweak only in code
     float m_MovingTurnSpeed = 180f;
     float m_RollingTurnSpeed = 720f;
-    float m_CombatMoveSpeedMultiplier = 1.5f;
+    float m_CombatMoveSpeedMultiplier = 1.4f;
     float m_MoveSpeedMultiplier = 8f;
     float m_WallJumpCheckDistance = 0.5f;
     float m_GroundCheckDistance = 0.3f;
@@ -255,7 +255,7 @@ public class CharacterController : MonoBehaviour
 
                         m_Animator.speed = Mathf.Lerp(m_Animator.speed, dodgeAnimSpeedGoal, 20f * Time.fixedDeltaTime);
                         dodgeMultiplier = Mathf.Lerp(dodgeMultiplier, dodgeMultiplierGoal, 8f * Time.fixedDeltaTime);
-                        Vector3 fwd = m_Animator.GetFloat("Forward") * Vector3.forward * 0.5f;
+                        Vector3 fwd = m_Animator.GetFloat("Forward") * Vector3.forward;
                         Vector3 side = m_Animator.GetFloat("HorizSpeed") * Vector3.right;
                         Vector3 total = fwd + side;
                         if (total.magnitude > 1f) total.Normalize();
@@ -459,7 +459,7 @@ public class CharacterController : MonoBehaviour
 
     void LateUpdate()
     {
-        bool rotationsEnabled = false;
+        bool rotationsEnabled = true;
 
         if (rotationsEnabled)
             if (inCombatMode() && !rolling())

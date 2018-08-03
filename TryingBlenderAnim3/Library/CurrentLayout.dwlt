@@ -20,7 +20,7 @@ MonoBehaviour:
   m_ShowMode: 4
   m_Title: 
   m_RootView: {fileID: 2}
-  m_MinSize: {x: 950, y: 392}
+  m_MinSize: {x: 950, y: 542}
   m_MaxSize: {x: 10000, y: 10000}
 --- !u!114 &2
 MonoBehaviour:
@@ -43,7 +43,7 @@ MonoBehaviour:
     y: 0
     width: 1536
     height: 781
-  m_MinSize: {x: 950, y: 392}
+  m_MinSize: {x: 950, y: 542}
   m_MaxSize: {x: 10000, y: 10000}
 --- !u!114 &3
 MonoBehaviour:
@@ -107,10 +107,10 @@ MonoBehaviour:
     y: 30
     width: 1536
     height: 731
-  m_MinSize: {x: 681, y: 342}
-  m_MaxSize: {x: 12008, y: 8042}
+  m_MinSize: {x: 713, y: 492}
+  m_MaxSize: {x: 18008, y: 14042}
   vertical: 0
-  controlID: 5056
+  controlID: 19256
 --- !u!114 &6
 MonoBehaviour:
   m_ObjectHideFlags: 52
@@ -156,10 +156,10 @@ MonoBehaviour:
     y: 0
     width: 539
     height: 731
-  m_MinSize: {x: 202, y: 342}
-  m_MaxSize: {x: 4004, y: 8042}
+  m_MinSize: {x: 234, y: 492}
+  m_MaxSize: {x: 10004, y: 14042}
   vertical: 1
-  controlID: 5057
+  controlID: 19257
 --- !u!114 &8
 MonoBehaviour:
   m_ObjectHideFlags: 52
@@ -205,15 +205,15 @@ MonoBehaviour:
     y: 412
     width: 539
     height: 319
-  m_MinSize: {x: 104, y: 121}
-  m_MaxSize: {x: 4004, y: 4021}
-  m_ActualView: {fileID: 16}
+  m_MinSize: {x: 234, y: 271}
+  m_MaxSize: {x: 10004, y: 10021}
+  m_ActualView: {fileID: 15}
   m_Panes:
   - {fileID: 15}
   - {fileID: 16}
   - {fileID: 17}
-  m_Selected: 1
-  m_LastSelected: 0
+  m_Selected: 0
+  m_LastSelected: 1
 --- !u!114 &10
 MonoBehaviour:
   m_ObjectHideFlags: 52
@@ -341,9 +341,9 @@ MonoBehaviour:
   m_PersistentViewDataDictionary: {fileID: 0}
   m_TreeViewState:
     scrollPos: {x: 0, y: 0}
-    m_SelectedIDs: 5cc40000
+    m_SelectedIDs: b0340000
     m_LastClickedID: 0
-    m_ExpandedIDs: e8fbffff0000000030600000e8600000
+    m_ExpandedIDs: f0fbffff00000000
     m_RenameOverlay:
       m_UserAcceptedRename: 0
       m_Name: 
@@ -406,6 +406,7 @@ MonoBehaviour:
     - {fileID: 1107884758355002826, guid: 9bb26e03eda3be54dbfca2691e613df3, type: 2}
     - {fileID: 1107940940928886232, guid: 9bb26e03eda3be54dbfca2691e613df3, type: 2}
     - {fileID: 1102349133504015604, guid: 9bb26e03eda3be54dbfca2691e613df3, type: 2}
+    - {fileID: 1107468693630719732, guid: 9bb26e03eda3be54dbfca2691e613df3, type: 2}
     m_ValueSerializationHelper:
     - e00: 0.5025846
       e01: 0
@@ -551,14 +552,14 @@ MonoBehaviour:
       e31: 0
       e32: 0
       e33: 1
-    - e00: 0.71433127
+    - e00: 0.44370535
       e01: 0
       e02: 0
-      e03: -496.72806
+      e03: -272.23413
       e10: 0
-      e11: 0.71433127
+      e11: 0.44370535
       e12: 0
-      e13: 234.22156
+      e13: 131.17023
       e20: 0
       e21: 0
       e22: 1
@@ -567,14 +568,14 @@ MonoBehaviour:
       e31: 0
       e32: 0
       e33: 1
-    - e00: 0.5707916
+    - e00: 0.9324363
       e01: 0
       e02: 0
-      e03: -29.923279
+      e03: -237.11412
       e10: 0
-      e11: 0.5707916
+      e11: 0.9324363
       e12: 0
-      e13: 227.4498
+      e13: 350.944
       e20: 0
       e21: 0
       e22: 1
@@ -583,14 +584,30 @@ MonoBehaviour:
       e31: 0
       e32: 0
       e33: 1
-    - e00: 1
+    - e00: 0.44370535
       e01: 0
       e02: 0
-      e03: -27.625
+      e03: 40.765854
       e10: 0
-      e11: 1
+      e11: 0.44370535
       e12: 0
-      e13: 38
+      e13: 77.17022
+      e20: 0
+      e21: 0
+      e22: 1
+      e23: 0
+      e30: 0
+      e31: 0
+      e32: 0
+      e33: 1
+    - e00: 0.9340073
+      e01: 0
+      e02: 0
+      e03: -379.01248
+      e10: 0
+      e11: 0.9340073
+      e12: 0
+      e13: 178.59721
       e20: 0
       e21: 0
       e22: 1
@@ -610,7 +627,7 @@ MonoBehaviour:
   m_MiniTool: 0
   m_LockTracker:
     m_IsLocked: 0
-  m_CurrentEditor: 1
+  m_CurrentEditor: 0
   m_LayerEditor:
     m_SelectedLayerIndex: 0
 --- !u!114 &14
@@ -675,20 +692,20 @@ MonoBehaviour:
     m_ShowAllHits: 0
     m_SearchArea: 0
     m_Folders:
-    - Assets
+    - Assets/Dev Drake/animations/combat/Great Sword
   m_ViewMode: 1
   m_StartGridSize: 64
   m_LastFolders:
-  - Assets
+  - Assets/Dev Drake/animations/combat/Great Sword
   m_LastFoldersGridSize: -1
   m_LastProjectPath: D:\github\UnityAdventureGame\TryingBlenderAnim3
   m_LockTracker:
     m_IsLocked: 0
   m_FolderTreeState:
-    scrollPos: {x: 0, y: 79}
-    m_SelectedIDs: b00b0000
-    m_LastClickedID: 2992
-    m_ExpandedIDs: 00000000b00b00008c0c0000e810000072130000a61400007e180000e0190000e61900004e1f0000a8270000be270000ec270000b029000062330000d63c00006c3f0000d2400000d440000000420000e6460000e44800008a4a0000d84a0000e0500000c651000072540000f05400007e560000f0590000985a0000225d0000da5d0000c8890000ca890000cc890000ce89000000ca9a3bffffff7f
+    scrollPos: {x: 0, y: 119}
+    m_SelectedIDs: 14290000
+    m_LastClickedID: 10516
+    m_ExpandedIDs: 00000000a80b0000840c0000e610000070130000a41400007c180000de190000e41900004e1f0000a8270000be270000ec270000b229000064330000de3c0000743f0000da400000dc40000008420000ee460000ec480000924a0000e04a0000e8500000ce5100004254000080540000fe5400008c560000fe590000a65a0000305d0000e85d0000828a0000848a0000868a0000888a000000ca9a3bffffff7f
     m_RenameOverlay:
       m_UserAcceptedRename: 0
       m_Name: 
@@ -716,7 +733,7 @@ MonoBehaviour:
     scrollPos: {x: 0, y: 0}
     m_SelectedIDs: 
     m_LastClickedID: 0
-    m_ExpandedIDs: 00000000b00b00008c0c0000e810000072130000a61400007e180000e0190000e61900004e1f0000a8270000be270000ec270000b029000062330000d63c00006c3f0000d2400000d440000000420000e6460000e44800008a4a0000d84a0000e0500000c651000072540000f05400007e560000f0590000985a0000225d0000da5d0000c8890000ca890000cc890000ce89000000ca9a3bffffff7f
+    m_ExpandedIDs: 00000000a80b0000840c0000e610000070130000a41400007c180000de190000e41900004e1f0000a8270000be270000ec270000b229000064330000de3c0000743f0000da400000dc40000008420000ee460000ec480000924a0000e04a0000e8500000ce5100004254000080540000fe5400008c560000fe590000a65a0000305d0000e85d0000828a0000848a0000868a0000888a000000ca9a3bffffff7f
     m_RenameOverlay:
       m_UserAcceptedRename: 0
       m_Name: 
@@ -741,10 +758,10 @@ MonoBehaviour:
       m_Icon: {fileID: 0}
       m_ResourceFile: 
   m_ListAreaState:
-    m_SelectedInstanceIDs: 5cc40000
-    m_LastClickedInstanceID: 50268
-    m_HadKeyboardFocusLastEvent: 1
-    m_ExpandedInstanceIDs: f2320000
+    m_SelectedInstanceIDs: 
+    m_LastClickedInstanceID: 0
+    m_HadKeyboardFocusLastEvent: 0
+    m_ExpandedInstanceIDs: f23200006c1a0000
     m_RenameOverlay:
       m_UserAcceptedRename: 0
       m_Name: 
