@@ -67,7 +67,7 @@ public class CharacterController : MonoBehaviour
     float m_GroundCheckDistance = 0.3f;
     int lerpFrames = 60;
     float lerpSmoothing = 16f;
-    float maxDodgeMultiplier = 4f;
+    float maxDodgeMultiplier = 5f;
     float minDodgeMultiplier = 1f;
     float dodgeMultiplier, dodgeMultiplierGoal;
     float dodgeAnimSpeedMin = 0.05f;
@@ -200,15 +200,15 @@ public class CharacterController : MonoBehaviour
         {
             if (inCombatMode())
             {
-                if (dodgePressed)
+                if (m_Animator.GetBool("Dodge"))
                 {
                     m_ForwardAmount *= 2f;
                     m_SideAmount *= 2f;
                 }
 
 
-                m_Animator.SetFloat("Forward", Mathf.MoveTowards(m_Animator.GetFloat("Forward"), m_ForwardAmount, 5f * Time.fixedDeltaTime));
-                m_Animator.SetFloat("HorizSpeed", Mathf.MoveTowards(m_Animator.GetFloat("HorizSpeed"), m_SideAmount, 5f * Time.fixedDeltaTime));
+                m_Animator.SetFloat("Forward", Mathf.MoveTowards(m_Animator.GetFloat("Forward"), m_ForwardAmount, 3f * Time.fixedDeltaTime));
+                m_Animator.SetFloat("HorizSpeed", Mathf.MoveTowards(m_Animator.GetFloat("HorizSpeed"), m_SideAmount, 3f * Time.fixedDeltaTime));
             }
             else
             {
@@ -240,21 +240,24 @@ public class CharacterController : MonoBehaviour
                     AnimatorStateInfo anim = m_Animator.GetCurrentAnimatorStateInfo(0);
                     if (attackMoveEnabled && anim.IsTag("attacking"))
                     {
-                        m_Animator.speed = Mathf.Lerp(m_Animator.speed, 1f, 20f * Time.fixedDeltaTime);
+                        //m_Animator.speed = Mathf.Lerp(m_Animator.speed, 1f, 20f * Time.fixedDeltaTime);
                         transform.Translate(Vector3.forward * m_CombatMoveSpeedMultiplier * 0.5f * Time.fixedDeltaTime);
                     }
                     else
                     {
-                        if (dodgePressed && dodgeMultiplier < 1.5f)
+                        //if (dodgePressed && dodgeMultiplier < 1.5f)
+                        if (dodgePressed && !m_Animator.GetBool("Dodge"))
                         {
                             dodgeMultiplierGoal = maxDodgeMultiplier;
                             dodgeAnimSpeedGoal = dodgeAnimSpeedMin;
-                            m_Animator.SetTrigger("Dodge");
-                            Invoke("ResetDodge", 0.2f);
+                            m_Animator.SetBool("Dodge", true);
+                            //Invoke("ResetDodge", 0.4f);
+                            //Invoke("ResetDodge", 0.8f);
                         }
 
-                        m_Animator.speed = Mathf.Lerp(m_Animator.speed, dodgeAnimSpeedGoal, 20f * Time.fixedDeltaTime);
-                        dodgeMultiplier = Mathf.Lerp(dodgeMultiplier, dodgeMultiplierGoal, 8f * Time.fixedDeltaTime);
+                        //m_Animator.speed = Mathf.Lerp(m_Animator.speed, dodgeAnimSpeedGoal, 20f * Time.fixedDeltaTime);
+                        //dodgeMultiplier = Mathf.Lerp(dodgeMultiplier, dodgeMultiplierGoal, 20f * Time.fixedDeltaTime);
+                        dodgeMultiplier = Mathf.Lerp(dodgeMultiplier, dodgeMultiplierGoal, 5f * Time.fixedDeltaTime);
                         Vector3 fwd = m_Animator.GetFloat("Forward") * Vector3.forward;
                         Vector3 side = m_Animator.GetFloat("HorizSpeed") * Vector3.right;
                         Vector3 total = fwd + side;
@@ -387,6 +390,7 @@ public class CharacterController : MonoBehaviour
     {
         dodgeMultiplierGoal = minDodgeMultiplier;
         dodgeAnimSpeedGoal = dodgeAnimSpeedMax;
+        m_Animator.SetBool("Dodge", false);
     }
 
     void CheckGroundStatus()
