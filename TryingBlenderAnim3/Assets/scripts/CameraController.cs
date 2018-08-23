@@ -127,7 +127,7 @@ public class CameraController : MonoBehaviour
     Vector3 horizontalPosOffsetNormal()
     {
         if(characterScript.inCombatMode())
-            return transform.right * 0.6f;
+            return transform.right * 0.9f;
         else
             return transform.right * 0.6f;
     }

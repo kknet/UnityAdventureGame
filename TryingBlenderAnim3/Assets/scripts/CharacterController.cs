@@ -459,14 +459,14 @@ public class CharacterController : MonoBehaviour
 
     void LateUpdate()
     {
-        bool rotationsEnabled = true;
+        bool rotationsEnabled = false;
 
         if (rotationsEnabled)
             if (inCombatMode() && !rolling())
             {
-                spine.transform.Rotate(15f * transform.up);
-                spine1.transform.Rotate(15f * transform.up);
-                spine2.transform.Rotate(15f * transform.up);
+                spine.transform.Rotate(10f * transform.up);
+                spine1.transform.Rotate(10f * transform.up);
+                spine2.transform.Rotate(10f * transform.up);
                 rightShoulder.transform.Rotate(20f * transform.up);
             }
     }
