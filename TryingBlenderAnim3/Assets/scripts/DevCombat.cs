@@ -21,6 +21,7 @@ public class DevCombat : MonoBehaviour
     private GameObject currentEnemy;
     private AudioSource[] enemyAttackReactionSounds;
     private DevCombatReactions devCombatReactionsScript;
+    private TargetMatching targetMatching;
 
     private float[] strongHitCrossFadeTimes, quickAttackOffsets;
     private string[] quickAttackStateNames;
@@ -46,6 +47,7 @@ public class DevCombat : MonoBehaviour
 
     public void Init()
     {
+        targetMatching = GetComponent<TargetMatching>();
         characterController = GetComponent<CharacterController>();
         devCombatReactionsScript = GetComponent<DevCombatReactions>();
         myAnimator = GetComponent<Animator>();
@@ -130,6 +132,7 @@ public class DevCombat : MonoBehaviour
     private void triggerQuickAttack()
     {
         myAnimator.SetBool("doAttack", true);
+        targetMatching.MatchTargetIfPossible();
     }
 
     public void stopAttack()

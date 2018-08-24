@@ -168,7 +168,7 @@ ModelImporter:
         floatParameter: 0
         intParameter: 0
         messageOptions: 0
-      - time: 0.508079
+      - time: 0.8438061
         functionName: switchAttack
         data: 
         objectReferenceParameter: {instanceID: 0}
