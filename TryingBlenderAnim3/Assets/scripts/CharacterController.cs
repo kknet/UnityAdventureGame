@@ -67,7 +67,7 @@ public class CharacterController : MonoBehaviour
     float m_GroundCheckDistance = 0.3f;
     int lerpFrames = 60;
     float lerpSmoothing = 16f;
-    float maxDodgeMultiplier = 5f;
+    float maxDodgeMultiplier = 3f;
     float minDodgeMultiplier = 1f;
     float dodgeMultiplier, dodgeMultiplierGoal;
     float dodgeAnimSpeedMin = 0.05f;
@@ -162,7 +162,7 @@ public class CharacterController : MonoBehaviour
             m_ForwardAmount = 0.33f;
 
         if (m_grounded || (!m_grounded && jumpState == JumpState.waitingToLand))
-            RotatePlayer();
+            RotatePlayer(move);
 
         bool fallingDown = m_Rigidbody.velocity.y < 0f;
         //if (jumping() || fallingDown)
@@ -289,10 +289,20 @@ public class CharacterController : MonoBehaviour
         return dir;
     }
 
-    void RotatePlayer()
+    Vector3 getDodgeDirection(Vector3 move)
+    {
+        return move;
+    }
+
+    void RotatePlayer(Vector3 move)
     {
         if (inCombatMode()/* && DevCombat.Locked*/)
-            transform.forward = Vector3.RotateTowards(transform.forward, CombatLookDirection(), 0.1f, Time.fixedDeltaTime * 1f);
+        {
+            if (rolling())
+                transform.Rotate(0, m_TurnAmount * m_MovingTurnSpeed * 2f * Time.fixedDeltaTime, 0);
+            else
+                transform.forward = Vector3.RotateTowards(transform.forward, CombatLookDirection(), 0.1f, Time.fixedDeltaTime * 1f);
+        }
         else if (Mathf.Abs(m_Animator.GetFloat("Forward")) > 0f)
             transform.Rotate(0, m_TurnAmount * m_MovingTurnSpeed * Time.fixedDeltaTime, 0);
     }
