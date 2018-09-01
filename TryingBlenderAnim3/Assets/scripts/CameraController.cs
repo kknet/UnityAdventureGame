@@ -11,6 +11,7 @@ public class CameraController : MonoBehaviour
 
     public CollisionHandler collision;
     public Transform target;
+    public Transform rollingHelper;
     public bool cameraBobEnabled;
     public bool cameraCollisionZoom;
     public bool autoAdjustCam;
@@ -45,6 +46,7 @@ public class CameraController : MonoBehaviour
     float climbingDistanceSmoothTime = 3f;
     float rotationYAxis = 0.0f;
     float rotationXAxis = 0.0f;
+    float previousGoalY = 0.0f;
     float velocityX = 0.0f;
     float velocityY = 0.0f;
     float moveDirection = -1;
@@ -272,17 +274,9 @@ public class CameraController : MonoBehaviour
             velocityX += mouseSensitivityX * mouseXOverall * 0.02f;
             velocityY += mouseSensitivityY * mouseYOverall * 0.02f;
         }
-
-        if (characterScript.inCombatMode() && !characterScript.rolling())
+        if (characterScript.inCombatMode())
         {
-            float goalY = ClampAngle(Player.transform.eulerAngles.y, 0, 360f);
-            if (goalY > 180f) goalY = goalY - 360f;
-
-            if (inputController.IsInputEnabled())
-                rotationYAxis = Mathf.Lerp(rotationYAxis, goalY, 5f * Time.fixedDeltaTime);
-            else
-                rotationYAxis = Mathf.Lerp(rotationYAxis, goalY, 5f * Time.fixedDeltaTime);
-
+            UpdateCombatRotationYAxis();
             rotationXAxis = 12f;
         }
         else
@@ -307,11 +301,37 @@ public class CameraController : MonoBehaviour
         return Quaternion.Euler(rotationXAxis, rotationYAxis, 0);
     }
 
+    private void UpdateCombatRotationYAxis()
+    {
+        float goalY = UnwrapEulerAngle(rollingHelper.eulerAngles.y, previousGoalY);
+        //goalY = ClampAngle(Player.transform.eulerAngles.y, previousGoalY);
+        //Debug.Log("goalY: " + goalY);
+
+        rotationYAxis = Mathf.Lerp(rotationYAxis, goalY, 5f * Time.fixedDeltaTime);
+        previousGoalY = goalY;
+    }
+
+
+    public static float UnwrapEulerAngle(float angle, float previous)
+    {
+        while (angle < -360F)
+            angle += 360F;
+        while (angle > 360F)
+            angle -= 360F;
+
+        while (angle - previous > 100f)
+            angle = angle - 360f;
+        while (angle - previous < -100f)
+            angle = angle + 360f;
+
+        return angle;
+    }
+
     public static float ClampAngle(float angle, float min, float max)
     {
-        if (angle < -360F)
+        while (angle < -360F)
             angle += 360F;
-        if (angle > 360F)
+        while (angle > 360F)
             angle -= 360F;
         return Mathf.Clamp(angle, min, max);
     }

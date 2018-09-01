@@ -52,6 +52,7 @@ public class CharacterController : MonoBehaviour
     //public List<WeightedDetectionTarget> detectionTargets = new List<WeightedDetectionTarget>();
 
     public GameObject spine, spine1, spine2, hips, leftShoulder, rightShoulder, leftLeg, rightLeg;
+    public Transform rollingHelper;
 
     [Tooltip("How much upwards force when jumping?")]
     [Range(7f, 15f)]
@@ -302,6 +303,9 @@ public class CharacterController : MonoBehaviour
                 transform.Rotate(0, m_TurnAmount * m_MovingTurnSpeed * 2f * Time.fixedDeltaTime, 0);
             else
                 transform.forward = Vector3.RotateTowards(transform.forward, CombatLookDirection(), 0.1f, Time.fixedDeltaTime * 1f);
+
+            rollingHelper.forward = Vector3.RotateTowards(rollingHelper.forward, CombatLookDirection(), 10f, Time.fixedDeltaTime * 10f);
+            //rollingHelper.forward = Vector3.RotateTowards(rollingHelper.forward, CombatLookDirection(), 0.1f, Time.fixedDeltaTime * 1f);
         }
         else if (Mathf.Abs(m_Animator.GetFloat("Forward")) > 0f)
             transform.Rotate(0, m_TurnAmount * m_MovingTurnSpeed * Time.fixedDeltaTime, 0);
