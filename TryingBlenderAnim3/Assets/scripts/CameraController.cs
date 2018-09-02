@@ -274,16 +274,27 @@ public class CameraController : MonoBehaviour
             velocityX += mouseSensitivityX * mouseXOverall * 0.02f;
             velocityY += mouseSensitivityY * mouseYOverall * 0.02f;
         }
+
         if (characterScript.inCombatMode())
         {
-            UpdateCombatRotationYAxis();
-            rotationXAxis = 12f;
+            if (devCombat.Locked)
+            {
+                UpdateCombatRotationYAxis();
+                rotationXAxis = 12f;
+            }
+            else
+            {
+                rotationYAxis += velocityX;
+                rotationXAxis -= velocityY;
+                previousGoalY = rotationYAxis;
+            }
         }
         else
         {
             velocityX += h * 0.2f;
             rotationYAxis += velocityX;
             rotationXAxis -= velocityY;
+            previousGoalY = rotationYAxis;
         }
 
         //------------restricting angle-----------//

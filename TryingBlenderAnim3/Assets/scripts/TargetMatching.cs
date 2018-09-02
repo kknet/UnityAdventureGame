@@ -30,7 +30,7 @@ public class TargetMatching : MonoBehaviour
 
     public void MatchTargetIfPossible()
     {
-        Quaternion correctRot = Quaternion.LookRotation(characterController.CombatLookDirection());
+        Quaternion correctRot = Quaternion.LookRotation(characterController.CurrentEnemyLookDirection());
 
         Vector3 enemyPos = devCombat.CurrentEnemy.transform.position;
         Vector3 curPos = transform.position;

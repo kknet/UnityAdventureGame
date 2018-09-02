@@ -68,12 +68,6 @@ public class CharacterController : MonoBehaviour
     float m_GroundCheckDistance = 0.3f;
     int lerpFrames = 60;
     float lerpSmoothing = 16f;
-    float maxDodgeMultiplier = 3f;
-    float minDodgeMultiplier = 1f;
-    float dodgeMultiplier, dodgeMultiplierGoal;
-    float dodgeAnimSpeedMin = 0.05f;
-    float dodgeAnimSpeedMax = 1f;
-    float dodgeAnimSpeedGoal;
 
     JumpState jumpState = JumpState.notJumping;
     JumpState prevJumpState = JumpState.notJumping;
@@ -103,8 +97,6 @@ public class CharacterController : MonoBehaviour
         m_Rigidbody.constraints = RigidbodyConstraints.FreezeRotationX | RigidbodyConstraints.FreezeRotationY | RigidbodyConstraints.FreezeRotationZ;
         m_jump = false;
         m_grounded = true;
-        dodgeAnimSpeedGoal = dodgeAnimSpeedMax;
-        dodgeMultiplierGoal = minDodgeMultiplier;
         lastGroundedTime = Time.time;
         InputController = GetComponent<InputController>();
         CharacterEvents = GetComponent<CharacterEvents>();
@@ -120,13 +112,6 @@ public class CharacterController : MonoBehaviour
         move = Vector3.ProjectOnPlane(move, m_GroundNormal);
 
         m_TurnAmount = Mathf.Atan2(move.x, move.z);
-
-        //if (inCombatMode() && InputController.controlsManager.GetButtonDown(ControlsManager.ButtonType.Jump))
-        //{
-        //    Debug.Log("Got here: " + m_TurnAmount);
-
-        //    transform.Rotate(Vector3.up, Mathf.Rad2Deg * m_TurnAmount);
-        //}
 
         if (anim.IsTag("equip"))
         {
@@ -184,7 +169,6 @@ public class CharacterController : MonoBehaviour
         else
             m_Animator.applyRootMotion = false;
 
-        bool dodgePressed = InputController.controlsManager.GetButtonDown(ControlsManager.ButtonType.Jump);
         CheckGroundStatus();
 
         if (jumpEnabled) updateJumpState();
@@ -201,13 +185,6 @@ public class CharacterController : MonoBehaviour
         {
             if (inCombatMode())
             {
-                if (m_Animator.GetBool("Dodge"))
-                {
-                    m_ForwardAmount *= 2f;
-                    m_SideAmount *= 2f;
-                }
-
-
                 m_Animator.SetFloat("Forward", Mathf.MoveTowards(m_Animator.GetFloat("Forward"), m_ForwardAmount, 3f * Time.fixedDeltaTime));
                 m_Animator.SetFloat("HorizSpeed", Mathf.MoveTowards(m_Animator.GetFloat("HorizSpeed"), m_SideAmount, 3f * Time.fixedDeltaTime));
             }
@@ -229,11 +206,6 @@ public class CharacterController : MonoBehaviour
                 if (rolling())
                 {
                     transform.Translate(Vector3.forward * Time.fixedDeltaTime * m_MoveSpeedMultiplier);
-
-                    //float fwd = DevCombat.rollFwd;
-                    //float side = DevCombat.rollSide;
-                    //transform.Translate(Vector3.forward * fwd * Time.fixedDeltaTime * m_MoveSpeedMultiplier);
-                    //transform.Translate(Vector3.right * side * Time.fixedDeltaTime * m_MoveSpeedMultiplier);
                 }
                 else
                 {
@@ -241,30 +213,15 @@ public class CharacterController : MonoBehaviour
                     AnimatorStateInfo anim = m_Animator.GetCurrentAnimatorStateInfo(0);
                     if (attackMoveEnabled && anim.IsTag("attacking"))
                     {
-                        //m_Animator.speed = Mathf.Lerp(m_Animator.speed, 1f, 20f * Time.fixedDeltaTime);
                         transform.Translate(Vector3.forward * m_CombatMoveSpeedMultiplier * 0.5f * Time.fixedDeltaTime);
                     }
                     else
                     {
-                        //if (dodgePressed && dodgeMultiplier < 1.5f)
-                        if (dodgePressed && !m_Animator.GetBool("Dodge"))
-                        {
-                            dodgeMultiplierGoal = maxDodgeMultiplier;
-                            dodgeAnimSpeedGoal = dodgeAnimSpeedMin;
-                            m_Animator.SetBool("Dodge", true);
-                            //Invoke("ResetDodge", 0.4f);
-                            //Invoke("ResetDodge", 0.8f);
-                        }
-
-                        //m_Animator.speed = Mathf.Lerp(m_Animator.speed, dodgeAnimSpeedGoal, 20f * Time.fixedDeltaTime);
-                        //dodgeMultiplier = Mathf.Lerp(dodgeMultiplier, dodgeMultiplierGoal, 20f * Time.fixedDeltaTime);
-                        dodgeMultiplier = Mathf.Lerp(dodgeMultiplier, dodgeMultiplierGoal, 5f * Time.fixedDeltaTime);
                         Vector3 fwd = m_Animator.GetFloat("Forward") * Vector3.forward;
                         Vector3 side = m_Animator.GetFloat("HorizSpeed") * Vector3.right;
                         Vector3 total = fwd + side;
                         if (total.magnitude > 1f) total.Normalize();
-
-                        transform.Translate(total * dodgeMultiplier * Time.fixedDeltaTime * m_CombatMoveSpeedMultiplier);
+                        transform.Translate(total * Time.fixedDeltaTime * m_CombatMoveSpeedMultiplier);
                     }
                 }
             }
@@ -281,13 +238,19 @@ public class CharacterController : MonoBehaviour
         if (fallingDown) jumpState = JumpState.waitingToFall;
     }
 
-    public Vector3 CombatLookDirection()
+    public Vector3 CurrentEnemyLookDirection()
     {
         Vector3 enemyPos = DevCombat.TestEnemy.transform.position;
         enemyPos = new Vector3(enemyPos.x, transform.position.y, enemyPos.z);
         Vector3 dir = enemyPos - transform.position;
         dir.Normalize();
         return dir;
+    }
+
+    public Vector3 cameraLookDirection()
+    {
+        Vector3 camTrans = Camera.main.transform.forward;
+        return new Vector3(camTrans.x, transform.forward.y, camTrans.z);
     }
 
     Vector3 getDodgeDirection(Vector3 move)
@@ -297,18 +260,28 @@ public class CharacterController : MonoBehaviour
 
     void RotatePlayer(Vector3 move)
     {
-        if (inCombatMode()/* && DevCombat.Locked*/)
+        if (!inCombatMode() /*&& Mathf.Abs(m_Animator.GetFloat("Forward")) > 0f*/) //non combat
         {
-            if (rolling())
-                transform.Rotate(0, m_TurnAmount * m_MovingTurnSpeed * 2f * Time.fixedDeltaTime, 0);
-            else
-                transform.forward = Vector3.RotateTowards(transform.forward, CombatLookDirection(), 0.1f, Time.fixedDeltaTime * 1f);
-
-            rollingHelper.forward = Vector3.RotateTowards(rollingHelper.forward, CombatLookDirection(), 10f, Time.fixedDeltaTime * 10f);
-            //rollingHelper.forward = Vector3.RotateTowards(rollingHelper.forward, CombatLookDirection(), 0.1f, Time.fixedDeltaTime * 1f);
-        }
-        else if (Mathf.Abs(m_Animator.GetFloat("Forward")) > 0f)
             transform.Rotate(0, m_TurnAmount * m_MovingTurnSpeed * Time.fixedDeltaTime, 0);
+        }
+        else if (inCombatMode() && rolling()) // rolling
+        {
+            transform.Rotate(0, m_TurnAmount * m_MovingTurnSpeed * 2f * Time.fixedDeltaTime, 0);
+            rollingHelper.forward = Vector3.RotateTowards(rollingHelper.forward, CurrentEnemyLookDirection(), 10f, Time.fixedDeltaTime * 10f);
+        }
+        else if (inCombatMode() && DevCombat.Locked) //locked
+        {
+            transform.forward = Vector3.RotateTowards(transform.forward, CurrentEnemyLookDirection(), 0.1f, Time.fixedDeltaTime * 1f);
+            rollingHelper.forward = Vector3.RotateTowards(rollingHelper.forward, CurrentEnemyLookDirection(), 10f, Time.fixedDeltaTime * 10f);
+        }
+        else if (inCombatMode() && !DevCombat.Locked)
+        {
+            if(Mathf.Abs(m_Animator.GetFloat("Forward")) > 0f || Mathf.Abs(m_Animator.GetFloat("HorizSpeed")) > 0f)
+                transform.forward = Vector3.RotateTowards(transform.forward, cameraLookDirection(), 0.1f, Time.fixedDeltaTime * 1f);
+            //transform.Rotate(0, m_TurnAmount * m_MovingTurnSpeed * Time.fixedDeltaTime, 0);
+        }
+
+        //combat unlocked has no rotation from WASD, only from the camera view
     }
 
     public bool running()
@@ -402,8 +375,6 @@ public class CharacterController : MonoBehaviour
 
     void ResetDodge()
     {
-        dodgeMultiplierGoal = minDodgeMultiplier;
-        dodgeAnimSpeedGoal = dodgeAnimSpeedMax;
         m_Animator.SetBool("Dodge", false);
     }
 

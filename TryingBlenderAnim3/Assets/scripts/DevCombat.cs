@@ -33,7 +33,7 @@ public class DevCombat : MonoBehaviour
 
     private bool needToAttack, doneLerping, needsRunningAnimation;
 
-    //[HideInInspector] public bool Locked;
+    [HideInInspector] public bool Locked;
 
     AttackType currentType;
     #endregion
@@ -80,41 +80,38 @@ public class DevCombat : MonoBehaviour
 
     private void handleInput()
     {
-        //bool EPressed = InputController.controlsManager.GetButtonDown(ControlsManager.ButtonType.Interact);
+        bool EPressed = InputController.controlsManager.GetButtonDown(ControlsManager.ButtonType.Interact);
         bool leftMousePressed = InputController.controlsManager.GetButtonDown(ControlsManager.ButtonType.Attack);
         bool rightMouseHeld = Input.GetKey(KeyCode.Mouse1);
         bool rightMouseReleased = Input.GetKeyUp(KeyCode.Mouse1);
         bool spaceBarPressed = InputController.controlsManager.GetButtonDown(ControlsManager.ButtonType.Jump);
 
-        if (rightMouseReleased)
+        if (rightMouseReleased) //unblock
             myAnimator.SetBool("isBlocking", false);
 
-        //if (EPressed)
-        //    Locked = !Locked;
+        if (EPressed) //locking
+            Locked = !Locked;
 
-        if (leftMousePressedTime > 0f && (Time.time - leftMousePressedTime > twoButtonPressTimeMax)) //quick attack
+        if (leftMousePressedTime > 0f && (Time.time - leftMousePressedTime > twoButtonPressTimeMax) && !characterController.rolling()) //quick attack
         {
             leftMousePressedTime = 0f;
             triggerQuickAttack();
         }
 
-        if (rightMouseHeld) //block
+        if (spaceBarPressed && !characterController.rolling()) //roll
+        {
+            if (characterController.inCombatMode())
+                myAnimator.SetBool("Dodge", true);
+        }
+        else if (rightMouseHeld && !characterController.rolling()) //block
         {
             stopAttack();
             myAnimator.SetBool("isBlocking", true);
         }
-        else if (leftMousePressed)
+        else if (leftMousePressed && !characterController.rolling()) //quick attack
         {
             handleLeftMousePressed();
             Debug.LogWarning("Left Mouse Pressed!");
-        }
-        else if (spaceBarPressed)
-        {
-            //if (myAnimator.GetBool("WeaponDrawn"))
-            //{
-            //    myAnimator.SetBool("roll", true);
-            //    Invoke("stopRolling", 1.0f);
-            //}
         }
     }
 
@@ -122,6 +119,11 @@ public class DevCombat : MonoBehaviour
     {
         myAnimator.SetBool("roll", false);
         rollRotation = Quaternion.identity;
+    }
+
+    public bool blocking()
+    {
+        return myAnimator.GetBool("isBlocking");
     }
 
     private void handleLeftMousePressed()

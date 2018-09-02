@@ -1,0 +1,5 @@
+when locked on
+- you face the enemy and rotate around
+
+when not locked on: 
+- you face the direction of the camera, you strafe using WASD but you stay facing the camera, you don't face the enemy
