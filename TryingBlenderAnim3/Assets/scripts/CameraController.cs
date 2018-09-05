@@ -31,8 +31,7 @@ public class CameraController : MonoBehaviour
     Vector3 velocityCamSmooth = Vector3.zero;
     Vector3 verticalPosOffset = Vector3.up * 1.5f;
     float horizontalPosOffsetMultiplier = 0.6f;
-    float normalDistance = 1.2f;
-    //float combatDistance = 1f;
+    float normalDistance = 1.5f;
     float combatDistance = 2f;
     float distance;
     float controllerSensitivityMultiplier = 3f;

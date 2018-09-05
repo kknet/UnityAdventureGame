@@ -84,7 +84,7 @@ public class InputController : MonoBehaviour
 
         bool walking = walk && !characterController.jumping() && !characterController.rolling();
         if (walking) m_Move *= 0.66f;
-        else if (dodge) m_Move *= 2f;
+        else if (dodge) m_Move *= 1.2f;
 
 
         // pass all parameters to the character control script

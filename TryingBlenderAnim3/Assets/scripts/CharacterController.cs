@@ -428,7 +428,7 @@ public class CharacterController : MonoBehaviour
 
     public bool inCombatMode()
     {
-        return m_Animator.GetBool("WeaponDrawn") || m_Animator.GetBool("ShieldDraw");
+        return m_Animator.GetBool("WeaponDrawn");
     }
 
     //lerp the player each frame to face a wall
