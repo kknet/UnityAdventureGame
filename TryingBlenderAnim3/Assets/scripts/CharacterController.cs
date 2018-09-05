@@ -260,7 +260,7 @@ public class CharacterController : MonoBehaviour
 
     void RotatePlayer(Vector3 move)
     {
-        if (!inCombatMode() /*&& Mathf.Abs(m_Animator.GetFloat("Forward")) > 0f*/) //non combat
+        if (!inCombatMode()) // non combat
         {
             transform.Rotate(0, m_TurnAmount * m_MovingTurnSpeed * Time.fixedDeltaTime, 0);
         }
@@ -269,19 +269,16 @@ public class CharacterController : MonoBehaviour
             transform.Rotate(0, m_TurnAmount * m_MovingTurnSpeed * 2f * Time.fixedDeltaTime, 0);
             rollingHelper.forward = Vector3.RotateTowards(rollingHelper.forward, CurrentEnemyLookDirection(), 10f, Time.fixedDeltaTime * 10f);
         }
-        else if (inCombatMode() && DevCombat.Locked) //locked
+        else if (inCombatMode() && DevCombat.Locked) // locked
         {
             transform.forward = Vector3.RotateTowards(transform.forward, CurrentEnemyLookDirection(), 0.1f, Time.fixedDeltaTime * 1f);
             rollingHelper.forward = Vector3.RotateTowards(rollingHelper.forward, CurrentEnemyLookDirection(), 10f, Time.fixedDeltaTime * 10f);
         }
-        else if (inCombatMode() && !DevCombat.Locked)
+        else if (inCombatMode() && !DevCombat.Locked) // not locked
         {
             if(Mathf.Abs(m_Animator.GetFloat("Forward")) > 0f || Mathf.Abs(m_Animator.GetFloat("HorizSpeed")) > 0f)
                 transform.forward = Vector3.RotateTowards(transform.forward, cameraLookDirection(), 0.1f, Time.fixedDeltaTime * 1f);
-            //transform.Rotate(0, m_TurnAmount * m_MovingTurnSpeed * Time.fixedDeltaTime, 0);
         }
-
-        //combat unlocked has no rotation from WASD, only from the camera view
     }
 
     public bool running()

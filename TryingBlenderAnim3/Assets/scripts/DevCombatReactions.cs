@@ -146,6 +146,7 @@ public class DevCombatReactions : MonoBehaviour
             //				yield return new WaitForSeconds (0.3f);
             //				myAnimator.CrossFade ("React from Right and Move Back", 0.1f);
             //			}
+            
         }
         else
         {

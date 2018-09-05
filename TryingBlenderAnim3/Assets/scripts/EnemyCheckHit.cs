@@ -8,17 +8,18 @@ public class EnemyCheckHit : MonoBehaviour
     private string[] reactAnimations = {
         "standing_react_large_from_right",
         "standing_react_large_from_left",
-        "React from Right and Move Back",
         "React from Right and Move Back"
     };
 
     public Collider hurtCollider;
     Animator animator;
+    Rigidbody rb;
 
 	// Use this for initialization
 	void Start () {
         animator = GetComponent<Animator>();
-	}
+        rb = GetComponent<Rigidbody>();
+    }
 
     void Update()
     {
@@ -36,7 +37,7 @@ public class EnemyCheckHit : MonoBehaviour
     // Update is called once per frame
     void HurtReaction ()
     {
-        int idx = Random.Range(0, 3);
+        int idx = Random.Range(0, 2);
         animator.Play(reactAnimations[idx]);
 	}
 
@@ -73,8 +74,19 @@ public class EnemyCheckHit : MonoBehaviour
         {
             animator.speed += 0.05f;
             devAnimator.speed += 0.05f;
+
+            transform.Translate(transform.forward.normalized * 0.1f);
+
             yield return null;
         }
+
+        //float tt = 0f;
+        //while (tt < 1f)
+        //{
+        //    transform.Translate(transform.forward.normalized * 0.1f);
+        //    tt += Time.fixedDeltaTime;
+        //    yield return null;
+        //}
     }
 
 }

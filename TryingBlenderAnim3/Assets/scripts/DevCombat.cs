@@ -68,6 +68,7 @@ public class DevCombat : MonoBehaviour
     {
         handleInput();
         CheckHit();
+        targetMatching.MatchTargetUpdate();
     }
 
     public GameObject CurrentEnemy
@@ -86,7 +87,7 @@ public class DevCombat : MonoBehaviour
         bool rightMouseReleased = Input.GetKeyUp(KeyCode.Mouse1);
         bool spaceBarPressed = InputController.controlsManager.GetButtonDown(ControlsManager.ButtonType.Jump);
 
-        if (rightMouseReleased) //unblock
+        if (rightMouseReleased) //unblock 
             myAnimator.SetBool("isBlocking", false);
 
         if (EPressed) //locking
@@ -134,7 +135,7 @@ public class DevCombat : MonoBehaviour
     private void triggerQuickAttack()
     {
         myAnimator.SetBool("doAttack", true);
-        targetMatching.MatchTargetIfPossible();
+        targetMatching.SetUpMatchTarget();
     }
 
     public void stopAttack()
@@ -247,7 +248,6 @@ public class DevCombat : MonoBehaviour
 
             Debug.Log("Blocked: " + other.transform.root.name);
         }
-
     }
 
 
