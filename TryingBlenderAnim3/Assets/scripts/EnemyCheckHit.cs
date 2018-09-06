@@ -11,6 +11,7 @@ public class EnemyCheckHit : MonoBehaviour
         "React from Right and Move Back"
     };
 
+    public DevCombat devCombat;
     public Collider hurtCollider;
     Animator animator;
     Rigidbody rb;
@@ -19,12 +20,13 @@ public class EnemyCheckHit : MonoBehaviour
 	void Start () {
         animator = GetComponent<Animator>();
         rb = GetComponent<Rigidbody>();
+        devCombat = DevMain.Player.GetComponent<DevCombat>();
     }
 
     void Update()
     {
         AnimatorStateInfo animState = animator.GetCurrentAnimatorStateInfo(0);
-        if (animState.IsTag("enemyRun"))
+        if (animState.IsTag("enemyRun") && devCombat.canHit)
         {
             if (CheckHit())
             {
@@ -75,7 +77,7 @@ public class EnemyCheckHit : MonoBehaviour
             animator.speed += 0.05f;
             devAnimator.speed += 0.05f;
 
-            transform.Translate(transform.forward.normalized * 0.1f);
+            transform.Translate(transform.forward.normalized * 0.08f);
 
             yield return null;
         }

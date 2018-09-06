@@ -5,12 +5,19 @@ using UnityEngine;
 [RequireComponent(typeof(Collider))] 
 public class DevCombat : MonoBehaviour
 {
+    enum AttackType
+    {
+        none,
+        jump,
+        quick
+    };
 
     #region globals
     public GameObject TestEnemy;
     public BoxCollider attackCollider;
     public AudioSource quickAttack, quickAttack2, quickAttack3;
     public AudioSource strongHit;
+    public bool canHit;
 
     [HideInInspector] public Quaternion rollRotation;
 
@@ -38,12 +45,7 @@ public class DevCombat : MonoBehaviour
     AttackType currentType;
     #endregion
 
-    enum AttackType
-    {
-        none,
-        jump,
-        quick
-    };
+    #region high level methods
 
     public void Init()
     {
@@ -64,18 +66,11 @@ public class DevCombat : MonoBehaviour
         twoButtonPressTimeMax = 0.1f;
         jumpAttackStartingOffset = 3.7f;
     }
+
     public void FrameUpdate()
     {
         CheckHit();
         targetMatching.MatchTargetUpdate();
-    }
-
-    public GameObject CurrentEnemy
-    {
-        get
-        {
-            return currentEnemy;
-        }
     }
 
     public void ProcessInputs(bool interact, bool leftMousePressed, bool rightMouseHeld, bool rightMouseReleased, bool spaceBarPressed)
@@ -105,7 +100,6 @@ public class DevCombat : MonoBehaviour
         else if (leftMousePressed && !characterController.rolling()) //quick attack
         {
             handleLeftMousePressed();
-            Debug.LogWarning("Left Mouse Pressed!");
         }
 
         if (myAnimator.GetCurrentAnimatorStateInfo(0).IsTag("attacking"))
@@ -114,15 +108,50 @@ public class DevCombat : MonoBehaviour
             myAnimator.applyRootMotion = false;
     }
 
+    public void EnableHits()
+    {
+        canHit = true;
+    }
+
+    public void DisableHits()
+    {
+        canHit = false;
+    }
+
+    void CheckHit()
+    {
+        if (!attacking())
+            return;
+
+        Collider[] cols = Physics.OverlapBox(attackCollider.bounds.center, attackCollider.bounds.extents,
+            attackCollider.transform.rotation, LayerMask.GetMask("HurtBox"));
+        foreach (Collider other in cols)
+        {
+            if (other.Equals(attackCollider))
+                continue;
+
+            Debug.Log("Dev was Hurt by: " + other.transform.root.name);
+        }
+
+        cols = Physics.OverlapBox(attackCollider.bounds.center, attackCollider.bounds.extents,
+            attackCollider.transform.rotation, LayerMask.GetMask("AttackBox"));
+        foreach (Collider other in cols)
+        {
+            if (other.Equals(attackCollider))
+                continue;
+
+            Debug.Log("Dev blocked: " + other.transform.root.name);
+        }
+    }
+
+    #endregion
+
+    #region helpers
+
     void stopRolling()
     {
         myAnimator.SetBool("roll", false);
         rollRotation = Quaternion.identity;
-    }
-
-    public bool blocking()
-    {
-        return myAnimator.GetBool("isBlocking");
     }
 
     private void handleLeftMousePressed()
@@ -168,6 +197,14 @@ public class DevCombat : MonoBehaviour
 
     #region getters
 
+    public GameObject CurrentEnemy
+    {
+        get
+        {
+            return currentEnemy;
+        }
+    }
+
     private bool movementButtonPressed()
     {
         return Input.GetKeyDown(KeyCode.W) || Input.GetKeyDown(KeyCode.A)
@@ -183,10 +220,15 @@ public class DevCombat : MonoBehaviour
 
     public bool notInCombatMove()
     {
-        return !isAttacking() && !devCombatReactionsScript.isBlocking();
+        return !attacking() && !devCombatReactionsScript.isBlocking();
     }
 
-    public bool isAttacking()
+    public bool blocking()
+    {
+        return myAnimator.GetBool("isBlocking");
+    }
+
+    public bool attacking()
     {
         AnimatorStateInfo info = myAnimator.GetCurrentAnimatorStateInfo(0);
         return info.IsName("quick_1") || info.IsName("quick_2") || info.IsName("quick_3") || info.IsName("jump attack") || info.IsName("flip attack");
@@ -223,35 +265,8 @@ public class DevCombat : MonoBehaviour
     }
     #endregion
 
-    void CheckHit()
-    {
-        if (!isAttacking()) 
-            return;
-
-        Collider[] cols = Physics.OverlapBox(attackCollider.bounds.center, attackCollider.bounds.extents, 
-            attackCollider.transform.rotation, LayerMask.GetMask("HurtBox"));
-        foreach (Collider other in cols) {
-            if (other.Equals(attackCollider))
-                continue;
-
-            Debug.Log("Hurt: " + other.transform.root.name);
-        }
-
-        cols = Physics.OverlapBox(attackCollider.bounds.center, attackCollider.bounds.extents,
-            attackCollider.transform.rotation, LayerMask.GetMask("AttackBox"));
-        foreach (Collider other in cols)
-        {
-            if (other.Equals(attackCollider))
-                continue;
-
-            Debug.Log("Blocked: " + other.transform.root.name);
-        }
-    }
-
-
     //placeholders
-
     public void makeEnemyReact() {}
     public void setHitStrong() {}
-
+    #endregion
 }

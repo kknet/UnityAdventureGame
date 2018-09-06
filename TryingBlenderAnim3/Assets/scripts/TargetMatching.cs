@@ -26,9 +26,9 @@ public class TargetMatching : MonoBehaviour
     };
 
     private float[] desiredDistances = {
-        2f,
-        1.5f,
-        2.5f
+        1f,
+        1f,
+        1.3f
     };
 
     private float margin = 1f;
@@ -44,12 +44,20 @@ public class TargetMatching : MonoBehaviour
     public void MatchTargetUpdate()
     {
         if (!shouldMatchTarget) return;
-        if (!animator.tag.Equals("attacking")) return;
-        
+        if (!animator.GetCurrentAnimatorStateInfo(0).IsTag("attacking"))
+        {
+            Debug.LogWarning("NOT DOING MT: " + animator.tag);
+            return;
+        }
+
+        Debug.LogWarning("DOING MT");
+
+
         animator.MatchTarget(desiredPos, correctRot, AvatarTarget.Root,
             new MatchTargetWeightMask(new Vector3(1, 1, 1), 0),
             animator.GetCurrentAnimatorStateInfo(0).normalizedTime /*0.2f*/,
-            /*matchEndTimes[attackIndex]*/ 1f);
+            Mathf.Max(matchEndTimes[attackIndex], animator.GetCurrentAnimatorStateInfo(0).normalizedTime)
+            );
     }
 
     public void SetUpMatchTarget()
@@ -63,6 +71,8 @@ public class TargetMatching : MonoBehaviour
         correctRot = Quaternion.LookRotation(characterController.currentEnemyLookDirection());
         desiredPos = enemyPos - (desiredDistances[attackIndex] * dir);
         shouldMatchTarget = InAttackingRange(curPos, desiredPos, attackIndex);
+
+        Debug.LogWarning("SET UP MT: " + (shouldMatchTarget ? "GOOD" : "BAD"));
     }
 
     private bool InAttackingRange(Vector3 curPos, Vector3 desiredPos, int attackIndex)
