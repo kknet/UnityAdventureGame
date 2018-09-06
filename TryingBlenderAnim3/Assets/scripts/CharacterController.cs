@@ -20,17 +20,18 @@ public class CharacterController : MonoBehaviour
         notJumping
     }
 
+    #region all imports
     #region imports (ignore these)
     [HideInInspector]
-    public bool m_jump;
+    public bool startJumping;
     [HideInInspector]
-    public bool m_grounded = true;
+    public bool isGrounded = true;
     [HideInInspector]
-    public float m_ForwardAmount;
+    public float forwardAmount;
     [HideInInspector]
     public float m_SideAmount;
     [HideInInspector]
-    public float m_TurnAmount;
+    public float turnAmount;
     [HideInInspector]
     public Animator m_Animator;
 
@@ -39,7 +40,7 @@ public class CharacterController : MonoBehaviour
     CharacterEvents CharacterEvents;
     DevCombat DevCombat;
 
-    Rigidbody m_Rigidbody;
+    Rigidbody rb;
     Vector3 m_GroundNormal;
     CapsuleCollider m_Capsule;
     Vector3 m_CapsuleCenter;
@@ -78,7 +79,9 @@ public class CharacterController : MonoBehaviour
 
     public bool jumpEnabled = false;
     #endregion
+    #endregion
 
+    #region important methods
     private void Awake()
     {
         //detectionTargets.Sort();
@@ -89,90 +92,102 @@ public class CharacterController : MonoBehaviour
     {
         DevCombat = GetComponent<DevCombat>();
         m_Animator = GetComponent<Animator>();
-        m_Rigidbody = GetComponent<Rigidbody>();
+        rb = GetComponent<Rigidbody>();
         m_Capsule = GetComponent<CapsuleCollider>();
         m_CapsuleHeight = m_Capsule.height;
         m_CapsuleCenter = m_Capsule.center;
 
-        m_Rigidbody.constraints = RigidbodyConstraints.FreezeRotationX | RigidbodyConstraints.FreezeRotationY | RigidbodyConstraints.FreezeRotationZ;
-        m_jump = false;
-        m_grounded = true;
+        rb.constraints = RigidbodyConstraints.FreezeRotationX | RigidbodyConstraints.FreezeRotationY | RigidbodyConstraints.FreezeRotationZ;
+        startJumping = false;
+        isGrounded = true;
         lastGroundedTime = Time.time;
         InputController = GetComponent<InputController>();
         CharacterEvents = GetComponent<CharacterEvents>();
         CharacterEvents.Init();
     }
 
-    public void Move(Vector3 move)
+    void LateUpdate()
+    {
+        bool rotationsEnabled = false;
+
+        if (rotationsEnabled)
+            if (inCombatMode() && !rolling())
+            {
+                spine.transform.Rotate(10f * transform.up);
+                spine1.transform.Rotate(10f * transform.up);
+                spine2.transform.Rotate(10f * transform.up);
+                rightShoulder.transform.Rotate(20f * transform.up);
+            }
+    }
+
+    public void ProcessInputs (Vector3 move, bool rollPressed)
+    {
+        CalculateForwardMovement(move);
+        UpdateAnimator(move, rollPressed);
+        RotatePlayer(move);
+        TranslatePlayer();
+        UpdateSounds();
+    }
+
+    void CalculateForwardMovement(Vector3 move)
     {
         AnimatorStateInfo anim = m_Animator.GetCurrentAnimatorStateInfo(0);
 
         if (move.magnitude > 1f) move.Normalize();
         move = transform.InverseTransformDirection(move);
         move = Vector3.ProjectOnPlane(move, m_GroundNormal);
-
-        m_TurnAmount = Mathf.Atan2(move.x, move.z);
+        turnAmount = Mathf.Atan2(move.x, move.z);
 
         if (anim.IsTag("equip"))
         {
-            m_ForwardAmount = 0f;
+            forwardAmount = 0f;
             move.z = 0f;
         }
         else if (anim.IsTag("impact"))
         {
             move = Vector3.back * 0.5f;
-            m_ForwardAmount = move.z * 1f;
+            forwardAmount = move.z * 1f;
         }
         else if (anim.IsTag("roll"))
-            m_ForwardAmount = move.z * 1f;
+            forwardAmount = move.z * 1f;
         else if (jumpEnabled && jumpState == JumpState.waitingToIdle && !checkJumpIntoWall())
-            m_ForwardAmount = move.z * 1f;
+            forwardAmount = move.z * 1f;
         else if (jumpEnabled && jumping() && !checkJumpIntoWall())
-            m_ForwardAmount = move.z * 2f;
+            forwardAmount = move.z * 2f;
         else if (jumpEnabled && jumping() && checkJumpIntoWall())
         {
-            m_ForwardAmount = 0f;
+            forwardAmount = 0f;
             move.z = 0f;
         }
         else
-            m_ForwardAmount = move.z;
+            forwardAmount = move.z;
 
         if (inCombatMode() && InputController.IsInputEnabled())
         {
             m_SideAmount = InputController.controlsManager.GetAxis(ControlsManager.ButtonType.Horizontal);
-            m_ForwardAmount = InputController.controlsManager.GetAxis(ControlsManager.ButtonType.Vertical);
+            forwardAmount = InputController.controlsManager.GetAxis(ControlsManager.ButtonType.Vertical);
         }
 
-
-        if (!inCombatMode() && m_TurnAmount > 0f && m_ForwardAmount < 0.33f)
-            m_ForwardAmount = 0.33f;
-
-        if (m_grounded || (!m_grounded && jumpState == JumpState.waitingToLand))
-            RotatePlayer(move);
-
-        bool fallingDown = m_Rigidbody.velocity.y < 0f;
-        //if (jumping() || fallingDown)
-        //    m_Rigidbody.AddForce(Physics.gravity * 1.25f);
-
-        UpdateAnimator(move);
-
-        //bool movingVert = !Mathf.Approximately(m_Animator.GetFloat("Forward"), 0f);
-        //bool movingHoriz = !Mathf.Approximately(m_Animator.GetFloat("Horizontal"), 0f);
-        //if (!movingVert && !movingHoriz)
-        //    CharacterEvents.stopFootstepSound();
+        if (!inCombatMode() && turnAmount > 0f && forwardAmount < 0.33f)
+            forwardAmount = 0.33f;
     }
 
-    void UpdateAnimator(Vector3 move)
+    void UpdateAnimator(Vector3 move, bool rollPressed)
     {
-        if (m_Animator.GetCurrentAnimatorStateInfo(0).IsTag("attacking"))
-            m_Animator.applyRootMotion = true;
-        else
-            m_Animator.applyRootMotion = false;
-
         CheckGroundStatus();
 
-        if (jumpEnabled) updateJumpState();
-        m_Rigidbody.useGravity = true;
+        if (jumpEnabled)
+        {
+            if (startJumping)
+            {
+                prevJumpState = jumpState;
+                jumpState = JumpState.waitingToRise;
+            }
+            updateJumpState();
+        }
+
+        if (rollPressed && !rolling() && !inCombatMode() && !jumping())
+            m_Animator.SetBool("Dodge", true);
 
         if (jumpEnabled && jumping() && checkJumpIntoWall())
         {
@@ -185,21 +200,23 @@ public class CharacterController : MonoBehaviour
         {
             if (inCombatMode())
             {
-                m_Animator.SetFloat("Forward", Mathf.MoveTowards(m_Animator.GetFloat("Forward"), m_ForwardAmount, 3f * Time.fixedDeltaTime));
+                m_Animator.SetFloat("Forward", Mathf.MoveTowards(m_Animator.GetFloat("Forward"), forwardAmount, 3f * Time.fixedDeltaTime));
                 m_Animator.SetFloat("HorizSpeed", Mathf.MoveTowards(m_Animator.GetFloat("HorizSpeed"), m_SideAmount, 3f * Time.fixedDeltaTime));
             }
             else
             {
-                m_Animator.SetFloat("Forward", Mathf.MoveTowards(m_Animator.GetFloat("Forward"), m_ForwardAmount, 0.8f * Time.fixedDeltaTime));
+                m_Animator.SetFloat("Forward", Mathf.MoveTowards(m_Animator.GetFloat("Forward"), forwardAmount, 0.8f * Time.fixedDeltaTime));
             }
         }
 
-        if (m_jump)
-        {
-            prevJumpState = jumpState;
-            jumpState = JumpState.waitingToRise;
-        }
-        else if (InputController.IsInputEnabled())
+        bool fallingDown = rb.velocity.y < 0f && !isGrounded && !jumping();
+        if (fallingDown) jumpState = JumpState.waitingToFall;
+        //if (jumping() || fallingDown) m_Rigidbody.AddForce(Physics.gravity * 1.25f);
+    }
+
+    void TranslatePlayer()
+    {
+        if (InputController.IsInputEnabled())
         {
             if (inCombatMode())
             {
@@ -233,147 +250,42 @@ public class CharacterController : MonoBehaviour
                                     Time.fixedDeltaTime * m_MoveSpeedMultiplier);
             }
         }
-
-        bool fallingDown = m_Rigidbody.velocity.y < 0f && !m_grounded && !jumping();
-        if (fallingDown) jumpState = JumpState.waitingToFall;
     }
 
-    public Vector3 CurrentEnemyLookDirection()
+    void UpdateSounds()
     {
-        Vector3 enemyPos = DevCombat.TestEnemy.transform.position;
-        enemyPos = new Vector3(enemyPos.x, transform.position.y, enemyPos.z);
-        Vector3 dir = enemyPos - transform.position;
-        dir.Normalize();
-        return dir;
-    }
-
-    public Vector3 cameraLookDirection()
-    {
-        Vector3 camTrans = Camera.main.transform.forward;
-        return new Vector3(camTrans.x, transform.forward.y, camTrans.z);
-    }
-
-    Vector3 getDodgeDirection(Vector3 move)
-    {
-        return move;
+        //if (!movingVert && !movingHoriz)
+        //    CharacterEvents.stopFootstepSound();
     }
 
     void RotatePlayer(Vector3 move)
     {
+        if (!isGrounded && (isGrounded || jumpState != JumpState.waitingToLand)) //can't rotate unless grounded or on second half of jump
+            return;
+
         if (!inCombatMode()) // non combat
         {
-            transform.Rotate(0, m_TurnAmount * m_MovingTurnSpeed * Time.fixedDeltaTime, 0);
+            transform.Rotate(0, turnAmount * m_MovingTurnSpeed * Time.fixedDeltaTime, 0);
         }
         else if (inCombatMode() && rolling()) // rolling
         {
-            transform.Rotate(0, m_TurnAmount * m_MovingTurnSpeed * 2f * Time.fixedDeltaTime, 0);
-            rollingHelper.forward = Vector3.RotateTowards(rollingHelper.forward, CurrentEnemyLookDirection(), 10f, Time.fixedDeltaTime * 10f);
+            transform.Rotate(0, turnAmount * m_MovingTurnSpeed * 2f * Time.fixedDeltaTime, 0);
+            rollingHelper.forward = Vector3.RotateTowards(rollingHelper.forward, currentEnemyLookDirection(), 10f, Time.fixedDeltaTime * 10f);
         }
         else if (inCombatMode() && DevCombat.Locked) // locked
         {
-            transform.forward = Vector3.RotateTowards(transform.forward, CurrentEnemyLookDirection(), 0.1f, Time.fixedDeltaTime * 1f);
-            rollingHelper.forward = Vector3.RotateTowards(rollingHelper.forward, CurrentEnemyLookDirection(), 10f, Time.fixedDeltaTime * 10f);
+            transform.forward = Vector3.RotateTowards(transform.forward, currentEnemyLookDirection(), 0.1f, Time.fixedDeltaTime * 1f);
+            rollingHelper.forward = Vector3.RotateTowards(rollingHelper.forward, currentEnemyLookDirection(), 10f, Time.fixedDeltaTime * 10f);
         }
         else if (inCombatMode() && !DevCombat.Locked) // not locked
         {
-            if(Mathf.Abs(m_Animator.GetFloat("Forward")) > 0f || Mathf.Abs(m_Animator.GetFloat("HorizSpeed")) > 0f)
+            if (Mathf.Abs(m_Animator.GetFloat("Forward")) > 0f || Mathf.Abs(m_Animator.GetFloat("HorizSpeed")) > 0f)
                 transform.forward = Vector3.RotateTowards(transform.forward, cameraLookDirection(), 0.1f, Time.fixedDeltaTime * 1f);
         }
     }
+    #endregion
 
-    public bool running()
-    {
-        return Mathf.Abs(m_Animator.GetFloat("Forward")) > 0.01f;
-    }
-
-    public bool rolling()
-    {
-        AnimatorStateInfo anim = m_Animator.GetCurrentAnimatorStateInfo(0);
-        return anim.IsTag("roll");
-    }
-
-    private IEnumerator guaranteeStopJump()
-    {
-        yield return new WaitForSeconds(2.5f);
-        if (!m_grounded)
-        {
-            if (Time.time - lastGroundedTime > 2.2f)
-            {
-                m_grounded = true;
-                lastGroundedTime = Time.time;
-            }
-        }
-    }
-
-    bool checkJumpIntoWall()
-    {
-        RaycastHit hitInfo;
-        bool jumpedIntoWall = Physics.Raycast(transform.position, transform.forward, out hitInfo, m_WallJumpCheckDistance);
-        bool falling = (jumpState == JumpState.waitingToIdle);
-        //return jumpedIntoWall && falling;
-        return jumpedIntoWall;
-    }
-
-    void updateJumpState()
-    {
-        switch (jumpState)
-        {
-            case JumpState.waitingToRise:
-                {
-                    AnimatorStateInfo animState = m_Animator.GetCurrentAnimatorStateInfo(0);
-                    bool canJump = (prevJumpState == JumpState.notJumping);
-                    if (canJump)
-                    {
-                        m_jump = false;
-                        m_grounded = false;
-                        jumpAmountGoal = 1f / 3f;
-                        m_Rigidbody.velocity = transform.up * m_JumpPower;
-                        prevJumpState = jumpState;
-                        jumpState = JumpState.waitingToFall;
-                    }
-                    break;
-                }
-            case JumpState.waitingToFall:
-                {
-                    bool alreadyLanded = m_grounded;
-                    bool falling = m_Rigidbody.velocity.y <= 0f;
-                    if (falling || alreadyLanded)
-                    {
-                        jumpAmountGoal = 2f / 3f;
-                        prevJumpState = jumpState;
-                        jumpState = JumpState.waitingToIdle;
-                    }
-
-                    break;
-                }
-            case JumpState.waitingToIdle:
-                {
-                    if (m_grounded)
-                    {
-                        jumpAmountGoal = -0.1f;
-                        m_Animator.SetFloat("JumpAmount", -0.1f);
-                        CharacterEvents.spawnFootDust(2);
-                        prevJumpState = jumpState;
-                        jumpState = JumpState.notJumping;
-                    }
-                    break;
-                }
-            case JumpState.notJumping:
-                {
-                    break;
-                }
-            default:
-                {
-                    break;
-                }
-        }
-        m_Animator.SetFloat("JumpAmount", Mathf.MoveTowards(m_Animator.GetFloat("JumpAmount"), jumpAmountGoal, 0.05f));
-    }
-
-    void ResetDodge()
-    {
-        m_Animator.SetBool("Dodge", false);
-    }
+    #region helpers and getters
 
     void CheckGroundStatus()
     {
@@ -404,17 +316,142 @@ public class CharacterController : MonoBehaviour
             Physics.Raycast(posPlusY - xOffset, Vector3.down, out hitInfo, m_GroundCheckDistance))
         {
             m_GroundNormal = hitInfo.normal;
-            m_grounded = true;
+            isGrounded = true;
             lastGroundedTime = Time.time;
         }
         else
         {
-            m_grounded = false;
+            isGrounded = false;
             m_GroundNormal = Vector3.up;
             m_Animator.applyRootMotion = false;
         }
     }
 
+    void updateJumpState()
+    {
+        switch (jumpState)
+        {
+            case JumpState.waitingToRise:
+                {
+                    AnimatorStateInfo animState = m_Animator.GetCurrentAnimatorStateInfo(0);
+                    bool canJump = (prevJumpState == JumpState.notJumping);
+                    if (canJump)
+                    {
+                        startJumping = false;
+                        isGrounded = false;
+                        jumpAmountGoal = 1f / 3f;
+                        rb.velocity = transform.up * m_JumpPower;
+                        prevJumpState = jumpState;
+                        jumpState = JumpState.waitingToFall;
+                    }
+                    break;
+                }
+            case JumpState.waitingToFall:
+                {
+                    bool alreadyLanded = isGrounded;
+                    bool falling = rb.velocity.y <= 0f;
+                    if (falling || alreadyLanded)
+                    {
+                        jumpAmountGoal = 2f / 3f;
+                        prevJumpState = jumpState;
+                        jumpState = JumpState.waitingToIdle;
+                    }
+
+                    break;
+                }
+            case JumpState.waitingToIdle:
+                {
+                    if (isGrounded)
+                    {
+                        jumpAmountGoal = -0.1f;
+                        m_Animator.SetFloat("JumpAmount", -0.1f);
+                        CharacterEvents.spawnFootDust(2);
+                        prevJumpState = jumpState;
+                        jumpState = JumpState.notJumping;
+                    }
+                    break;
+                }
+            case JumpState.notJumping:
+                {
+                    break;
+                }
+            default:
+                {
+                    break;
+                }
+        }
+        m_Animator.SetFloat("JumpAmount", Mathf.MoveTowards(m_Animator.GetFloat("JumpAmount"), jumpAmountGoal, 0.05f));
+    }
+
+    //lerp the player each frame to face a wall
+    public IEnumerator lerpToFaceWall(Vector3 wallNormal)
+    {
+        int count = 0;
+        while (count <= lerpFrames)
+        {
+            transform.forward = Vector3.Slerp(transform.forward, wallNormal, Time.fixedDeltaTime * lerpSmoothing);
+            ++count;
+            yield return null;
+        }
+    }
+
+    private IEnumerator guaranteeStopJump()
+    {
+        yield return new WaitForSeconds(2.5f);
+        if (!isGrounded)
+        {
+            if (Time.time - lastGroundedTime > 2.2f)
+            {
+                isGrounded = true;
+                lastGroundedTime = Time.time;
+            }
+        }
+    }
+
+    public Vector3 currentEnemyLookDirection()
+    {
+        Vector3 enemyPos = DevCombat.TestEnemy.transform.position;
+        enemyPos = new Vector3(enemyPos.x, transform.position.y, enemyPos.z);
+        Vector3 dir = enemyPos - transform.position;
+        dir.Normalize();
+        return dir;
+    }
+
+    public Vector3 cameraLookDirection()
+    {
+        Vector3 camTrans = Camera.main.transform.forward;
+        return new Vector3(camTrans.x, transform.forward.y, camTrans.z);
+    }
+
+    Vector3 getDodgeDirection(Vector3 move)
+    {
+        return move;
+    }
+
+    public bool running()
+    {
+        return Mathf.Abs(m_Animator.GetFloat("Forward")) > 0.01f;
+    }
+
+    public bool rolling()
+    {
+        AnimatorStateInfo anim = m_Animator.GetCurrentAnimatorStateInfo(0);
+        return anim.IsTag("roll");
+    }
+
+    bool checkJumpIntoWall()
+    {
+        RaycastHit hitInfo;
+        bool jumpedIntoWall = Physics.Raycast(transform.position, transform.forward, out hitInfo, m_WallJumpCheckDistance);
+        bool falling = (jumpState == JumpState.waitingToIdle);
+        //return jumpedIntoWall && falling;
+        return jumpedIntoWall;
+    }
+
+    void ResetDodge()
+    {
+        m_Animator.SetBool("Dodge", false);
+    }
 
     public bool isClimbing()
     {
@@ -430,30 +467,5 @@ public class CharacterController : MonoBehaviour
     {
         return m_Animator.GetBool("WeaponDrawn");
     }
-
-    //lerp the player each frame to face a wall
-    public IEnumerator lerpToFaceWall(Vector3 wallNormal)
-    {
-        int count = 0;
-        while (count <= lerpFrames)
-        {
-            transform.forward = Vector3.Slerp(transform.forward, wallNormal, Time.fixedDeltaTime * lerpSmoothing);
-            ++count;
-            yield return null;
-        }
-    }
-
-    void LateUpdate()
-    {
-        bool rotationsEnabled = false;
-
-        if (rotationsEnabled)
-            if (inCombatMode() && !rolling())
-            {
-                spine.transform.Rotate(10f * transform.up);
-                spine1.transform.Rotate(10f * transform.up);
-                spine2.transform.Rotate(10f * transform.up);
-                rightShoulder.transform.Rotate(20f * transform.up);
-            }
-    }
+    #endregion
 }

@@ -66,7 +66,6 @@ public class DevCombat : MonoBehaviour
     }
     public void FrameUpdate()
     {
-        handleInput();
         CheckHit();
         targetMatching.MatchTargetUpdate();
     }
@@ -79,18 +78,12 @@ public class DevCombat : MonoBehaviour
         }
     }
 
-    private void handleInput()
+    public void ProcessInputs(bool interact, bool leftMousePressed, bool rightMouseHeld, bool rightMouseReleased, bool spaceBarPressed)
     {
-        bool EPressed = InputController.controlsManager.GetButtonDown(ControlsManager.ButtonType.Interact);
-        bool leftMousePressed = InputController.controlsManager.GetButtonDown(ControlsManager.ButtonType.Attack);
-        bool rightMouseHeld = Input.GetKey(KeyCode.Mouse1);
-        bool rightMouseReleased = Input.GetKeyUp(KeyCode.Mouse1);
-        bool spaceBarPressed = InputController.controlsManager.GetButtonDown(ControlsManager.ButtonType.Jump);
-
         if (rightMouseReleased) //unblock 
             myAnimator.SetBool("isBlocking", false);
 
-        if (EPressed) //locking
+        if (interact) //locking
             Locked = !Locked;
 
         if (leftMousePressedTime > 0f && (Time.time - leftMousePressedTime > twoButtonPressTimeMax) && !characterController.rolling()) //quick attack
@@ -114,6 +107,11 @@ public class DevCombat : MonoBehaviour
             handleLeftMousePressed();
             Debug.LogWarning("Left Mouse Pressed!");
         }
+
+        if (myAnimator.GetCurrentAnimatorStateInfo(0).IsTag("attacking"))
+            myAnimator.applyRootMotion = true;
+        else
+            myAnimator.applyRootMotion = false;
     }
 
     void stopRolling()

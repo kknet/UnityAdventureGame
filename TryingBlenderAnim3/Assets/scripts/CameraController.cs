@@ -123,7 +123,7 @@ public class CameraController : MonoBehaviour
 
     bool cameraShouldBob()
     {
-        return characterScript.m_ForwardAmount > 0.9f && !characterScript.inCombatMode();
+        return characterScript.forwardAmount > 0.9f && !characterScript.inCombatMode() && !characterScript.rolling();
     }
 
     Vector3 horizontalPosOffset()

@@ -60,7 +60,7 @@ public class TargetMatching : MonoBehaviour
         dir.Normalize();
 
         attackIndex = animator.GetInteger("quickAttack") - 1;
-        correctRot = Quaternion.LookRotation(characterController.CurrentEnemyLookDirection());
+        correctRot = Quaternion.LookRotation(characterController.currentEnemyLookDirection());
         desiredPos = enemyPos - (desiredDistances[attackIndex] * dir);
         shouldMatchTarget = InAttackingRange(curPos, desiredPos, attackIndex);
     }
