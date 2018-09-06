@@ -13,10 +13,16 @@ public class TargetMatching : MonoBehaviour
     int attackIndex;
     bool shouldMatchTarget;
 
+    //private float[] matchEndTimes = {
+    //    0.66f,
+    //    0.8f,
+    //    0.5f
+    //};
+
     private float[] matchEndTimes = {
-        0.66f,
-        0.8f,
-        0.5f
+        0.45f,
+        0.45f,
+        0.472f
     };
 
     private float[] attackDistances = {
@@ -26,12 +32,12 @@ public class TargetMatching : MonoBehaviour
     };
 
     private float[] desiredDistances = {
-        1f,
-        1f,
+        0.7f,
+        0.7f,
         1.3f
     };
 
-    private float margin = 1f;
+    private float margin = 3f;
 
     private void Awake()
     {
