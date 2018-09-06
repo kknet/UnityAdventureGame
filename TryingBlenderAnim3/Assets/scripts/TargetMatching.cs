@@ -59,10 +59,13 @@ public class TargetMatching : MonoBehaviour
         Debug.LogWarning("DOING MT");
 
 
+        if (animator.GetCurrentAnimatorStateInfo(0).normalizedTime > matchEndTimes[attackIndex])
+            return;
+
         animator.MatchTarget(desiredPos, correctRot, AvatarTarget.Root,
             new MatchTargetWeightMask(new Vector3(1, 1, 1), 0),
             animator.GetCurrentAnimatorStateInfo(0).normalizedTime /*0.2f*/,
-            Mathf.Max(matchEndTimes[attackIndex], animator.GetCurrentAnimatorStateInfo(0).normalizedTime)
+            matchEndTimes[attackIndex]
             );
     }
 
@@ -77,6 +80,12 @@ public class TargetMatching : MonoBehaviour
         correctRot = Quaternion.LookRotation(characterController.currentEnemyLookDirection());
         desiredPos = enemyPos - (desiredDistances[attackIndex] * dir);
         shouldMatchTarget = InAttackingRange(curPos, desiredPos, attackIndex);
+
+        if (!shouldMatchTarget)
+        {
+            shouldMatchTarget = true;
+            desiredPos = enemyPos - ((1.5f + desiredDistances[attackIndex]) * dir);
+        }
 
         Debug.LogWarning("SET UP MT: " + (shouldMatchTarget ? "GOOD" : "BAD"));
     }
