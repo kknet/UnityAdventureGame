@@ -5,6 +5,12 @@ using UnityEngine;
 [RequireComponent(typeof(Collider))]
 public class EnemyCheckHit : MonoBehaviour
 {
+    //private string[] reactAnimations = {
+    //    "standing_react_large_from_right",
+    //    "standing_react_large_from_left",
+    //    "React from Right and Move Back"
+    //};
+
     private string[] reactAnimations = {
         "standing_react_large_from_right",
         "standing_react_large_from_left",
@@ -39,9 +45,10 @@ public class EnemyCheckHit : MonoBehaviour
     // Update is called once per frame
     void HurtReaction ()
     {
-        int idx = Random.Range(0, 2);
-        animator.Play(reactAnimations[idx]);
-	}
+        //int idx = Random.Range(0, 2);
+        //animator.Play(reactAnimations[idx]);
+        animator.Play("Fall Back");
+    }
 
     bool CheckHit()
     {
@@ -58,6 +65,22 @@ public class EnemyCheckHit : MonoBehaviour
         return false;
     }
 
+    IEnumerator moveEnemyBack()
+    {
+
+        float tt = 0f;
+        float multiplier = 0.025f;
+        float decrement = multiplier / 100f;
+
+        while (tt < 100f)
+        {
+            transform.Translate(transform.forward.normalized * multiplier);
+            tt += 1f;
+            multiplier = multiplier - decrement;
+            yield return null;
+        }
+    }
+
     IEnumerator animatorSpeedChanges()
     {
         Animator devAnimator = DevMain.Player.GetComponent<Animator>();
@@ -72,23 +95,19 @@ public class EnemyCheckHit : MonoBehaviour
 
 
         yield return new WaitForSecondsRealtime(0.05f);
+
+        StartCoroutine(moveEnemyBack());
+
         while (animator.speed < 1f)
         {
             animator.speed += 0.05f;
             devAnimator.speed += 0.05f;
 
-            transform.Translate(transform.forward.normalized * 0.08f);
+            transform.Translate(transform.forward.normalized * 0.15f);
 
             yield return null;
         }
 
-        //float tt = 0f;
-        //while (tt < 1f)
-        //{
-        //    transform.Translate(transform.forward.normalized * 0.1f);
-        //    tt += Time.fixedDeltaTime;
-        //    yield return null;
-        //}
     }
 
 }

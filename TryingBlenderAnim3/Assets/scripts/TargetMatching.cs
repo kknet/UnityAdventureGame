@@ -37,7 +37,7 @@ public class TargetMatching : MonoBehaviour
         1.3f
     };
 
-    private float margin = 3f;
+    private float margin = 4f;
 
     private void Awake()
     {
@@ -84,7 +84,8 @@ public class TargetMatching : MonoBehaviour
         if (!shouldMatchTarget)
         {
             shouldMatchTarget = true;
-            desiredPos = enemyPos - ((1.5f + desiredDistances[attackIndex]) * dir);
+            //desiredPos = curPos + (0.5f * Vector3.Distance(desiredPos, curPos) * dir);
+            desiredPos = enemyPos - ((margin + desiredDistances[attackIndex]) * dir);
         }
 
         Debug.LogWarning("SET UP MT: " + (shouldMatchTarget ? "GOOD" : "BAD"));
