@@ -67,12 +67,6 @@ public class DevCombat : MonoBehaviour
         jumpAttackStartingOffset = 3.7f;
     }
 
-    public void FrameUpdate()
-    {
-        CheckHit();
-        targetMatching.MatchTargetUpdate();
-    }
-
     public void ProcessInputs(bool interact, bool leftMousePressed, bool rightMouseHeld, bool rightMouseReleased, bool spaceBarPressed)
     {
         if (rightMouseReleased) //unblock 
@@ -87,10 +81,12 @@ public class DevCombat : MonoBehaviour
             triggerQuickAttack();
         }
 
-        if (spaceBarPressed && !characterController.rolling()) //roll
+        if (spaceBarPressed && !characterController.rolling() && characterController.inCombatMode()) //roll
         {
-            if (characterController.inCombatMode())
-                myAnimator.SetBool("Dodge", true);
+            myAnimator.SetBool("Dodge", true);
+            stopAttack();
+            DisableHits();
+            myAnimator.InterruptMatchTarget(false);
         }
         else if (rightMouseHeld && !characterController.rolling()) //block
         {
@@ -106,6 +102,10 @@ public class DevCombat : MonoBehaviour
             myAnimator.applyRootMotion = true;
         else
             myAnimator.applyRootMotion = false;
+
+
+        CheckHit();
+        targetMatching.MatchTargetUpdate();
     }
 
     public void EnableHits()

@@ -50,13 +50,13 @@ public class TargetMatching : MonoBehaviour
     public void MatchTargetUpdate()
     {
         if (!shouldMatchTarget) return;
-        if (!animator.GetCurrentAnimatorStateInfo(0).IsTag("attacking"))
+        if (!animator.GetCurrentAnimatorStateInfo(0).IsTag("attacking") || !animator.GetBool("doAttack") || animator.GetBool("Dodge"))
         {
-            Debug.LogWarning("NOT DOING MT: " + animator.tag);
+            Debug.LogWarning("NOT");
             return;
         }
 
-        Debug.LogWarning("DOING MT");
+        Debug.LogWarning("DOING");
 
 
         if (animator.GetCurrentAnimatorStateInfo(0).normalizedTime > matchEndTimes[attackIndex])
@@ -84,8 +84,8 @@ public class TargetMatching : MonoBehaviour
         if (!shouldMatchTarget)
         {
             shouldMatchTarget = true;
-            //desiredPos = curPos + (0.5f * Vector3.Distance(desiredPos, curPos) * dir);
-            desiredPos = enemyPos - ((margin + desiredDistances[attackIndex]) * dir);
+            desiredPos = curPos + (0.5f * Vector3.Distance(desiredPos, curPos) * dir);
+            //desiredPos = enemyPos - ((margin + desiredDistances[attackIndex]) * dir);
         }
 
         Debug.LogWarning("SET UP MT: " + (shouldMatchTarget ? "GOOD" : "BAD"));

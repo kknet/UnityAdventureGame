@@ -95,7 +95,6 @@ public class DevMain : MonoBehaviour
 
         if (doCombat)
         {
-            devCombat.FrameUpdate();
             devCombatReactions.FrameUpdate();
         }
 
