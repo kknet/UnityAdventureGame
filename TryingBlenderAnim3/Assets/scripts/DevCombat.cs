@@ -198,22 +198,8 @@ public class DevCombat : MonoBehaviour
         while (myAnimator.GetCurrentAnimatorStateInfo(0).IsTag("attacking"))
             yield return null;
 
-        //switch (myAnimator.GetInteger("quickAttack"))
-        //{
-        //    case 1:
-        //        myAnimator.SetInteger("quickAttack", 2);
-        //        break;
-        //    case 2:
-        //        myAnimator.SetInteger("quickAttack", 3);
-        //        break;
-        //    case 3:
-        //        myAnimator.SetInteger("quickAttack", 1);
-        //        break;
-        //    default:
-        //        Debug.LogAssertion("quickAttack is not set to 1-3, look at DevCombat.cs script");
-        //        break;
-        //}
-
+        float dist = Vector3.Distance(transform.position, TestEnemy.transform.position);
+        float firstAttackTravelDist = targetMatching.margins[0] + targetMatching.desiredDistances[0];
 
         switch (myAnimator.GetInteger("quickAttack"))
         {
@@ -222,11 +208,10 @@ public class DevCombat : MonoBehaviour
                     (Random.Range(0f, 1f) < 0.7f) ? 3 : 2);
                 break;
             case 2:
-                myAnimator.SetInteger("quickAttack",
-                    (Random.Range(0f, 1f) < 0.7f) ? 3 : 1);
+                myAnimator.SetInteger("quickAttack", firstAttackTravelDist > dist ? 1 : 3);
                 break;
             case 3:
-                myAnimator.SetInteger("quickAttack", pickAttackByDistance());
+                myAnimator.SetInteger("quickAttack", firstAttackTravelDist > dist ? 1 : 2);
                 break;
             default:
                 Debug.LogAssertion("quickAttack is not set to 1-3, look at DevCombat.cs script");

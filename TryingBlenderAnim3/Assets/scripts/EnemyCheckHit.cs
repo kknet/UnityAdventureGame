@@ -108,9 +108,19 @@ public class EnemyCheckHit : MonoBehaviour
         float tt = 0f;
         float multiplier = 0.025f;
         float decrement = multiplier / 100f;
+
+        float angle = Random.Range(-10f, -30f);
+        if (devCombat.mirroredAttack()) angle *= -1f;
+        Vector3 direction = Quaternion.AngleAxis(angle, transform.up) * transform.forward.normalized;
+
         while (tt < 100f)
         {
-            transform.Translate(transform.forward.normalized * multiplier);
+            if(animator.speed < 1f)
+                //transform.Translate(transform.forward.normalized * 0.15f);
+                transform.Translate(direction * 0.15f);
+
+            //transform.Translate(transform.forward.normalized * multiplier);
+            transform.Translate(direction * multiplier);
             tt += 1f;
             multiplier = Mathf.Max(multiplier - decrement, 0.01f);
             yield return null;
@@ -129,7 +139,6 @@ public class EnemyCheckHit : MonoBehaviour
             yield return null;
         }
 
-
         yield return new WaitForSecondsRealtime(0.05f);
 
         StartCoroutine(translateEnemyFall(enemyFallDirection));
@@ -138,12 +147,8 @@ public class EnemyCheckHit : MonoBehaviour
         {
             animator.speed += 0.05f;
             devAnimator.speed += 0.05f;
-
-            transform.Translate(transform.forward.normalized * 0.15f);
-
             yield return null;
         }
-
     }
 
 }
