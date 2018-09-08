@@ -227,8 +227,11 @@ public class CharacterController : MonoBehaviour
                     float animNormTime = m_Animator.GetCurrentAnimatorStateInfo(0).normalizedTime;
                     if (animNormTime > 0.1f && animNormTime < 0.3f)
                         m_RollingSpeedMultiplier = Mathf.MoveTowards(m_RollingSpeedMultiplier, m_RollingSpeedMax, Time.fixedDeltaTime * 50f);
+                    else if (animNormTime > 0.8f)
+                        m_RollingSpeedMultiplier = Mathf.MoveTowards(m_RollingSpeedMultiplier, m_CombatMoveSpeedMultiplier, Time.fixedDeltaTime * 200f);
                     else
                         m_RollingSpeedMultiplier = Mathf.MoveTowards(m_RollingSpeedMultiplier, m_RollingSpeedMin, Time.fixedDeltaTime * 200f);
+
                     transform.Translate(Vector3.forward * Time.fixedDeltaTime * m_RollingSpeedMultiplier);
                 }
                 else
@@ -289,7 +292,7 @@ public class CharacterController : MonoBehaviour
         }
         else if (inCombatMode() && DevCombat.Locked) // locked
         {
-            transform.forward = Vector3.RotateTowards(transform.forward, currentEnemyLookDirection(), 5f, Time.fixedDeltaTime * 5f);
+            transform.forward = Vector3.RotateTowards(transform.forward, currentEnemyLookDirection(), 0.15f, Time.fixedDeltaTime * 2f);
             rollingHelper.forward = Vector3.RotateTowards(rollingHelper.forward, currentEnemyLookDirection(), 10f, Time.fixedDeltaTime * 10f);
         }
         else if (inCombatMode() && !DevCombat.Locked) // not locked
