@@ -159,6 +159,18 @@ public class DevCombat : MonoBehaviour
         leftMousePressedTime = Time.time;
     }
 
+    private int pickAttackByDistance()
+    {
+        float dist = Vector3.Distance(transform.position, TestEnemy.transform.position);
+        Debug.Log(dist);
+        for(int idx = 0; idx < targetMatching.margins.Length; ++idx)
+        {
+            if (targetMatching.margins[idx] + targetMatching.desiredDistances[idx] > dist)
+                return idx + 1;
+        }
+        return targetMatching.margins.Length;
+    }
+
     private void triggerQuickAttack()
     {
         myAnimator.SetBool("doAttack", true);
@@ -178,24 +190,59 @@ public class DevCombat : MonoBehaviour
 
     public void switchAttack()
     {
+        StartCoroutine(switchAttackOnceDoneAttacking());
+    }
+
+    IEnumerator switchAttackOnceDoneAttacking()
+    {
+        while (myAnimator.GetCurrentAnimatorStateInfo(0).IsTag("attacking"))
+            yield return null;
+
+        //switch (myAnimator.GetInteger("quickAttack"))
+        //{
+        //    case 1:
+        //        myAnimator.SetInteger("quickAttack", 2);
+        //        break;
+        //    case 2:
+        //        myAnimator.SetInteger("quickAttack", 3);
+        //        break;
+        //    case 3:
+        //        myAnimator.SetInteger("quickAttack", 1);
+        //        break;
+        //    default:
+        //        Debug.LogAssertion("quickAttack is not set to 1-3, look at DevCombat.cs script");
+        //        break;
+        //}
+
+
         switch (myAnimator.GetInteger("quickAttack"))
         {
             case 1:
-                myAnimator.SetInteger("quickAttack", 2);
+                myAnimator.SetInteger("quickAttack",
+                    (Random.Range(0f, 1f) < 0.7f) ? 3 : 2);
                 break;
             case 2:
-                myAnimator.SetInteger("quickAttack", 3);
+                myAnimator.SetInteger("quickAttack",
+                    (Random.Range(0f, 1f) < 0.7f) ? 3 : 1);
                 break;
             case 3:
-                myAnimator.SetInteger("quickAttack", 1);
+                myAnimator.SetInteger("quickAttack", pickAttackByDistance());
                 break;
             default:
                 Debug.LogAssertion("quickAttack is not set to 1-3, look at DevCombat.cs script");
                 break;
         }
+
+        if (Random.Range(0f, 1f) < 0.5f)
+            myAnimator.SetFloat("Mirrored", mirroredAttack() ? 0f : 1f);
     }
 
     #region getters
+
+    public bool mirroredAttack()
+    {
+        return myAnimator.GetFloat("Mirrored") > 0.1f;
+    }
 
     public GameObject CurrentEnemy
     {

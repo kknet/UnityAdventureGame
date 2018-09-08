@@ -41,8 +41,8 @@ public class EnemyCombatAI : MonoBehaviour
     {
         handleTestingInput();
 
-        if (setLookAtDev && !notInCombatMove())
-            lookAtDev();
+        //if (setLookAtDev && enemyAnim.GetCurrentAnimatorStateInfo(0).IsTag("enemyRun"))
+        //    lookAtDev();
 
         handleAttacking();
     }
@@ -144,8 +144,9 @@ public class EnemyCombatAI : MonoBehaviour
     public void setHitStrong()
     {
         bool isBlocking = dev.GetComponent<DevCombatReactions>().isBlocking();
-        bool rotationAllows = dev.GetComponent<DevCombatReactions>().rotationAllowsBlock();
-        if (isBlocking && rotationAllows)
+        //bool rotationAllows = dev.GetComponent<DevCombatReactions>().rotationAllowsBlock();
+        //if (isBlocking && rotationAllows)
+        if (isBlocking)
         {
             enemyAnim.CrossFade("sword_and_shield_impact_1", strongHitCrossFadeTimes[enemyAnim.GetInteger("enemyQuick") - 1]);
         }

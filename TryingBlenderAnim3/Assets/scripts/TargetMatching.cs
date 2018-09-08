@@ -31,14 +31,14 @@ public class TargetMatching : MonoBehaviour
         1.067f
     };
 
-    private float[] desiredDistances = {
+    public float[] desiredDistances = {
         0.7f,
         0.7f,
         1.3f
     };
 
-    private float[] margins = {
-        3f,
+    public float[] margins = {
+        2f,
         5f,
         5f
     };

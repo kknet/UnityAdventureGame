@@ -2,23 +2,27 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+
 [RequireComponent(typeof(Collider))]
 public class EnemyCheckHit : MonoBehaviour
 {
-    //private string[] reactAnimations = {
-    //    "standing_react_large_from_right",
-    //    "standing_react_large_from_left",
-    //    "React from Right and Move Back"
-    //};
+    public enum Direction
+    {
+        Forward,
+        Backward,
+        Left,
+        Right
+    }
 
     private string[] reactAnimations = {
-        "standing_react_large_from_right",
-        "standing_react_large_from_left",
-        "React from Right and Move Back"
+        "Fall Forward",
+        "Fall Back",
+        "Fall Right",
+        "Fall Left"
     };
 
-    public DevCombat devCombat;
     public Collider hurtCollider;
+    DevCombat devCombat;
     Animator animator;
     Rigidbody rb;
 
@@ -36,18 +40,52 @@ public class EnemyCheckHit : MonoBehaviour
         {
             if (CheckHit())
             {
-                HurtReaction();
-                StartCoroutine(animatorSpeedChanges());
+                Direction enemyFallDirection = DevToEnemyHitDirection();
+                HurtReaction(enemyFallDirection);
+                StartCoroutine(animatorSpeedChanges(enemyFallDirection));
             }
         }
     }
 
-    // Update is called once per frame
-    void HurtReaction ()
+    //The direction that the enemy goes after being hit
+    public Direction DevToEnemyHitDirection()
     {
-        //int idx = Random.Range(0, 2);
-        //animator.Play(reactAnimations[idx]);
-        animator.Play("Fall Back");
+        Vector3 enemyForward = devCombat.TestEnemy.transform.forward;
+        Vector3 devForward = DevMain.Player.transform.forward;
+        float angle = Vector3.SignedAngle(enemyForward, devForward, Vector3.up);
+        float absAngle = Mathf.Abs(angle);
+
+        //if (absAngle > 135f) return Direction.Backward;
+        //if (absAngle < 45f) return Direction.Forward;
+        //if (angle > 45f) return Direction.Right;
+        //else return Direction.Left;
+
+        if (absAngle > 90f) return Direction.Backward;
+        else return Direction.Forward;
+    }
+
+    void HurtReaction (Direction enemyFallDirection)
+    {
+        //switch (enemyFallDirection)
+        //{
+        //    case Direction.Forward:
+        //        animator.Play("Fall Forward");
+        //        break;
+        //    case Direction.Backward:
+        //        animator.Play("Fall Back");
+        //        break;
+        //    case Direction.Left:
+        //        animator.Play("Fall Left");
+        //        break;
+        //    default:
+        //        animator.Play("Fall Right");
+        //        break;
+        //}
+
+        if(devCombat.mirroredAttack())
+            animator.Play("Fall Back Mirrored");
+        else
+            animator.Play("Fall Back");
     }
 
     bool CheckHit()
@@ -65,23 +103,21 @@ public class EnemyCheckHit : MonoBehaviour
         return false;
     }
 
-    IEnumerator moveEnemyBack()
+    IEnumerator translateEnemyFall(Direction enemyFallDirection)
     {
-
         float tt = 0f;
         float multiplier = 0.025f;
         float decrement = multiplier / 100f;
-
         while (tt < 100f)
         {
             transform.Translate(transform.forward.normalized * multiplier);
             tt += 1f;
-            multiplier = multiplier - decrement;
+            multiplier = Mathf.Max(multiplier - decrement, 0.01f);
             yield return null;
         }
     }
 
-    IEnumerator animatorSpeedChanges()
+    IEnumerator animatorSpeedChanges(Direction enemyFallDirection)
     {
         Animator devAnimator = DevMain.Player.GetComponent<Animator>();
         animator.speed = 0f;
@@ -96,7 +132,7 @@ public class EnemyCheckHit : MonoBehaviour
 
         yield return new WaitForSecondsRealtime(0.05f);
 
-        StartCoroutine(moveEnemyBack());
+        StartCoroutine(translateEnemyFall(enemyFallDirection));
 
         while (animator.speed < 1f)
         {
