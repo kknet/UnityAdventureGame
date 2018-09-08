@@ -63,7 +63,8 @@ public class CharacterController : MonoBehaviour
 
     #region things to tweak only in code
     float m_MovingTurnSpeed = 180f;
-    float m_CombatMoveSpeedMultiplier = 1.4f;
+    float m_CombatMoveSpeedMultiplier = 1.7f;
+    //float m_CombatMoveSpeedMultiplier = 1.4f;
     float m_MoveSpeedMultiplier = 8f;
     float m_RollingSpeedMax = 8f;
     float m_RollingSpeedMin = 6f;
