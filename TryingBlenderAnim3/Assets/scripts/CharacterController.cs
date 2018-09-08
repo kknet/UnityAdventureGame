@@ -62,9 +62,11 @@ public class CharacterController : MonoBehaviour
 
     #region things to tweak only in code
     float m_MovingTurnSpeed = 180f;
-    float m_RollingTurnSpeed = 720f;
     float m_CombatMoveSpeedMultiplier = 1.4f;
     float m_MoveSpeedMultiplier = 8f;
+    float m_RollingSpeedMax = 8f;
+    float m_RollingSpeedMin = 6f;
+    float m_RollingSpeedMultiplier = 6f;
     float m_WallJumpCheckDistance = 0.5f;
     float m_GroundCheckDistance = 0.3f;
     int lerpFrames = 60;
@@ -222,7 +224,12 @@ public class CharacterController : MonoBehaviour
             {
                 if (rolling())
                 {
-                    transform.Translate(Vector3.forward * Time.fixedDeltaTime * m_MoveSpeedMultiplier);
+                    float animNormTime = m_Animator.GetCurrentAnimatorStateInfo(0).normalizedTime;
+                    if (animNormTime > 0.1f && animNormTime < 0.3f)
+                        m_RollingSpeedMultiplier = Mathf.MoveTowards(m_RollingSpeedMultiplier, m_RollingSpeedMax, Time.fixedDeltaTime * 50f);
+                    else
+                        m_RollingSpeedMultiplier = Mathf.MoveTowards(m_RollingSpeedMultiplier, m_RollingSpeedMin, Time.fixedDeltaTime * 200f);
+                    transform.Translate(Vector3.forward * Time.fixedDeltaTime * m_RollingSpeedMultiplier);
                 }
                 else
                 {
@@ -263,18 +270,26 @@ public class CharacterController : MonoBehaviour
         if (!isGrounded && (isGrounded || jumpState != JumpState.waitingToLand)) //can't rotate unless grounded or on second half of jump
             return;
 
+        float animNormTime = m_Animator.GetCurrentAnimatorStateInfo(0).normalizedTime;
+
+
         if (!inCombatMode()) // non combat
         {
             transform.Rotate(0, turnAmount * m_MovingTurnSpeed * Time.fixedDeltaTime, 0);
         }
-        else if (inCombatMode() && rolling()) // rolling
+        else if (inCombatMode() && rolling() && animNormTime < 0.5f) // rolling
         {
-            transform.Rotate(0, turnAmount * m_MovingTurnSpeed * 2f * Time.fixedDeltaTime, 0);
+            transform.Rotate(0, turnAmount * m_MovingTurnSpeed * 3f * Time.fixedDeltaTime, 0);
+            rollingHelper.forward = Vector3.RotateTowards(rollingHelper.forward, currentEnemyLookDirection(), 10f, Time.fixedDeltaTime * 10f);
+        }
+        else if (inCombatMode() && rolling() && animNormTime >= 0.5f) // rolling
+        {
+            transform.Rotate(0, turnAmount * m_MovingTurnSpeed * 0.1f * Time.fixedDeltaTime, 0);
             rollingHelper.forward = Vector3.RotateTowards(rollingHelper.forward, currentEnemyLookDirection(), 10f, Time.fixedDeltaTime * 10f);
         }
         else if (inCombatMode() && DevCombat.Locked) // locked
         {
-            transform.forward = Vector3.RotateTowards(transform.forward, currentEnemyLookDirection(), 0.1f, Time.fixedDeltaTime * 1f);
+            transform.forward = Vector3.RotateTowards(transform.forward, currentEnemyLookDirection(), 5f, Time.fixedDeltaTime * 5f);
             rollingHelper.forward = Vector3.RotateTowards(rollingHelper.forward, currentEnemyLookDirection(), 10f, Time.fixedDeltaTime * 10f);
         }
         else if (inCombatMode() && !DevCombat.Locked) // not locked

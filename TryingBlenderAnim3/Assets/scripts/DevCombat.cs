@@ -81,7 +81,7 @@ public class DevCombat : MonoBehaviour
             triggerQuickAttack();
         }
 
-        if (spaceBarPressed && !characterController.rolling() && characterController.inCombatMode()) //roll
+        if (spaceBarPressed && !myAnimator.GetBool("Dodge") && characterController.inCombatMode()) //roll
         {
             myAnimator.SetBool("Dodge", true);
             stopAttack();

@@ -104,7 +104,6 @@ public class InputController : MonoBehaviour
         bool walking = walk && !characterController.jumping() && !characterController.rolling();
         bool rolling = animator.GetBool("Dodge");
         if (walking) m_Move *= 0.66f;
-        else if (rolling && characterController.inCombatMode()) m_Move *= 1.2f;
 
         // pass all parameters to character scripts to process and translate inputs into character actions
         characterController.ProcessInputs(m_Move, spaceBarPressed);
