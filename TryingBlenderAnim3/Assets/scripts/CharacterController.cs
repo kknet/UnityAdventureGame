@@ -38,6 +38,7 @@ public class CharacterController : MonoBehaviour
 
     InputController InputController;
     CharacterEvents CharacterEvents;
+    CameraController CameraController;
     DevCombat DevCombat;
 
     Rigidbody rb;
@@ -93,6 +94,7 @@ public class CharacterController : MonoBehaviour
     public void Init()
     {
         DevCombat = GetComponent<DevCombat>();
+        CameraController = GetComponent<CameraController>();
         m_Animator = GetComponent<Animator>();
         rb = GetComponent<Rigidbody>();
         m_Capsule = GetComponent<CapsuleCollider>();

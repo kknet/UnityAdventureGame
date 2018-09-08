@@ -4,6 +4,12 @@ using UnityStandardAssets.CrossPlatformInput;
 
 public class CameraController : MonoBehaviour
 {
+
+    public enum Reason {
+        Rolling,
+        NotInCombat
+    }
+
     #region variables etc
     public static CameraController camScript;
     [HideInInspector] public GameObject Player;
@@ -50,6 +56,12 @@ public class CameraController : MonoBehaviour
     float velocityY = 0.0f;
     float moveDirection = -1;
 
+    public Reason combatSmoothReason;
+    float combatRotationYAxisSmoothMin = 1f;
+    float combatRotationYAxisSmoothRoll = 3f;
+    float combatRotationYAxisSmoothMax = 5f;
+    float combatRotationYAxisSmooth = 1f;
+
     int noRotationYCount = 0;
     int noRotationXCount = 0;
     int noRotationXThreshold = 5;
@@ -87,6 +99,7 @@ public class CameraController : MonoBehaviour
     }
     #endregion
 
+    #region important methods
     public void Init()
     {
         Player = DevMain.Player;
@@ -121,20 +134,6 @@ public class CameraController : MonoBehaviour
         positionSmoothTime = smoothTime * 2f;
     }
 
-    bool cameraShouldBob()
-    {
-        return characterScript.forwardAmount > 0.9f && !characterScript.inCombatMode() && !characterScript.rolling();
-    }
-
-    Vector3 horizontalPosOffset()
-    {
-        float multiplierGoal;
-        Vector3 direction = transform.right;
-        multiplierGoal = characterScript.inCombatMode() ? 0.9f : 0.6f;
-        horizontalPosOffsetMultiplier = Mathf.Lerp(horizontalPosOffsetMultiplier, multiplierGoal, 3f * Time.fixedDeltaTime);
-        return direction * horizontalPosOffsetMultiplier;
-    }
-    
     public void PhysicsUpdate()
     {
         moveCamera();
@@ -212,48 +211,6 @@ public class CameraController : MonoBehaviour
         velocityY = Mathf.Lerp(velocityY, 0, Time.fixedDeltaTime * smoothTime * 2f);
     }
 
-    private void handleAutoReset()
-    {
-        bool moving = characterScript.running();
-        bool noRotationY = (Mathf.Abs(velocityY) < 0.01);
-        if (moving && noRotationY)
-            rotationXAxis = Mathf.Lerp(rotationXAxis, 10f, Time.fixedDeltaTime * smoothTime * 0.2f);
-    }
-
-    private float initialDistance()
-    {
-        if (characterScript.inCombatMode())
-            return combatDistance;
-        else
-            return normalDistance;
-    }
-
-    private float distanceSmoothTime()
-    {
-        //if (characterScript.m_climbingWall)
-        //    return climbingDistanceSmoothTime;
-        //else
-        return normalDistanceSmoothTime;
-    }
-
-    public float cameraXRotationDif()
-    {
-        float dif = Mathf.Abs(target.eulerAngles.y - transform.eulerAngles.y);
-        if (dif > 180) dif = 360 - dif;
-        return dif;
-    }
-
-    private bool handleManualReset()
-    {
-        if (InputController.controlsManager.GetButtonDown(ControlsManager.ButtonType.ResetCam))
-        {
-            rotationYAxis = target.eulerAngles.y;
-            rotationXAxis = 10f;
-            return true;
-        }
-        return false;
-    }
-
     Quaternion updateRotation()
     {
         float controllerMouseX = InputController.controlsManager.controller.GetAxis(ControlsManager.ButtonType.MouseX);
@@ -274,12 +231,14 @@ public class CameraController : MonoBehaviour
             velocityY += mouseSensitivityY * mouseYOverall * 0.02f;
         }
 
+        UpdateCombatRotationSmooth();
+
         if (characterScript.inCombatMode())
         {
             if (devCombat.Locked)
             {
                 UpdateCombatRotationYAxis();
-                rotationXAxis = 12f;
+                rotationXAxis = Mathf.Lerp(rotationXAxis, 12f, Time.fixedDeltaTime * 3f);
             }
             else
             {
@@ -310,17 +269,91 @@ public class CameraController : MonoBehaviour
 
         return Quaternion.Euler(rotationXAxis, rotationYAxis, 0);
     }
+    #endregion
+
+    #region helpers and getters
+    private void handleAutoReset()
+    {
+        bool moving = characterScript.running();
+        bool noRotationY = (Mathf.Abs(velocityY) < 0.01);
+        if (moving && noRotationY)
+            rotationXAxis = Mathf.Lerp(rotationXAxis, 10f, Time.fixedDeltaTime * smoothTime * 0.2f);
+    }
+
+    private bool handleManualReset()
+    {
+        if (InputController.controlsManager.GetButtonDown(ControlsManager.ButtonType.ResetCam))
+        {
+            rotationYAxis = target.eulerAngles.y;
+            rotationXAxis = 10f;
+            return true;
+        }
+        return false;
+    }
+
+    private void UpdateCombatRotationSmooth()
+    {
+        if (!characterScript.inCombatMode())
+        {
+            combatRotationYAxisSmooth = combatRotationYAxisSmoothMin;
+            combatSmoothReason = Reason.NotInCombat;
+        }
+        else if (characterScript.rolling())
+        {
+            combatRotationYAxisSmooth = Mathf.Lerp(combatRotationYAxisSmooth, combatRotationYAxisSmoothRoll, Time.fixedDeltaTime * 100f);
+            combatSmoothReason = Reason.Rolling;
+        }
+        else
+            combatRotationYAxisSmooth = Mathf.Lerp(combatRotationYAxisSmooth, combatRotationYAxisSmoothMax, 
+                combatSmoothReason.Equals(Reason.NotInCombat) ? Time.fixedDeltaTime * 0.5f : Time.fixedDeltaTime * 5f);
+    }
 
     private void UpdateCombatRotationYAxis()
     {
         float goalY = UnwrapEulerAngle(rollingHelper.eulerAngles.y, previousGoalY);
-        //goalY = ClampAngle(Player.transform.eulerAngles.y, previousGoalY);
-        //Debug.Log("goalY: " + goalY);
 
-        rotationYAxis = Mathf.Lerp(rotationYAxis, goalY, 5f * Time.fixedDeltaTime);
+        rotationYAxis = Mathf.Lerp(rotationYAxis, goalY, combatRotationYAxisSmooth * Time.fixedDeltaTime);
+        //rotationYAxis = Mathf.Lerp(rotationYAxis, goalY, 5f * Time.fixedDeltaTime);
+
         previousGoalY = goalY;
     }
 
+    private float initialDistance()
+    {
+        if (characterScript.inCombatMode())
+            return combatDistance;
+        else
+            return normalDistance;
+    }
+
+    private float distanceSmoothTime()
+    {
+        //if (characterScript.m_climbingWall)
+        //    return climbingDistanceSmoothTime;
+        //else
+        return normalDistanceSmoothTime;
+    }
+
+    public float cameraXRotationDif()
+    {
+        float dif = Mathf.Abs(target.eulerAngles.y - transform.eulerAngles.y);
+        if (dif > 180) dif = 360 - dif;
+        return dif;
+    }
+
+    bool cameraShouldBob()
+    {
+        return characterScript.forwardAmount > 0.9f && !characterScript.inCombatMode() && !characterScript.rolling();
+    }
+
+    Vector3 horizontalPosOffset()
+    {
+        float multiplierGoal;
+        Vector3 direction = transform.right;
+        multiplierGoal = characterScript.inCombatMode() ? 0.9f : 0.6f;
+        horizontalPosOffsetMultiplier = Mathf.Lerp(horizontalPosOffsetMultiplier, multiplierGoal, 3f * Time.fixedDeltaTime);
+        return direction * horizontalPosOffsetMultiplier;
+    }
 
     public static float UnwrapEulerAngle(float angle, float previous)
     {
@@ -345,6 +378,7 @@ public class CameraController : MonoBehaviour
             angle -= 360F;
         return Mathf.Clamp(angle, min, max);
     }
+    #endregion
 }
 
 [System.Serializable]
