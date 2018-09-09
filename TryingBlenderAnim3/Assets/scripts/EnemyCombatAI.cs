@@ -12,6 +12,7 @@ public class EnemyCombatAI : MonoBehaviour
 
     private GameObject dev;
     private Animator enemyAnim;
+    private EnemyCheckHit enemyCheckHit;
 
     private AudioSource[] devAttackReactionSounds;
     private float[] strongHitCrossFadeTimes,
@@ -25,6 +26,7 @@ public class EnemyCombatAI : MonoBehaviour
     public void Init()
     {
         enemyAnim = this.gameObject.GetComponent<Animator>();
+        enemyCheckHit = GetComponent<EnemyCheckHit>();
         dev = DevMain.Player;
         enemyAnim.SetBool("enemyBlock", setBlocking);
 
@@ -41,8 +43,9 @@ public class EnemyCombatAI : MonoBehaviour
     {
         handleTestingInput();
 
-        //if (setLookAtDev && enemyAnim.GetCurrentAnimatorStateInfo(0).IsTag("enemyRun"))
-        //    lookAtDev();
+        if (setLookAtDev && !enemyCheckHit.recoveringFromHit &&
+            enemyAnim.GetCurrentAnimatorStateInfo(0).IsTag("enemyRun"))
+            lookAtDev();
 
         handleAttacking();
     }
@@ -207,8 +210,7 @@ public class EnemyCombatAI : MonoBehaviour
     private void lookAtDev()
     {
         Vector3 lookDirection = (dev.transform.position - transform.position).normalized;
-        Vector3 offset = (transform.right * 0.4f);
-        transform.forward = Vector3.RotateTowards(transform.forward, lookDirection + offset, 20f * Time.deltaTime, 0.0f);
+        transform.forward = Vector3.RotateTowards(transform.forward, lookDirection, 20f * Time.deltaTime, 0.0f);
     }
 
     #endregion

@@ -218,7 +218,7 @@ public class DevCombat : MonoBehaviour
                 break;
         }
 
-        if (Random.Range(0f, 1f) < 0.5f)
+        if (Random.Range(0f, 1f) < 0.7f)
             myAnimator.SetFloat("Mirrored", mirroredAttack() ? 0f : 1f);
     }
 

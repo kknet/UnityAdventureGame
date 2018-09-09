@@ -1,13 +1,13 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TryingBlenderAnim3", "Assembly-CSharp.csproj", "{3B0F9B08-3E2C-7C9A-3F2E-0B494E0DEC84}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Assembly-CSharp", "Assembly-CSharp.csproj", "{3B0F9B08-3E2C-7C9A-3F2E-0B494E0DEC84}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TryingBlenderAnim3", "Assembly-CSharp-firstpass.csproj", "{3C86E954-FC26-707A-5C5D-2A623F14041D}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Assembly-CSharp-firstpass", "Assembly-CSharp-firstpass.csproj", "{3C86E954-FC26-707A-5C5D-2A623F14041D}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TryingBlenderAnim3", "Assembly-CSharp-Editor.csproj", "{7ABCC43A-3E48-A9C2-3C81-1F37BFAD7B42}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Assembly-CSharp-Editor", "Assembly-CSharp-Editor.csproj", "{7ABCC43A-3E48-A9C2-3C81-1F37BFAD7B42}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TryingBlenderAnim3", "Assembly-CSharp-Editor-firstpass.csproj", "{4BDD5EBA-C0CC-DB15-17D8-6E1BD9A6906D}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Assembly-CSharp-Editor-firstpass", "Assembly-CSharp-Editor-firstpass.csproj", "{4BDD5EBA-C0CC-DB15-17D8-6E1BD9A6906D}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
