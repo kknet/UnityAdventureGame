@@ -29,7 +29,7 @@ public class CharacterController : MonoBehaviour
     [HideInInspector]
     public float forwardAmount;
     [HideInInspector]
-    public float m_SideAmount;
+    public float sideAmount;
     [HideInInspector]
     public float turnAmount;
     [HideInInspector]
@@ -169,7 +169,7 @@ public class CharacterController : MonoBehaviour
 
         if (inCombatMode() && InputController.IsInputEnabled())
         {
-            m_SideAmount = InputController.controlsManager.GetAxis(ControlsManager.ButtonType.Horizontal);
+            sideAmount = InputController.controlsManager.GetAxis(ControlsManager.ButtonType.Horizontal);
             forwardAmount = InputController.controlsManager.GetAxis(ControlsManager.ButtonType.Vertical);
         }
 
@@ -194,6 +194,13 @@ public class CharacterController : MonoBehaviour
         if (rollPressed && !rolling() && !inCombatMode() && !jumping())
             m_Animator.SetBool("Dodge", true);
 
+        AnimatorStateInfo info = m_Animator.GetCurrentAnimatorStateInfo(0);
+        if (!info.IsTag("roll") && !info.IsTag("Running"))
+        {
+            forwardAmount = 0f;
+            sideAmount = 0f;
+        }
+
         if (jumpEnabled && jumping() && checkJumpIntoWall())
         {
             m_Animator.SetFloat("Forward", 0f);
@@ -206,7 +213,7 @@ public class CharacterController : MonoBehaviour
             if (inCombatMode())
             {
                 m_Animator.SetFloat("Forward", Mathf.MoveTowards(m_Animator.GetFloat("Forward"), forwardAmount, 3f * Time.fixedDeltaTime));
-                m_Animator.SetFloat("HorizSpeed", Mathf.MoveTowards(m_Animator.GetFloat("HorizSpeed"), m_SideAmount, 3f * Time.fixedDeltaTime));
+                m_Animator.SetFloat("HorizSpeed", Mathf.MoveTowards(m_Animator.GetFloat("HorizSpeed"), sideAmount, 3f * Time.fixedDeltaTime));
             }
             else
             {
@@ -235,7 +242,14 @@ public class CharacterController : MonoBehaviour
                     else
                         m_RollingSpeedMultiplier = Mathf.MoveTowards(m_RollingSpeedMultiplier, m_RollingSpeedMin, Time.fixedDeltaTime * 200f);
 
-                    transform.Translate(Vector3.forward * Time.fixedDeltaTime * m_RollingSpeedMultiplier);
+
+                    //if (DevCombat.Locked)
+                    //{
+                    //    Vector3 total = (sideAmount * rollingHelper.right) + (forwardAmount * rollingHelper.forward);
+                    //    transform.Translate(total.normalized * Time.fixedDeltaTime * m_RollingSpeedMultiplier);
+                    //}
+                    //else
+                        transform.Translate(Vector3.forward * Time.fixedDeltaTime * m_RollingSpeedMultiplier);
                 }
                 else
                 {
