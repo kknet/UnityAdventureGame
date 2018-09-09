@@ -38,7 +38,7 @@ public class EnemyCheckHit : MonoBehaviour
     void Update()
     {
         AnimatorStateInfo animState = animator.GetCurrentAnimatorStateInfo(0);
-        if (animState.IsTag("enemyRun") && devCombat.canHit && !recoveringFromHit)
+        if (devCombat.canHit && !recoveringFromHit)
         {
             if (CheckHit())
             {
@@ -117,12 +117,12 @@ public class EnemyCheckHit : MonoBehaviour
         //Vector3 direction = Quaternion.AngleAxis(angle, Vector3.up) * DevMain.Player.transform.forward.normalized;
         Vector3 direction = Quaternion.AngleAxis(angle, transform.up) * -transform.forward.normalized;
 
-        while (tt < 100f)
+        while (tt < 70f)
         {
             Debug.DrawLine(transform.position + Vector3.up, transform.position + Vector3.up + (30f * direction), Color.magenta);
 
-            if (animator.speed < 1f)
-                transform.Translate(direction * (multiplier + 0.15f), Space.World);
+            if (animator.speed < 0.6f)
+                transform.Translate(direction * (multiplier + 0.2f), Space.World);
             else
                 transform.Translate(direction * multiplier, Space.World);
 
@@ -156,6 +156,11 @@ public class EnemyCheckHit : MonoBehaviour
             devAnimator.speed += 0.05f;
             yield return null;
         }
+    }
+
+    public void FinishRecoveringFromHit()
+    {
+        recoveringFromHit = false;
     }
 
 }
