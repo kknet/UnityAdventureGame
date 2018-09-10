@@ -13,7 +13,6 @@ public class DevCombat : MonoBehaviour
     };
 
     #region globals
-    public GameObject TestEnemy;
     public BoxCollider attackCollider;
     public AudioSource quickAttack, quickAttack2, quickAttack3;
     public AudioSource strongHit;
@@ -22,7 +21,6 @@ public class DevCombat : MonoBehaviour
     [HideInInspector] public Quaternion rollRotation;
 
     private CharacterController characterController;
-    private GameObject[] enemies;
     private Animator myAnimator;
     private Camera cam;
     private GameObject currentEnemy;
@@ -40,6 +38,8 @@ public class DevCombat : MonoBehaviour
 
     private bool needToAttack, doneLerping, needsRunningAnimation;
 
+    private bool alwaysLocked = true;
+
     [HideInInspector] public bool Locked;
 
     AttackType currentType;
@@ -54,11 +54,9 @@ public class DevCombat : MonoBehaviour
         devCombatReactionsScript = GetComponent<DevCombatReactions>();
         myAnimator = GetComponent<Animator>();
         cam = Camera.main;
-        currentEnemy = GameObject.Find("Brute2");
         currentType = AttackType.none;
         quickAttackStateNames = new string[] { "quick_1", "quick_2", "quick_3" };
         enemyAttackReactionSounds = new AudioSource[] { quickAttack, quickAttack2, quickAttack3, quickAttack3 };
-        enemies = GameObject.FindGameObjectsWithTag("Enemy");
 
         /*variables to tweak*/
         strongHitCrossFadeTimes = new float[] { 0.2f, 0.2f, 0.05f };
@@ -72,7 +70,9 @@ public class DevCombat : MonoBehaviour
         if (rightMouseReleased) //unblock 
             myAnimator.SetBool("isBlocking", false);
 
-        if (interact) //locking
+        if (alwaysLocked)
+            Locked = true;
+        else if (interact) //locking
             Locked = !Locked;
 
         if (leftMousePressedTime > 0f && (Time.time - leftMousePressedTime > twoButtonPressTimeMax) && !characterController.rolling()) //quick attack
@@ -161,7 +161,7 @@ public class DevCombat : MonoBehaviour
 
     private int pickAttackByDistance()
     {
-        float dist = Vector3.Distance(transform.position, TestEnemy.transform.position);
+        float dist = Vector3.Distance(transform.position, CurrentEnemy.transform.position);
         Debug.Log(dist);
         for(int idx = 0; idx < targetMatching.margins.Length; ++idx)
         {
@@ -198,7 +198,7 @@ public class DevCombat : MonoBehaviour
         while (myAnimator.GetCurrentAnimatorStateInfo(0).IsTag("attacking"))
             yield return null;
 
-        float dist = Vector3.Distance(transform.position, TestEnemy.transform.position);
+        float dist = Vector3.Distance(transform.position, CurrentEnemy.transform.position);
         float firstAttackTravelDist = targetMatching.margins[0] + targetMatching.desiredDistances[0];
 
         switch (myAnimator.GetInteger("quickAttack"))
@@ -234,6 +234,10 @@ public class DevCombat : MonoBehaviour
         get
         {
             return currentEnemy;
+        }
+        set
+        {
+            currentEnemy = value;
         }
     }
 

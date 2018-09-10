@@ -53,7 +53,7 @@ public class EnemyCheckHit : MonoBehaviour
     //The direction that the enemy goes after being hit
     public Direction DevToEnemyHitDirection()
     {
-        Vector3 enemyForward = devCombat.TestEnemy.transform.forward;
+        Vector3 enemyForward = devCombat.CurrentEnemy.transform.forward;
         Vector3 devForward = DevMain.Player.transform.forward;
         float angle = Vector3.SignedAngle(enemyForward, devForward, Vector3.up);
         float absAngle = Mathf.Abs(angle);
@@ -122,7 +122,7 @@ public class EnemyCheckHit : MonoBehaviour
             Debug.DrawLine(transform.position + Vector3.up, transform.position + Vector3.up + (30f * direction), Color.magenta);
 
             if (animator.speed < 0.6f)
-                transform.Translate(direction * (multiplier + 0.2f), Space.World);
+                transform.Translate(direction * (multiplier + 0.25f), Space.World);
             else
                 transform.Translate(direction * multiplier, Space.World);
 

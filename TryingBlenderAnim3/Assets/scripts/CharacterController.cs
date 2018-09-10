@@ -445,7 +445,7 @@ public class CharacterController : MonoBehaviour
 
     public Vector3 currentEnemyLookDirection()
     {
-        Vector3 enemyPos = DevCombat.TestEnemy.transform.position;
+        Vector3 enemyPos = DevCombat.CurrentEnemy.transform.position;
         enemyPos = new Vector3(enemyPos.x, transform.position.y, enemyPos.z);
         Vector3 dir = enemyPos - transform.position;
         dir.Normalize();
