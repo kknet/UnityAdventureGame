@@ -112,7 +112,7 @@ public class EnemyCheckHit : MonoBehaviour
         float multiplier = 0.025f;
         float decrement = multiplier / 100f;
 
-        float angle = Random.Range(-20f, -60f);
+        float angle = Random.Range(-30f, -70f);
         if (devCombat.mirroredAttack()) angle *= -1f;
         //Vector3 direction = Quaternion.AngleAxis(angle, Vector3.up) * DevMain.Player.transform.forward.normalized;
         Vector3 direction = Quaternion.AngleAxis(angle, transform.up) * -transform.forward.normalized;

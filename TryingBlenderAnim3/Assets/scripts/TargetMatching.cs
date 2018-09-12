@@ -38,7 +38,7 @@ public class TargetMatching : MonoBehaviour
     };
 
     public float[] margins = {
-        2f,
+        3f,
         5f,
         5f
     };

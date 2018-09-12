@@ -312,7 +312,7 @@ public class CharacterController : MonoBehaviour
         }
         else if (inCombatMode() && DevCombat.Locked) // locked
         {
-            transform.forward = Vector3.RotateTowards(transform.forward, currentEnemyLookDirection(), 0.15f, Time.fixedDeltaTime * 2f);
+            transform.forward = Vector3.RotateTowards(transform.forward, currentEnemyLookDirection(), 0.25f, Time.fixedDeltaTime * 5f);
             rollingHelper.forward = Vector3.RotateTowards(rollingHelper.forward, currentEnemyLookDirection(), 10f, Time.fixedDeltaTime * 10f);
         }
         else if (inCombatMode() && !DevCombat.Locked) // not locked

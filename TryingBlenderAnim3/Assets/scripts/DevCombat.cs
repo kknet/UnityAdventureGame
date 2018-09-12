@@ -205,13 +205,13 @@ public class DevCombat : MonoBehaviour
         {
             case 1:
                 myAnimator.SetInteger("quickAttack",
-                    (Random.Range(0f, 1f) < 0.7f) ? 3 : 2);
+                    (Random.Range(0f, 1f) < 0.5f) ? 3 : 2);
                 break;
             case 2:
-                myAnimator.SetInteger("quickAttack", firstAttackTravelDist > dist ? 1 : 3);
+                myAnimator.SetInteger("quickAttack", Random.Range(0f, 1f) < 0.8f && firstAttackTravelDist < dist ? 3 : 1);
                 break;
             case 3:
-                myAnimator.SetInteger("quickAttack", firstAttackTravelDist > dist ? 1 : 2);
+                myAnimator.SetInteger("quickAttack", Random.Range(0f, 1f) < 0.8f && firstAttackTravelDist < dist ? 2 : 1);
                 break;
             default:
                 Debug.LogAssertion("quickAttack is not set to 1-3, look at DevCombat.cs script");
