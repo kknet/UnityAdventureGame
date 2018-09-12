@@ -41,6 +41,7 @@ public class CharacterController : MonoBehaviour
     CameraController CameraController;
     DevCombat DevCombat;
 
+    Transform modelTransform;
     Rigidbody rb;
     Vector3 m_GroundNormal;
     CapsuleCollider m_Capsule;
@@ -55,6 +56,7 @@ public class CharacterController : MonoBehaviour
 
     public GameObject spine, spine1, spine2, hips, leftShoulder, rightShoulder, leftLeg, rightLeg;
     public Transform rollingHelper;
+    
 
     [Tooltip("How much upwards force when jumping?")]
     [Range(7f, 15f)]
@@ -109,6 +111,7 @@ public class CharacterController : MonoBehaviour
         InputController = GetComponent<InputController>();
         CharacterEvents = GetComponent<CharacterEvents>();
         CharacterEvents.Init();
+        modelTransform = transform.GetChild(2);
     }
 
     void LateUpdate()
@@ -302,7 +305,7 @@ public class CharacterController : MonoBehaviour
             transform.Rotate(0, turnAmount * m_MovingTurnSpeed * 3f * Time.fixedDeltaTime, 0);
             rollingHelper.forward = Vector3.RotateTowards(rollingHelper.forward, currentEnemyLookDirection(), 10f, Time.fixedDeltaTime * 10f);
         }
-        else if (inCombatMode() && rolling() && animNormTime >= 0.5f) // rolling
+        else if (inCombatMode() && rolling() && animNormTime >= 0.5f) // rollingz
         {
             transform.Rotate(0, turnAmount * m_MovingTurnSpeed * 0.1f * Time.fixedDeltaTime, 0);
             rollingHelper.forward = Vector3.RotateTowards(rollingHelper.forward, currentEnemyLookDirection(), 10f, Time.fixedDeltaTime * 10f);

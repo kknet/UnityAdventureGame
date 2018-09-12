@@ -91,18 +91,22 @@ public class InputController : MonoBehaviour
 
     void SendInputs(float h, float v, bool interact, bool walk, bool leftMousePressed, bool rightMouseHeld, bool rightMouseReleased, bool spaceBarPressed)
     {
+        bool walking = walk && !characterController.jumping() && !characterController.rolling();
+        bool rolling = animator.GetBool("Dodge");
+
         if (m_Cam != null)
         {
             m_CamForward = Vector3.Scale(m_Cam.forward, new Vector3(1, 0, 1)).normalized;
-            m_Move = defaultMoveCalculation(h, v); //calculate camera relative direction to move
+            if (rolling)
+                m_Move = rollingMoveCalculation(h, v);
+            else
+                m_Move = defaultMoveCalculation(h, v); //calculate camera relative direction to move
         }
         else
         {
             m_Move = v * Vector3.forward + h * Vector3.right; // we use world-relative directions in the case of no main camera
         }
 
-        bool walking = walk && !characterController.jumping() && !characterController.rolling();
-        bool rolling = animator.GetBool("Dodge");
         if (walking) m_Move *= 0.66f;
 
         // pass all parameters to character scripts to process and translate inputs into character actions
@@ -156,6 +160,15 @@ public class InputController : MonoBehaviour
     private Vector3 defaultMoveCalculation(float h, float v)
     {
         return v * m_CamForward + h * m_Cam.right;
+    }
+
+    private Vector3 rollingMoveCalculation(float h, float v)
+    {
+        Vector3 vFactor = v * m_CamForward;
+        Vector3 hFactor = h * m_Cam.right;
+        hFactor += Mathf.Abs(Mathf.Clamp(Mathf.Pow(Vector3.Distance(transform.position, devCombat.CurrentEnemy.transform.position), -0.5f), 0.1f, 1f) * 
+            (h * 0.5f)) * m_CamForward;
+        return vFactor + hFactor;
     }
     #endregion
 }
