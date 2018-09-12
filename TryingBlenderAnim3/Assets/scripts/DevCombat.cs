@@ -38,7 +38,7 @@ public class DevCombat : MonoBehaviour
 
     private bool needToAttack, doneLerping, needsRunningAnimation;
 
-    private bool alwaysLocked = true;
+    private bool alwaysLocked = false;
 
     [HideInInspector] public bool Locked;
 
