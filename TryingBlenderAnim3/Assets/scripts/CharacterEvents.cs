@@ -17,7 +17,7 @@ public class CharacterEvents : MonoBehaviour
     public GameObject footDust;
 
     [SerializeField]
-    public GameObject slashEffect;
+    public GameObject slashEffect1, slashEffect1Mirrored;
 
     [Tooltip("Feet transforms used for particle effect postioning. Don't change!")]
     [SerializeField]
@@ -98,10 +98,26 @@ public class CharacterEvents : MonoBehaviour
     #region methods called by animation events
     public void playSlashEffect()
     {
-        Vector3 pos = transform.position + (0.25f * transform.right) + (1.5f * transform.up);
-        //Quaternion rot = transform.rotation * Quaternion.AngleAxis(-90f, transform.up)/* * Quaternion.AngleAxis(90f, Vector3.forward)*/;
-        //GameObject slashEffectClone = Instantiate(slashEffect, pos, rot);
-        GameObject slashEffectClone = Instantiate(slashEffect, pos, transform.rotation, transform);
+        int attackIndex = m_Animator.GetInteger("quickAttack");
+        bool mirrored = m_Animator.GetFloat("Mirrored") > 0f;
+        Vector3 pos = Vector3.zero;
+        Quaternion rot = transform.rotation;
+        GameObject slashEffectClone = null;
+
+        if (attackIndex == 1)
+        {
+            if (mirrored)
+            {
+                pos = transform.position + (-0.5f * transform.right) + (1.5f * transform.up);
+                slashEffectClone = Instantiate(slashEffect1Mirrored, pos, rot, transform);
+            }
+            else
+            {
+                pos = transform.position + (0.25f * transform.right) + (1.5f * transform.up);
+                slashEffectClone = Instantiate(slashEffect1, pos, rot, transform);
+            }
+        }
+
         slashEffectClone.GetComponent<ParticleSystem>().Play();
         Destroy(slashEffectClone, 1.0f);
     }

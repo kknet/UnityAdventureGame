@@ -213,6 +213,7 @@ public class DevCombat : MonoBehaviour
         if (testing1)
         {
             myAnimator.SetInteger("quickAttack", 1);
+            myAnimator.SetFloat("Mirrored", mirroredAttack() ? 0f : 1f);
             yield break;
         }
 
