@@ -209,10 +209,10 @@ public class DevCombat : MonoBehaviour
         while (myAnimator.GetCurrentAnimatorStateInfo(0).IsTag("attacking"))
             yield return null;
 
-        bool testing1 = true;
+        bool testing1 = false;
         if (testing1)
         {
-            myAnimator.SetInteger("quickAttack", 1);
+            myAnimator.SetInteger("quickAttack", 2);
             myAnimator.SetFloat("Mirrored", mirroredAttack() ? 0f : 1f);
             yield break;
         }

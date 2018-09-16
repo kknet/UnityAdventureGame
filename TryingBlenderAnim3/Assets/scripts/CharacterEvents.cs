@@ -110,12 +110,12 @@ public class CharacterEvents : MonoBehaviour
         {
             if (mirrored)
             {
-                pos = transform.position + (-0.5f * transform.right) + (1.5f * transform.up);
+                pos = transform.position + (-0.507f * transform.right) + (1.433f * transform.up);
                 slashEffectClone = Instantiate(slashEffect1Mirrored, pos, rot, transform);
             }
             else
             {
-                pos = transform.position + (0.25f * transform.right) + (1.5f * transform.up);
+                pos = transform.position + (0.507f * transform.right) + (1.433f * transform.up);
                 slashEffectClone = Instantiate(slashEffect1, pos, rot, transform);
             }
         }
@@ -123,12 +123,12 @@ public class CharacterEvents : MonoBehaviour
         {
             if (mirrored)
             {
-                pos = transform.position + (-0.13f * transform.right) + (1.6f * transform.up);
+                pos = transform.position + (0.1f * transform.right) + (1.4f * transform.up) + (-0.4f * transform.forward);
                 slashEffectClone = Instantiate(slashEffect2Mirrored, pos, rot, transform);
             }
             else
             {
-                pos = transform.position + (0f * transform.right) + (1.75f * transform.up) + (-0.5f * transform.forward);
+                pos = transform.position + (0.2f * transform.right) + (1.7f * transform.up) + (-0.5f * transform.forward);
                 slashEffectClone = Instantiate(slashEffect2, pos, rot, transform);
             }
         }

@@ -107,7 +107,7 @@ ModelImporter:
     400098: mixamorig:Spine
     400100: mixamorig:Spine1
     400102: mixamorig:Spine2
-    7400000: GS Long Distance 3
+    7400000: GS Long Distance 3 M
     9500000: //RootNode
   externalObjects: {}
   materials:
@@ -138,7 +138,7 @@ ModelImporter:
     extraUserProperties: []
     clipAnimations:
     - serializedVersion: 16
-      name: GS Long Distance 3
+      name: GS Long Distance 3 M
       takeName: mixamo.com
       firstFrame: 0
       lastFrame: 127
