@@ -189,6 +189,15 @@
     <Compile Include="Assets\scripts\TrackObstacles.cs" />
     <Compile Include="Assets\scripts\WeaponHitsStrong.cs" />
     <Compile Include="Assets\scripts\WeaponToggle.cs" />
+    <Compile Include="Assets\SoxAnimationToolkit\ConstraintTransform\ConstraintTransform.cs" />
+    <Compile Include="Assets\SoxAnimationToolkit\DragTransform\SoxAtkDragTransform.cs" />
+    <Compile Include="Assets\SoxAnimationToolkit\JiggleBoneSimple\SoxAtkJiggleBoneSimple.cs" />
+    <Compile Include="Assets\SoxAnimationToolkit\JiggleBoneTentacle\SoxAtkCollider.cs" />
+    <Compile Include="Assets\SoxAnimationToolkit\JiggleBoneTentacle\SoxAtkJiggleBone.cs" />
+    <Compile Include="Assets\SoxAnimationToolkit\JiggleBoneTentacle\SoxAtkTentacle.cs" />
+    <Compile Include="Assets\SoxAnimationToolkit\LookAt\SoxAtkLookAt.cs" />
+    <Compile Include="Assets\SoxAnimationToolkit\MotionPath\SoxAtkMotionPath.cs" />
+    <Compile Include="Assets\SoxAnimationToolkit\SampleResources\TestResources\FPSDisplay.cs" />
     <Compile Include="Assets\Temple of Ancient India\Scripts\DoorTrigger.cs" />
     <Compile Include="Assets\torch\scene\script\TorchSlider.cs" />
     <Compile Include="Assets\torch\scene\script\Torchslider2.cs" />
@@ -196,6 +205,7 @@
     <None Include="Assets\PostProcessing\Resources\Shaders\DepthOfField.shader" />
     <None Include="Assets\Environment\NatureStarterKit2\Standard Assets\Effects\GlassRefraction\Shaders\GlassStainedBumpDistort.shader" />
     <None Include="Assets\Environment\NatureStarterKit2\Standard Assets\Effects\ImageEffects\Shaders\_BloomAndFlares\BlendOneOne.shader" />
+    <None Include="Assets\SoxAnimationToolkit\ReadMe.txt" />
     <None Include="Assets\Environment\NatureStarterKit2\Standard Assets\Effects\ImageEffects\Shaders\NoiseEffectShaderRGB.shader" />
     <None Include="Assets\Environment\NatureStarterKit2\Standard Assets\Effects\ToonShading\Shaders\ToonBasic.shader" />
     <None Include="Assets\Environment\NatureStarterKit2\Standard Assets\Effects\ImageEffects\Shaders\_DepthOfField\SeparableWeightedBlurDof34.shader" />

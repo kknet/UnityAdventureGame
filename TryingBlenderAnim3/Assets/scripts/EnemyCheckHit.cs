@@ -109,7 +109,7 @@ public class EnemyCheckHit : MonoBehaviour
     IEnumerator translateEnemyFall(Direction enemyFallDirection)
     {
         float tt = 0f;
-        float multiplier = 0.025f;
+        float multiplier = 0.045f;
         float decrement = multiplier / 100f;
 
         float angle = Random.Range(-30f, -70f);

@@ -156,7 +156,7 @@ public class CameraController : MonoBehaviour
         targetPos = target.position + verticalPosOffset + horizontalPosOffset();
         camPos = targetPos + rotation * negDistance + backPosOffset;
         if(cameraBobEnabled)
-            camPos = cameraBob.AddCameraBob(camPos, characterScript.m_Animator.GetFloat("Forward"), cameraShouldBob());
+            camPos = cameraBob.AddCameraBob(camPos, characterScript.m_Animator.GetFloat("Forward"), cameraShouldBob(), characterScript.crouching());
 
         Vector3 defaultNegDistance = new Vector3(0.0f, 0.0f, -initialDistance());
         desiredCamPos = targetPos + rotation * defaultNegDistance;
@@ -322,6 +322,8 @@ public class CameraController : MonoBehaviour
     {
         if (characterScript.inCombatMode())
             return combatDistance;
+        else if (characterScript.rolling())
+            return normalDistance * 3f;
         else
             return normalDistance;
     }

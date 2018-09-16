@@ -9,7 +9,7 @@ public class ControlsManager
 
     public enum ButtonType
     {
-        Horizontal, Vertical, MouseX, MouseY, Jump, Walk, Climb, ResetCam, Interact, Pause, Back, Attack
+        Horizontal, Vertical, MouseX, MouseY, Jump, Walk, Crouch, ResetCam, Interact, Pause, Back, Attack
     }
 
     public enum InputDevice
@@ -22,8 +22,8 @@ public class ControlsManager
     public InputValues[] values;
 
     private ButtonType[] axes = { ButtonType.Horizontal, ButtonType.Vertical, ButtonType.MouseX, ButtonType.MouseY };
-    private ButtonType[] buttons = { ButtonType.Jump, ButtonType.Walk, ButtonType.Climb, ButtonType.ResetCam, ButtonType.Interact, ButtonType.Pause, ButtonType.Back, ButtonType.Attack };
-    private string[] inputNames = { "Horizontal", "Vertical", "MouseX", "MouseY", "Jump", "Walk", "Climb", "ResetCam", "Interact", "Pause", "Back" , "Attack"};
+    private ButtonType[] buttons = { ButtonType.Jump, ButtonType.Walk, ButtonType.Crouch, ButtonType.ResetCam, ButtonType.Interact, ButtonType.Pause, ButtonType.Back, ButtonType.Attack };
+    private string[] inputNames = { "Horizontal", "Vertical", "MouseX", "MouseY", "Jump", "Walk", "Crouch", "ResetCam", "Interact", "Pause", "Back" , "Attack"};
     private string keyboardAppend = "K";
     private string controllerWinAppend = "Win";
     private string controllerMacAppend = "Mac";
@@ -117,7 +117,7 @@ public class ControlsManager
         Dictionary<ButtonType, string> buttonToName;
 
         public InputValues(string append, string Horizontal, string Vertical, string MouseX, string MouseY,
-            string Jump, string Walk, string Climb, string ResetCam, string Interact, string Pause, string Back, string Attack)
+            string Jump, string Walk, string Crouch, string ResetCam, string Interact, string Pause, string Back, string Attack)
         {
             buttonToName = new Dictionary<ButtonType, string>();
 
@@ -127,7 +127,7 @@ public class ControlsManager
             buttonToName[ButtonType.MouseY] = MouseY + append;
             buttonToName[ButtonType.Jump] = Jump + append;
             buttonToName[ButtonType.Walk] = Walk + append;
-            buttonToName[ButtonType.Climb] = Climb + append;
+            buttonToName[ButtonType.Crouch] = Crouch + append;
             buttonToName[ButtonType.ResetCam] = ResetCam + append;
             buttonToName[ButtonType.Interact] = Interact + append;
             buttonToName[ButtonType.Pause] = Pause + append;

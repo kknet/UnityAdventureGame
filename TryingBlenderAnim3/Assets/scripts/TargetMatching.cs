@@ -32,15 +32,15 @@ public class TargetMatching : MonoBehaviour
     };
 
     public float[] desiredDistances = {
-        0.7f,
-        0.7f,
-        1.3f
+        1.5f,
+        1.5f,
+        2f
     };
 
     public float[] margins = {
-        3f,
-        5f,
-        5f
+        4f,
+        6f,
+        6f
     };
 
     private void Awake()

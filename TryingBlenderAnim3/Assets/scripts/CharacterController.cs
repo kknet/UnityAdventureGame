@@ -68,6 +68,7 @@ public class CharacterController : MonoBehaviour
     float m_CombatMoveSpeedMultiplier = 1.7f;
     //float m_CombatMoveSpeedMultiplier = 1.4f;
     float m_MoveSpeedMultiplier = 8f;
+    float m_CrouchSpeedMultiplier = 3f;
     float m_RollingSpeedMax = 8f;
     float m_RollingSpeedMin = 6f;
     float m_RollingSpeedMultiplier = 6f;
@@ -128,10 +129,10 @@ public class CharacterController : MonoBehaviour
             }
     }
 
-    public void ProcessInputs (Vector3 move, bool rollPressed)
+    public void ProcessInputs (Vector3 move, bool rollPressed, bool crouchToggled)
     {
         CalculateForwardMovement(move);
-        UpdateAnimator(move, rollPressed);
+        UpdateAnimator(move, rollPressed, crouchToggled);
         RotatePlayer(move);
         TranslatePlayer();
         UpdateSounds();
@@ -180,7 +181,7 @@ public class CharacterController : MonoBehaviour
             forwardAmount = 0.33f;
     }
 
-    void UpdateAnimator(Vector3 move, bool rollPressed)
+    void UpdateAnimator(Vector3 move, bool rollPressed, bool crouchToggled)
     {
         CheckGroundStatus();
 
@@ -194,11 +195,14 @@ public class CharacterController : MonoBehaviour
             updateJumpState();
         }
 
+        if (crouchToggled)
+            m_Animator.SetBool("Crouched", !m_Animator.GetBool("Crouched"));
+
         if (rollPressed && !rolling() && !inCombatMode() && !jumping())
             m_Animator.SetBool("Dodge", true);
 
         AnimatorStateInfo info = m_Animator.GetCurrentAnimatorStateInfo(0);
-        if (!info.IsTag("roll") && !info.IsTag("Running"))
+        if (!info.IsTag("roll") && !info.IsTag("Running") && !info.IsTag("crouching"))
         {
             forwardAmount = 0f;
             sideAmount = 0f;
@@ -276,8 +280,18 @@ public class CharacterController : MonoBehaviour
             {
                 float fwd = m_Animator.GetFloat("Forward");
                 float fwdMultiplier = fwd > 0f ? Mathf.Pow(fwd, 1.5f) : 0f;
-                transform.Translate(fwdMultiplier * Vector3.forward *
-                                    Time.fixedDeltaTime * m_MoveSpeedMultiplier);
+
+                if (crouching())
+                {
+                    transform.Translate(fwdMultiplier * Vector3.forward *
+                                        Time.fixedDeltaTime * m_CrouchSpeedMultiplier);
+                }
+                else
+                {
+                    transform.Translate(fwdMultiplier * Vector3.forward *
+                        Time.fixedDeltaTime * m_MoveSpeedMultiplier);
+                }
+
             }
         }
     }
@@ -324,6 +338,12 @@ public class CharacterController : MonoBehaviour
     #endregion
 
     #region helpers and getters
+
+    public bool crouching()
+    {
+        AnimatorStateInfo info = m_Animator.GetCurrentAnimatorStateInfo(0);
+        return info.IsTag("crouching");
+    }
 
     void CheckGroundStatus()
     {

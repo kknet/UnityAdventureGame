@@ -65,8 +65,14 @@ public class DevCombat : MonoBehaviour
         jumpAttackStartingOffset = 3.7f;
     }
 
-    public void ProcessInputs(bool interact, bool leftMousePressed, bool rightMouseHeld, bool rightMouseReleased, bool spaceBarPressed)
+    public void ProcessInputs(bool interact, bool leftMousePressed, bool rightMouseHeld, bool rightMouseReleased, bool spaceBarPressed, bool stealthAttack)
     {
+        if (stealthAttack)
+        {
+            myAnimator.SetBool("Stealth Attack", true);
+            return;
+        }
+
         if (rightMouseReleased) //unblock 
             myAnimator.SetBool("isBlocking", false);
 
@@ -106,6 +112,11 @@ public class DevCombat : MonoBehaviour
 
         CheckHit();
         targetMatching.MatchTargetUpdate();
+    }
+
+    public void stopStealthAttack()
+    {
+        myAnimator.SetBool("Stealth Attack", false);
     }
 
     public void EnableHits()

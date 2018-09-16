@@ -6,15 +6,23 @@ using UnityEngine;
 public class CameraBob : MonoBehaviour
 {
     float maxBobSpeed = 12f;
-    float maxBobAmount = 0.03f;
+    float maxBobAmountDefault = 0.03f;
     float timer = Mathf.PI / 2;
     float bobAmount, bobSpeed; 
     Vector3 camPos;
 
-    public Vector3 AddCameraBob(Vector3 restPosition, float curForwardAmount, bool cameraShouldBob)
+    float maxBobAmount(bool crouching)
+    {
+        if (crouching)
+            return maxBobAmountDefault / 3f;
+        else
+            return maxBobAmountDefault;
+    }
+
+    public Vector3 AddCameraBob(Vector3 restPosition, float curForwardAmount, bool cameraShouldBob, bool crouching)
     {
         camPos = Camera.main.transform.position;
-        updateBobAmountAndSpeed(curForwardAmount, cameraShouldBob);
+        updateBobAmountAndSpeed(curForwardAmount, cameraShouldBob, crouching);
 
         if (curForwardAmount > 0f) //moving
         {
@@ -36,11 +44,11 @@ public class CameraBob : MonoBehaviour
         return camPos;
     }
 
-    void updateBobAmountAndSpeed(float curForwardAmount, bool cameraShouldBob)
+    void updateBobAmountAndSpeed(float curForwardAmount, bool cameraShouldBob, bool crouching)
     {
         if (cameraShouldBob)
         {
-            bobAmount = Mathf.Lerp(bobAmount, maxBobAmount * curForwardAmount, 2f * Time.fixedDeltaTime);
+            bobAmount = Mathf.Lerp(bobAmount, maxBobAmount(crouching) * curForwardAmount, 2f * Time.fixedDeltaTime);
             bobSpeed = Mathf.Lerp(bobSpeed, maxBobSpeed * curForwardAmount, 2f * Time.fixedDeltaTime);
         }
         else

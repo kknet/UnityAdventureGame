@@ -71,13 +71,14 @@ public class InputController : MonoBehaviour
         {
             characterController.forwardAmount = 0f;
             GetComponent<Animator>().SetFloat("Forward", 0f);
-            characterController.ProcessInputs(Vector3.zero, false);
+            characterController.ProcessInputs(Vector3.zero, false, false);
             if (cameraEnabled) cameraController.PhysicsUpdate();
             return;
         }
 
         float h = controlsManager.GetAxis(ControlsManager.ButtonType.Horizontal);
         float v = controlsManager.GetAxis(ControlsManager.ButtonType.Vertical);
+        bool c = controlsManager.GetButtonDown(ControlsManager.ButtonType.Crouch);
         bool interact = controlsManager.GetButtonDown(ControlsManager.ButtonType.Interact);
         bool walk = controlsManager.GetButton(ControlsManager.ButtonType.Walk);
 
@@ -86,13 +87,16 @@ public class InputController : MonoBehaviour
         bool rightMouseReleased = Input.GetKeyUp(KeyCode.Mouse1);
         bool spaceBarPressed = InputController.controlsManager.GetButtonDown(ControlsManager.ButtonType.Jump);
 
-        SendInputs(h, v, interact, walk, leftMousePressed, rightMouseHeld, rightMouseReleased, spaceBarPressed);
+        SendInputs(h, v, c, interact, walk, leftMousePressed, rightMouseHeld, rightMouseReleased, spaceBarPressed);
     }
 
-    void SendInputs(float h, float v, bool interact, bool walk, bool leftMousePressed, bool rightMouseHeld, bool rightMouseReleased, bool spaceBarPressed)
+    void SendInputs(float h, float v, bool c, bool interact, bool walk, bool leftMousePressed, bool rightMouseHeld, bool rightMouseReleased, bool spaceBarPressed)
     {
         bool walking = walk && !characterController.jumping() && !characterController.rolling();
         bool rolling = animator.GetBool("Dodge");
+        bool crouching = characterController.crouching();
+        bool stealthAttack = leftMousePressed && animator.GetCurrentAnimatorStateInfo(0).IsTag("crouching");
+        bool toggleCrouching = !characterController.inCombatMode() && c;
 
         if (m_Cam != null)
         {
@@ -105,15 +109,16 @@ public class InputController : MonoBehaviour
         else
         {
             m_Move = v * Vector3.forward + h * Vector3.right; // we use world-relative directions in the case of no main camera
-        }
+        } 
 
         if (walking) m_Move *= 0.66f;
-
+        if (rolling && !characterController.inCombatMode()) m_Move *= 0.8f;
+        
         // pass all parameters to character scripts to process and translate inputs into character actions
-        characterController.ProcessInputs(m_Move, spaceBarPressed);
+        characterController.ProcessInputs(m_Move, spaceBarPressed, toggleCrouching);
         cameraController.PhysicsUpdate();
         if(combatEnabled)
-            devCombat.ProcessInputs(interact, leftMousePressed, rightMouseHeld, rightMouseReleased, spaceBarPressed);
+            devCombat.ProcessInputs(interact, leftMousePressed, rightMouseHeld, rightMouseReleased, spaceBarPressed, stealthAttack);
     }
 
     IEnumerator BufferedJump()

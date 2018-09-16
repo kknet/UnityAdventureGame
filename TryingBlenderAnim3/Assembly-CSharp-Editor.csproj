@@ -109,6 +109,15 @@
     <Compile Include="Assets\PostProcessing\Editor\Utils\EditorResources.cs" />
     <Compile Include="Assets\PostProcessing\Editor\Utils\FxStyles.cs" />
     <Compile Include="Assets\PostProcessing\Editor\Utils\ReflectionUtils.cs" />
+    <Compile Include="Assets\SoxAnimationToolkit\AnimPoseCopyPaste\Editor\SoxAtkAnimPoseCopyPaste.cs" />
+    <Compile Include="Assets\SoxAnimationToolkit\DragTransform\Editor\SoxAtkDragTransformEditor.cs" />
+    <Compile Include="Assets\SoxAnimationToolkit\JiggleBoneSimple\Editor\SoxAtkJiggleBoneSimpleEditor.cs" />
+    <Compile Include="Assets\SoxAnimationToolkit\JiggleBoneTentacle\Editor\SoxAtkJiggleBoneEditor.cs" />
+    <Compile Include="Assets\SoxAnimationToolkit\JiggleBoneTentacle\Editor\SoxAtkSphereColliderMenu.cs" />
+    <Compile Include="Assets\SoxAnimationToolkit\JiggleBoneTentacle\Editor\SoxAtkTentacleEditor.cs" />
+    <Compile Include="Assets\SoxAnimationToolkit\LookAt\Editor\SoxAtkLookAtEditor.cs" />
+    <Compile Include="Assets\SoxAnimationToolkit\MotionPath\Editor\SoxAtkMotionPathEditor.cs" />
+    <Compile Include="Assets\SoxAnimationToolkit\MotionPath\Editor\SoxAtkMotionPathMenu.cs" />
     <Compile Include="Assets\Tools\TerrainRotator\Editor\TerrainRotator.cs" />
     <Reference Include="Assembly-UnityScript">
       <HintPath>D:/github/UnityAdventureGame/TryingBlenderAnim3/Library/ScriptAssemblies/Assembly-UnityScript.dll</HintPath>
