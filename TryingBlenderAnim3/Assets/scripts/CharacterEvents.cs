@@ -16,6 +16,9 @@ public class CharacterEvents : MonoBehaviour
     [SerializeField]
     public GameObject footDust;
 
+    [SerializeField]
+    public GameObject slashEffect;
+
     [Tooltip("Feet transforms used for particle effect postioning. Don't change!")]
     [SerializeField]
     public Transform leftFoot, rightFoot;
@@ -93,6 +96,16 @@ public class CharacterEvents : MonoBehaviour
     #endregion
 
     #region methods called by animation events
+    public void playSlashEffect()
+    {
+        Vector3 pos = transform.position + (0.25f * transform.right) + (1.5f * transform.up);
+        //Quaternion rot = transform.rotation * Quaternion.AngleAxis(-90f, transform.up)/* * Quaternion.AngleAxis(90f, Vector3.forward)*/;
+        //GameObject slashEffectClone = Instantiate(slashEffect, pos, rot);
+        GameObject slashEffectClone = Instantiate(slashEffect, pos, transform.rotation);
+        slashEffectClone.GetComponent<ParticleSystem>().Play();
+        Destroy(slashEffectClone, 1.0f);
+    }
+
     public void spawnFootDust(int doLeftFoot)
     {
         GameObject footDustClone = null;

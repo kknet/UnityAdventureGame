@@ -209,6 +209,13 @@ public class DevCombat : MonoBehaviour
         while (myAnimator.GetCurrentAnimatorStateInfo(0).IsTag("attacking"))
             yield return null;
 
+        bool testing1 = true;
+        if (testing1)
+        {
+            myAnimator.SetInteger("quickAttack", 1);
+            yield break;
+        }
+
         float dist = Vector3.Distance(transform.position, CurrentEnemy.transform.position);
         float firstAttackTravelDist = targetMatching.margins[0] + targetMatching.desiredDistances[0];
 
