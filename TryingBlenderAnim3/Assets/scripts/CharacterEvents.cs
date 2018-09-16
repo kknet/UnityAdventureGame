@@ -17,7 +17,9 @@ public class CharacterEvents : MonoBehaviour
     public GameObject footDust;
 
     [SerializeField]
-    public GameObject slashEffect1, slashEffect1Mirrored;
+    public GameObject slashEffect1, slashEffect1Mirrored,
+                      slashEffect2, slashEffect2Mirrored,
+                      slashEffect3, slashEffect3Mirrored;
 
     [Tooltip("Feet transforms used for particle effect postioning. Don't change!")]
     [SerializeField]
@@ -115,6 +117,32 @@ public class CharacterEvents : MonoBehaviour
             {
                 pos = transform.position + (0.25f * transform.right) + (1.5f * transform.up);
                 slashEffectClone = Instantiate(slashEffect1, pos, rot, transform);
+            }
+        }
+        else if (attackIndex == 2)
+        {
+            if (mirrored)
+            {
+                pos = transform.position + (-0.13f * transform.right) + (1.6f * transform.up);
+                slashEffectClone = Instantiate(slashEffect2Mirrored, pos, rot, transform);
+            }
+            else
+            {
+                pos = transform.position + (0f * transform.right) + (1.75f * transform.up) + (-0.5f * transform.forward);
+                slashEffectClone = Instantiate(slashEffect2, pos, rot, transform);
+            }
+        }
+        else if (attackIndex == 3)
+        {
+            if (mirrored)
+            {
+                pos = transform.position + (-0.6f * transform.right) + (0.6f * transform.up) + (0.2f * transform.forward);
+                slashEffectClone = Instantiate(slashEffect3Mirrored, pos, rot, transform);
+            }
+            else
+            {
+                pos = transform.position + (0.35f * transform.right) + (0.6f * transform.up) + (0.2f * transform.forward);
+                slashEffectClone = Instantiate(slashEffect3, pos, rot, transform);
             }
         }
 
