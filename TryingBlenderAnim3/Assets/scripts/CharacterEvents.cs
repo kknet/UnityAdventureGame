@@ -101,7 +101,7 @@ public class CharacterEvents : MonoBehaviour
         Vector3 pos = transform.position + (0.25f * transform.right) + (1.5f * transform.up);
         //Quaternion rot = transform.rotation * Quaternion.AngleAxis(-90f, transform.up)/* * Quaternion.AngleAxis(90f, Vector3.forward)*/;
         //GameObject slashEffectClone = Instantiate(slashEffect, pos, rot);
-        GameObject slashEffectClone = Instantiate(slashEffect, pos, transform.rotation);
+        GameObject slashEffectClone = Instantiate(slashEffect, pos, transform.rotation, transform);
         slashEffectClone.GetComponent<ParticleSystem>().Play();
         Destroy(slashEffectClone, 1.0f);
     }
