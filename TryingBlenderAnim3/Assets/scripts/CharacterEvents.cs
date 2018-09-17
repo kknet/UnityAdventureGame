@@ -111,25 +111,25 @@ public class CharacterEvents : MonoBehaviour
             if (mirrored)
             {
                 pos = transform.position + (-0.507f * transform.right) + (1.433f * transform.up);
-                slashEffectClone = Instantiate(slashEffect1Mirrored, pos, rot, transform);
+                slashEffectClone = Instantiate(slashEffect1Mirrored, pos, rot);
             }
             else
             {
                 pos = transform.position + (0.507f * transform.right) + (1.433f * transform.up);
-                slashEffectClone = Instantiate(slashEffect1, pos, rot, transform);
+                slashEffectClone = Instantiate(slashEffect1, pos, rot);
             }
         }
         else if (attackIndex == 2)
         {
             if (mirrored)
             {
-                pos = transform.position + (0.1f * transform.right) + (1.4f * transform.up) + (-0.4f * transform.forward);
-                slashEffectClone = Instantiate(slashEffect2Mirrored, pos, rot, transform);
+                pos = transform.position + (0.1f * transform.right) + (1.4f * transform.up) + (-0.2f * transform.forward);
+                slashEffectClone = Instantiate(slashEffect2Mirrored, pos, rot);
             }
             else
             {
                 pos = transform.position + (0.2f * transform.right) + (1.7f * transform.up) + (-0.5f * transform.forward);
-                slashEffectClone = Instantiate(slashEffect2, pos, rot, transform);
+                slashEffectClone = Instantiate(slashEffect2, pos, rot);
             }
         }
         else if (attackIndex == 3)
@@ -137,12 +137,12 @@ public class CharacterEvents : MonoBehaviour
             if (mirrored)
             {
                 pos = transform.position + (-0.6f * transform.right) + (0.6f * transform.up) + (0.2f * transform.forward);
-                slashEffectClone = Instantiate(slashEffect3Mirrored, pos, rot, transform);
+                slashEffectClone = Instantiate(slashEffect3Mirrored, pos, rot);
             }
             else
             {
                 pos = transform.position + (0.35f * transform.right) + (0.6f * transform.up) + (0.2f * transform.forward);
-                slashEffectClone = Instantiate(slashEffect3, pos, rot, transform);
+                slashEffectClone = Instantiate(slashEffect3, pos, rot);
             }
         }
 

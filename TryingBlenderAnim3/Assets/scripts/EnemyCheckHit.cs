@@ -45,7 +45,7 @@ public class EnemyCheckHit : MonoBehaviour
                 recoveringFromHit = true;
                 Direction enemyFallDirection = DevToEnemyHitDirection();
                 HurtReaction(enemyFallDirection);
-                StartCoroutine(animatorSpeedChanges(enemyFallDirection));
+                StartCoroutine(animatorSpeedChanges());
             }
         }
     }
@@ -106,7 +106,7 @@ public class EnemyCheckHit : MonoBehaviour
         return false;
     }
 
-    IEnumerator translateEnemyFall(Direction enemyFallDirection)
+    IEnumerator translateEnemyFall()
     {
         float tt = 0f;
         float multiplier = 0.045f;
@@ -134,7 +134,7 @@ public class EnemyCheckHit : MonoBehaviour
         recoveringFromHit = false;
     }
 
-    IEnumerator animatorSpeedChanges(Direction enemyFallDirection)
+    IEnumerator animatorSpeedChanges()
     {
         Animator devAnimator = DevMain.Player.GetComponent<Animator>();
         animator.speed = 0f;
@@ -148,7 +148,7 @@ public class EnemyCheckHit : MonoBehaviour
 
         yield return new WaitForSecondsRealtime(0.05f);
 
-        StartCoroutine(translateEnemyFall(enemyFallDirection));
+        StartCoroutine(translateEnemyFall());
 
         while (animator.speed < 1f)
         {

@@ -34,7 +34,7 @@ public class ManageTargetEnemy : MonoBehaviour {
         if (Mathf.Abs(mouseX) < threshold)
             return;
 
-        Debug.Log("Mouse X: " + mouseX);
+        //Debug.Log("Mouse X: " + mouseX);
 
         //KeepListOfTargets();
         chosenTap = PickTarget(mouseX);
