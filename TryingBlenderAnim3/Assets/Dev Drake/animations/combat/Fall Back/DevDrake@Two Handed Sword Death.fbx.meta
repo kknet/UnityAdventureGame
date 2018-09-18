@@ -140,7 +140,7 @@ ModelImporter:
     - serializedVersion: 16
       name: Fall Back
       takeName: mixamo.com
-      firstFrame: 0
+      firstFrame: 76
       lastFrame: 144
       wrapMode: 0
       orientationOffsetY: 0

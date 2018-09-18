@@ -61,6 +61,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Assets\CheckHitDeflectorShield.cs" />
     <Compile Include="Assets\EnsureAttackStopped.cs" />
     <Compile Include="Assets\Environment\NatureStarterKit2\Standard Assets\Effects\ImageEffects\Scripts\Antialiasing.cs" />
     <Compile Include="Assets\Environment\NatureStarterKit2\Standard Assets\Effects\ImageEffects\Scripts\Bloom.cs" />
