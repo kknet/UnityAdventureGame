@@ -83,8 +83,11 @@ public class DevCombat : MonoBehaviour
 
         if (leftMousePressedTime > 0f && (Time.time - leftMousePressedTime > twoButtonPressTimeMax) && !characterController.rolling()) //quick attack
         {
-            leftMousePressedTime = 0f;
-            triggerQuickAttack();
+            if(myAnimator.GetCurrentAnimatorStateInfo(0).IsTag("Running"))
+            {
+                leftMousePressedTime = 0f;
+                triggerQuickAttack();
+            }
         }
 
         if (spaceBarPressed && !myAnimator.GetBool("Dodge") && characterController.inCombatMode()) //roll

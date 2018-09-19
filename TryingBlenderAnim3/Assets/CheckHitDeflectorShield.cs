@@ -9,11 +9,14 @@ public class CheckHitDeflectorShield : MonoBehaviour {
     Rigidbody rb;
     Collider hurtCollider;
     TargetMatching targetMatching;
+    DevCombat devCombat;
+    EnemyDeflectShieldController enemyDeflect;
 
-    bool deflectingEnabled = true;
+    [HideInInspector] public bool deflectingEnabled;
 
     private void Awake()
     {
+        devCombat = GetComponent<DevCombat>();
         targetMatching = GetComponent<TargetMatching>();
         animator = GetComponent<Animator>();
         rb = GetComponent<Rigidbody>();
@@ -38,6 +41,9 @@ public class CheckHitDeflectorShield : MonoBehaviour {
 
     private void FixedUpdate()
     {
+        enemyDeflect = devCombat.CurrentEnemy.GetComponent<EnemyDeflectShieldController>();
+        deflectingEnabled = enemyDeflect.DeflectingEnabled();
+
         if (deflectingEnabled && !targetMatching.recoveringFromHit)
         {
             if (CheckHit())
@@ -51,26 +57,24 @@ public class CheckHitDeflectorShield : MonoBehaviour {
     {
         //animator.applyRootMotion = false;
         Debug.Log("hit defector");
+        animator.SetBool("doAttack", false);
         targetMatching.shouldMatchTarget = false;
         animator.InterruptMatchTarget(false);
         targetMatching.recoveringFromHit = true;
 
         animator.speed = 0f;
 
+        yield return new WaitForSecondsRealtime(0.06f);
         if (Random.Range(0f, 1f) > 0.5f)
-            animator.SetFloat("Mirrored", 1.0f);
+            animator.CrossFadeInFixedTime("Knocked Out Mirrored", 0.1f);
         else
-            animator.SetFloat("Mirrored", 0.0f);
-        animator.Play("Fall Back");
-        animator.SetBool("doAttack", false);
-
-        yield return new WaitForSecondsRealtime(0.05f);
+            animator.CrossFadeInFixedTime("Knocked Out", 0.1f);
 
         StartCoroutine(translateFall());
 
         while (animator.speed < 1f)
         {
-            animator.speed += 0.03f;
+            animator.speed += 0.05f;
             yield return new WaitForEndOfFrame();
         }
 
@@ -84,19 +88,21 @@ public class CheckHitDeflectorShield : MonoBehaviour {
     IEnumerator translateFall()
     {
         float tt = 0f;
-        float multiplier = 0.1f;
-        float decrement = multiplier / 100f;
+        float multiplier = 0.3f;
+        float decrement = multiplier / 30f;
 
         float angle = Random.Range(-1f, -10f);
         if (Random.Range(0f, 1f) > 0.5f) angle *= -1f;
         Vector3 direction = Quaternion.AngleAxis(angle, transform.up) * -transform.forward.normalized;
 
-        while (tt < 100f)
+        while (tt < 150f)
         {
             Debug.DrawLine(transform.position + Vector3.up, transform.position + Vector3.up + (30f * direction), Color.magenta);
 
-            float speed = multiplier + (0.25f * (1f - animator.speed));
-            transform.Translate(direction * speed, Space.World);
+            float speed = multiplier/* + (0.1f * Mathf.Pow(1f - animator.speed, 2f))*/;
+
+            if(animator.speed > 0.1f)
+                transform.Translate(direction * speed, Space.World);
 
             //if (animator.speed < 0.6f)
             //    transform.Translate(direction * (multiplier + 0.25f), Space.World);
@@ -104,7 +110,8 @@ public class CheckHitDeflectorShield : MonoBehaviour {
             //    transform.Translate(direction * multiplier, Space.World);
 
             tt += 1f;
-            multiplier = Mathf.Max(multiplier - decrement, 0.01f);
+            multiplier = Mathf.MoveTowards(multiplier, 0f, Time.fixedDeltaTime * multiplier * 1.5f);
+            //multiplier = Mathf.Max(multiplier - decrement, 0.01f);
             yield return new WaitForFixedUpdate();
         }
 

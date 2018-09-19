@@ -26,19 +26,22 @@ public class EnemyCheckHit : MonoBehaviour
     DevCombat devCombat;
     Animator animator;
     Rigidbody rb;
+    CheckHitDeflectorShield deflector;
 
 	// Use this for initialization
 	void Start () {
         animator = GetComponent<Animator>();
         rb = GetComponent<Rigidbody>();
         devCombat = DevMain.Player.GetComponent<DevCombat>();
+        deflector = DevMain.Player.GetComponent<CheckHitDeflectorShield>();
+
         recoveringFromHit = false;
     }
 
     void Update()
     {
         AnimatorStateInfo animState = animator.GetCurrentAnimatorStateInfo(0);
-        if (devCombat.canHit && !recoveringFromHit)
+        if (devCombat.canHit && !recoveringFromHit && !deflector.deflectingEnabled)
         {
             if (CheckHit())
             {
@@ -146,7 +149,10 @@ public class EnemyCheckHit : MonoBehaviour
             yield return null;
         }
 
-        yield return new WaitForSecondsRealtime(0.05f);
+        if (Random.Range(0f, 1f) < 0.25f)
+            yield return new WaitForSecondsRealtime(0.2f);
+        else
+            yield return new WaitForSecondsRealtime(0.07f);
 
         StartCoroutine(translateEnemyFall());
 

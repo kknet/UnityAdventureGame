@@ -9,6 +9,7 @@ public class TargetMatching : MonoBehaviour
     Animator animator;
     Rigidbody rb;
     Collider hurtCollider;
+    CheckHitDeflectorShield deflectorHit;
 
     Vector3 desiredPos;
     Quaternion correctRot;
@@ -49,6 +50,7 @@ public class TargetMatching : MonoBehaviour
 
     private void Awake()
     {
+        deflectorHit = GetComponent<CheckHitDeflectorShield>();
         characterController = GetComponent<CharacterController>();
         devCombat = GetComponent<DevCombat>();
         animator = GetComponent<Animator>();
@@ -69,9 +71,20 @@ public class TargetMatching : MonoBehaviour
 
         Debug.LogWarning("DOING");
 
-
         if (animator.GetCurrentAnimatorStateInfo(0).normalizedTime > matchEndTimes[attackIndex])
             return;
+
+        //if (deflectorHit.deflectingEnabled)
+        //{
+        //    float sphereRadius = 0.5f;
+        //    float distToDesiredPos = Vector3.Distance(transform.position, desiredPos);
+        //    Vector3 dirToDesiredPos = desiredPos - transform.position;
+        //    dirToDesiredPos.Normalize();
+
+        //    attackIndex = animator.GetInteger("quickAttack") - 1;
+        //    distToDesiredPos = Mathf.Max(0f, distToDesiredPos - sphereRadius);
+        //    desiredPos = transform.position + (dirToDesiredPos * distToDesiredPos);
+        //}
 
         animator.MatchTarget(desiredPos, correctRot, AvatarTarget.Root,
             new MatchTargetWeightMask(new Vector3(1, 1, 1), 0),
@@ -93,6 +106,10 @@ public class TargetMatching : MonoBehaviour
         Vector3 dir = enemyPos - curPos;
         dir.Normalize();
 
+        float sphereRadius = 0.5f;
+        if (deflectorHit.deflectingEnabled)
+            enemyPos = enemyPos - (dir * sphereRadius);
+
         attackIndex = animator.GetInteger("quickAttack") - 1;
         correctRot = Quaternion.LookRotation(characterController.currentEnemyLookDirection());
         desiredPos = enemyPos - (desiredDistances[attackIndex] * dir);
@@ -102,8 +119,6 @@ public class TargetMatching : MonoBehaviour
         {
             shouldMatchTarget = true;
             desiredPos = curPos + (margins[attackIndex] * dir);
-            //desiredPos = curPos + (0.5f * Vector3.Distance(desiredPos, curPos) * dir);
-            //desiredPos = enemyPos - ((margins[attackIndex] + desiredDistances[attackIndex]) * dir);
         }
 
         Debug.LogWarning("SET UP MT: " + (shouldMatchTarget ? "GOOD" : "BAD"));

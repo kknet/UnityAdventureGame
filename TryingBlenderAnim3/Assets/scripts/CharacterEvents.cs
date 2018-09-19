@@ -34,11 +34,14 @@ public class CharacterEvents : MonoBehaviour
     private bool applyJumpTrans;
     private AudioSource[] footSteps;
 
+    CheckHitDeflectorShield deflector;
+
 
     public void Init()
     {
         m_Animator = GetComponent<Animator>();
         footSteps = new AudioSource[]{footstep1, footstep2, footstep3, footstep4};
+        deflector = GetComponent<CheckHitDeflectorShield>();
     }
 
     private float rand(float a, float b)
@@ -100,6 +103,8 @@ public class CharacterEvents : MonoBehaviour
     #region methods called by animation events
     public void playSlashEffect()
     {
+        if (!m_Animator.GetBool("doAttack") && deflector.deflectingEnabled)
+            return;
         int attackIndex = m_Animator.GetInteger("quickAttack");
         bool mirrored = m_Animator.GetFloat("Mirrored") > 0f;
         Vector3 pos = Vector3.zero;
