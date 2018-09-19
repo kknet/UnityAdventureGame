@@ -19,7 +19,8 @@ public class DevCombat : MonoBehaviour
     public bool canHit;
 
     [HideInInspector] public Quaternion rollRotation;
-
+    [HideInInspector] public bool startRolling;
+    [HideInInspector] public bool startAttacking;
     private CharacterController characterController;
     private Animator myAnimator;
     private Camera cam;
@@ -38,6 +39,7 @@ public class DevCombat : MonoBehaviour
 
     private bool needToAttack, doneLerping, needsRunningAnimation;
 
+    private bool blockingEnabled = false;
     private bool alwaysLocked = false;
 
     [HideInInspector] public bool Locked;
@@ -65,7 +67,7 @@ public class DevCombat : MonoBehaviour
         jumpAttackStartingOffset = 3.7f;
     }
 
-    public void ProcessInputs(bool interact, bool leftMousePressed, bool rightMouseHeld, bool rightMouseReleased, bool spaceBarPressed, bool stealthAttack)
+    public void ProcessInputs(bool interact, bool rightMouseHeld, bool rightMouseReleased, bool stealthAttack)
     {
         if (stealthAttack)
         {
@@ -73,7 +75,7 @@ public class DevCombat : MonoBehaviour
             return;
         }
 
-        if (rightMouseReleased) //unblock 
+        if (blockingEnabled && rightMouseReleased) //unblock 
             myAnimator.SetBool("isBlocking", false);
 
         if (alwaysLocked)
@@ -81,30 +83,24 @@ public class DevCombat : MonoBehaviour
         else if (interact) //locking
             Locked = !Locked;
 
-        if (leftMousePressedTime > 0f && (Time.time - leftMousePressedTime > twoButtonPressTimeMax) && !characterController.rolling()) //quick attack
+        if (startAttacking) //quick attack
         {
-            if(myAnimator.GetCurrentAnimatorStateInfo(0).IsTag("Running"))
-            {
-                leftMousePressedTime = 0f;
-                triggerQuickAttack();
-            }
+            startAttacking = false;
+            triggerQuickAttack();
         }
 
-        if (spaceBarPressed && !myAnimator.GetBool("Dodge") && characterController.inCombatMode()) //roll
+        if (startRolling) //roll
         {
+            startRolling = false;
             myAnimator.SetBool("Dodge", true);
             stopAttack();
             DisableHits();
             myAnimator.InterruptMatchTarget(false);
         }
-        else if (rightMouseHeld && !characterController.rolling()) //block
+        else if (blockingEnabled && rightMouseHeld && !characterController.rolling()) //block
         {
             stopAttack();
             myAnimator.SetBool("isBlocking", true);
-        }
-        else if (leftMousePressed && !characterController.rolling()) //quick attack
-        {
-            handleLeftMousePressed();
         }
 
         if (myAnimator.GetCurrentAnimatorStateInfo(0).IsTag("attacking"))
@@ -289,7 +285,7 @@ public class DevCombat : MonoBehaviour
     public bool attacking()
     {
         AnimatorStateInfo info = myAnimator.GetCurrentAnimatorStateInfo(0);
-        return info.IsName("quick_1") || info.IsName("quick_2") || info.IsName("quick_3") || info.IsName("jump attack") || info.IsName("flip attack");
+        return info.IsTag("attacking");
     }
     #endregion
 

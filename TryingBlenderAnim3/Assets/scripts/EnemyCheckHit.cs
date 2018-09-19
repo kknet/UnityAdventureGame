@@ -96,6 +96,9 @@ public class EnemyCheckHit : MonoBehaviour
 
     bool CheckHit()
     {
+        if (!devCombat.attacking())
+            return false;
+        
         Collider[] cols = Physics.OverlapBox(hurtCollider.bounds.center, hurtCollider.bounds.extents,
             hurtCollider.transform.rotation, LayerMask.GetMask("AttackBox"));
         foreach (Collider other in cols)

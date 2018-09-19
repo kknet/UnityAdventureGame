@@ -57,9 +57,15 @@ public class InputController : MonoBehaviour
 
         controlsManager.updateRecentInputDevice();
 
-        if(characterController.jumpEnabled)
+        if (characterController.jumpEnabled)
+        {
             if (controlsManager.GetButtonDown(ControlsManager.ButtonType.Jump))
                 StartCoroutine(BufferedJump()); //allows you to press jump slightly (10 frames) before you hit the ground.
+        }
+        else if (controlsManager.GetButtonDown(ControlsManager.ButtonType.Jump)) //rolling
+            StartCoroutine(BufferedRoll()); //allows you to press rolling slightly (10 frames) before you stop rolling.
+        else if (InputController.controlsManager.GetButtonDown(ControlsManager.ButtonType.Attack)) //rolling
+            StartCoroutine(BufferedAttack()); //allows you to press attack slightly (10 frames) before you stop attacking.
     }
 
     void HandleInputs()
@@ -71,7 +77,7 @@ public class InputController : MonoBehaviour
         {
             characterController.forwardAmount = 0f;
             GetComponent<Animator>().SetFloat("Forward", 0f);
-            characterController.ProcessInputs(Vector3.zero, false, false);
+            characterController.ProcessInputs(Vector3.zero, false);
             if (cameraEnabled) cameraController.PhysicsUpdate();
             return;
         }
@@ -85,12 +91,11 @@ public class InputController : MonoBehaviour
         bool leftMousePressed = InputController.controlsManager.GetButtonDown(ControlsManager.ButtonType.Attack);
         bool rightMouseHeld = Input.GetKey(KeyCode.Mouse1);
         bool rightMouseReleased = Input.GetKeyUp(KeyCode.Mouse1);
-        bool spaceBarPressed = InputController.controlsManager.GetButtonDown(ControlsManager.ButtonType.Jump);
 
-        SendInputs(h, v, c, interact, walk, leftMousePressed, rightMouseHeld, rightMouseReleased, spaceBarPressed);
+        SendInputs(h, v, c, interact, walk, leftMousePressed, rightMouseHeld, rightMouseReleased);
     }
 
-    void SendInputs(float h, float v, bool c, bool interact, bool walk, bool leftMousePressed, bool rightMouseHeld, bool rightMouseReleased, bool spaceBarPressed)
+    void SendInputs(float h, float v, bool c, bool interact, bool walk, bool leftMousePressed, bool rightMouseHeld, bool rightMouseReleased)
     {
         bool walking = walk && !characterController.jumping() && !characterController.rolling();
         bool rolling = animator.GetBool("Dodge");
@@ -115,10 +120,10 @@ public class InputController : MonoBehaviour
         if (rolling && !characterController.inCombatMode()) m_Move *= 0.8f;
         
         // pass all parameters to character scripts to process and translate inputs into character actions
-        characterController.ProcessInputs(m_Move, spaceBarPressed, toggleCrouching);
+        characterController.ProcessInputs(m_Move, toggleCrouching);
         cameraController.PhysicsUpdate();
         if(combatEnabled)
-            devCombat.ProcessInputs(interact, leftMousePressed, rightMouseHeld, rightMouseReleased, spaceBarPressed, stealthAttack);
+            devCombat.ProcessInputs(interact, rightMouseHeld, rightMouseReleased, stealthAttack);
     }
 
     IEnumerator BufferedJump()
@@ -131,6 +136,52 @@ public class InputController : MonoBehaviour
             {
                 characterController.startJumping = true;
                 Debug.LogWarning("Jumped");
+                break;
+            }
+            else
+            {
+                ++count;
+                yield return new WaitForEndOfFrame();
+            }
+        }
+    }
+
+    IEnumerator BufferedRoll()
+    {
+        int count = 0;
+        int limit = 5;
+        while (count < limit)
+        {
+            if (!animator.GetBool("Dodge") && characterController.inCombatMode())
+            {
+                devCombat.startRolling = true;
+                Debug.LogWarning("Start Rolling");
+                break;
+            }
+            if (!characterController.rolling() && !characterController.inCombatMode() && !characterController.jumping())
+            {
+                characterController.startRolling = true;
+                Debug.LogWarning("Start Rolling");
+                break;
+            }
+            else
+            {
+                ++count;
+                yield return new WaitForEndOfFrame();
+            }
+        }
+    }
+
+    IEnumerator BufferedAttack()
+    {
+        int count = 0;
+        int limit = 50;
+        while (count < limit)
+        {
+            if (characterController.inCombatMode() && animator.GetCurrentAnimatorStateInfo(0).IsTag("Running"))
+            {
+                devCombat.startAttacking = true;
+                Debug.LogWarning("Start Attacking");
                 break;
             }
             else

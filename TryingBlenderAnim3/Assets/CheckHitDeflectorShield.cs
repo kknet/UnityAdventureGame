@@ -26,6 +26,12 @@ public class CheckHitDeflectorShield : MonoBehaviour {
 
     private bool CheckHit()
     {
+        if (!devCombat.attacking())
+            return false;
+
+        //if (animator.GetBool("Dodge"))
+        //    return false;
+
         Collider[] cols = Physics.OverlapBox(hurtCollider.bounds.center, hurtCollider.bounds.extents,
             hurtCollider.transform.rotation, LayerMask.GetMask("DeflectorShield"));
         foreach (Collider other in cols)
@@ -65,10 +71,8 @@ public class CheckHitDeflectorShield : MonoBehaviour {
         animator.speed = 0f;
 
         yield return new WaitForSecondsRealtime(0.06f);
-        if (Random.Range(0f, 1f) > 0.5f)
-            animator.CrossFadeInFixedTime("Knocked Out Mirrored", 0.1f);
-        else
-            animator.CrossFadeInFixedTime("Knocked Out", 0.1f);
+
+        animator.CrossFadeInFixedTime("Knocked Out", 0.1f);
 
         StartCoroutine(translateFall());
 

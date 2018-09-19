@@ -25,6 +25,8 @@ public class CharacterController : MonoBehaviour
     [HideInInspector]
     public bool startJumping;
     [HideInInspector]
+    public bool startRolling;
+    [HideInInspector]
     public bool isGrounded = true;
     [HideInInspector]
     public float forwardAmount;
@@ -129,10 +131,10 @@ public class CharacterController : MonoBehaviour
             }
     }
 
-    public void ProcessInputs (Vector3 move, bool rollPressed, bool crouchToggled)
+    public void ProcessInputs (Vector3 move, bool crouchToggled)
     {
         CalculateForwardMovement(move);
-        UpdateAnimator(move, rollPressed, crouchToggled);
+        UpdateAnimator(move, crouchToggled);
         RotatePlayer(move);
         TranslatePlayer();
         UpdateSounds();
@@ -181,7 +183,7 @@ public class CharacterController : MonoBehaviour
             forwardAmount = 0.33f;
     }
 
-    void UpdateAnimator(Vector3 move, bool rollPressed, bool crouchToggled)
+    void UpdateAnimator(Vector3 move, bool crouchToggled)
     {
         CheckGroundStatus();
 
@@ -196,10 +198,18 @@ public class CharacterController : MonoBehaviour
         }
 
         if (crouchToggled)
-            m_Animator.SetBool("Crouched", !m_Animator.GetBool("Crouched"));
+        {
+            if (crouching())
+                m_Animator.SetFloat("Forward", 0.5f); //when un-crouching, you have to start off walking then go to running
 
-        if (rollPressed && !rolling() && !inCombatMode() && !jumping())
+            m_Animator.SetBool("Crouched", !m_Animator.GetBool("Crouched"));
+        }
+
+        if (startRolling)
+        {
             m_Animator.SetBool("Dodge", true);
+            startRolling = false;
+        }
 
         AnimatorStateInfo info = m_Animator.GetCurrentAnimatorStateInfo(0);
         if (!info.IsTag("roll") && !info.IsTag("Running") && !info.IsTag("crouching"))
