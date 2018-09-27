@@ -2,7 +2,11 @@
 Thumbs.db
 ehthumbs.db
 
-TryingBlenderAnim3/Library
+# =============== #
+# Unity generated #
+# =============== #
+TryingBlenderAnim3/Temp/
+TryingBlenderAnim3/Library/
 
 # Folder config file
 Desktop.ini
