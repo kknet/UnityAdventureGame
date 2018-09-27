@@ -152,7 +152,7 @@ public class EnemyCheckHit : MonoBehaviour
             yield return null;
         }
 
-        if (Random.Range(0f, 1f) < 0.25f)
+        if (Random.Range(0f, 1f) < 0.5f)
             yield return new WaitForSecondsRealtime(0.2f);
         else
             yield return new WaitForSecondsRealtime(0.07f);

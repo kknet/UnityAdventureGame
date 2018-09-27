@@ -50,6 +50,11 @@ public class EnemyCombatAI : MonoBehaviour
         handleAttacking();
     }
 
+    public void stopCastingSpell()
+    {
+        enemyAnim.SetBool("castingSpell", false);
+    }
+
     public void playBattleCry()
     {
         if (strongHit.isPlaying)

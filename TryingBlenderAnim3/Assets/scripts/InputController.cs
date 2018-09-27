@@ -178,7 +178,9 @@ public class InputController : MonoBehaviour
         int limit = 50;
         while (count < limit)
         {
-            if (characterController.inCombatMode() && animator.GetCurrentAnimatorStateInfo(0).IsTag("Running"))
+            AnimatorStateInfo info = animator.GetCurrentAnimatorStateInfo(0);
+            if ( characterController.inCombatMode() && !animator.GetBool("doAttack") 
+                && (!info.IsTag("attacking") || (info.IsTag("attacking") && info.normalizedTime > 0.9f)) )
             {
                 devCombat.startAttacking = true;
                 Debug.LogWarning("Start Attacking");

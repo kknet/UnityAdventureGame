@@ -27,26 +27,50 @@ public class TargetMatching : MonoBehaviour
     private float[] matchEndTimes = {
         0.45f,
         0.45f,
-        0.472f
+        0.472f,
+        0.25f,
+        0.25f
     };
 
     private float[] attackDistances = {
         0.806f,
         0.951f,
-        1.067f
+        1.067f,
+        0.05f,
+        0.05f
     };
 
-    public float[] desiredDistances = {
+    private float[] desiredDistances = {
         1.5f,
         1.5f,
-        2f
+        2f,
+        0.5f,
+        0.5f
     };
 
-    public float[] margins = {
+    private float[] margins = {
         4f,
         6f,
-        6f
+        6f,
+        1.3f,
+        1f
     };
+
+    private int[] attacksByDistance =  {
+        5,
+        4,
+        1,
+        2,
+        3
+    };
+
+    public int[] AttacksByDistance
+    {
+        get
+        {
+            return attacksByDistance;
+        }
+    }
 
     private void Awake()
     {
@@ -57,6 +81,22 @@ public class TargetMatching : MonoBehaviour
         hurtCollider = GetComponent<Collider>();
         rb = GetComponent<Rigidbody>();
         shouldMatchTarget = false;
+    }
+
+    public float[] Margins
+    {
+        get
+        {
+            return margins;
+        }
+    }
+
+    public float[] DesiredDistances
+    {
+        get
+        {
+            return desiredDistances;
+        }
     }
 
     public void MatchTargetUpdate()
@@ -71,26 +111,18 @@ public class TargetMatching : MonoBehaviour
 
         Debug.LogWarning("DOING");
 
-        if (animator.GetCurrentAnimatorStateInfo(0).normalizedTime > matchEndTimes[attackIndex])
+        float normalizedTime = animator.GetCurrentAnimatorStateInfo(0).normalizedTime;
+
+        if (normalizedTime > matchEndTimes[attackIndex])
             return;
 
-        //if (deflectorHit.deflectingEnabled)
-        //{
-        //    float sphereRadius = 0.5f;
-        //    float distToDesiredPos = Vector3.Distance(transform.position, desiredPos);
-        //    Vector3 dirToDesiredPos = desiredPos - transform.position;
-        //    dirToDesiredPos.Normalize();
+        MatchTargetWeightMask mask = new MatchTargetWeightMask(new Vector3(1, 1, 1), 0);
+        float startTime = normalizedTime;
+        float endTime = matchEndTimes[attackIndex];
 
-        //    attackIndex = animator.GetInteger("quickAttack") - 1;
-        //    distToDesiredPos = Mathf.Max(0f, distToDesiredPos - sphereRadius);
-        //    desiredPos = transform.position + (dirToDesiredPos * distToDesiredPos);
-        //}
+        if (attackIndex == 4 || attackIndex == 5) startTime = Mathf.Max(normalizedTime, 0.15f);
 
-        animator.MatchTarget(desiredPos, correctRot, AvatarTarget.Root,
-            new MatchTargetWeightMask(new Vector3(1, 1, 1), 0),
-            animator.GetCurrentAnimatorStateInfo(0).normalizedTime /*0.2f*/,
-            matchEndTimes[attackIndex]
-            );
+        animator.MatchTarget(desiredPos, correctRot, AvatarTarget.Root, mask, startTime, endTime);
     }
 
     public void SetUpMatchTarget()

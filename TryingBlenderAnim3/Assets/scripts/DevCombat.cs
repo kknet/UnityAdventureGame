@@ -86,6 +86,7 @@ public class DevCombat : MonoBehaviour
         if (startAttacking) //quick attack
         {
             startAttacking = false;
+            switchAttackInternal();
             triggerQuickAttack();
         }
 
@@ -173,12 +174,13 @@ public class DevCombat : MonoBehaviour
     {
         float dist = Vector3.Distance(transform.position, CurrentEnemy.transform.position);
         Debug.Log(dist);
-        for(int idx = 0; idx < targetMatching.margins.Length; ++idx)
+        foreach(int closestIdx in targetMatching.AttacksByDistance)
         {
-            if (targetMatching.margins[idx] + targetMatching.desiredDistances[idx] > dist)
+            int idx = closestIdx - 1;
+            if (targetMatching.Margins[idx] + targetMatching.DesiredDistances[idx] > dist)
                 return idx + 1;
         }
-        return targetMatching.margins.Length;
+        return targetMatching.AttacksByDistance[targetMatching.AttacksByDistance.Length];
     }
 
     private void triggerQuickAttack()
@@ -200,44 +202,67 @@ public class DevCombat : MonoBehaviour
 
     public void switchAttack()
     {
+        //StartCoroutine(switchAttackOnceDoneAttacking());
+    }
+
+    private void switchAttackInternal()
+    {
         StartCoroutine(switchAttackOnceDoneAttacking());
     }
 
     IEnumerator switchAttackOnceDoneAttacking()
     {
-        while (myAnimator.GetCurrentAnimatorStateInfo(0).IsTag("attacking"))
-            yield return null;
+        //while (myAnimator.GetCurrentAnimatorStateInfo(0).IsTag("attacking"))
+        //    yield return null;
+
+        //while (myAnimator.GetCurrentAnimatorStateInfo(0).normalizedTime < 0.5f)
+        //    yield return null;
 
         bool testing1 = false;
         if (testing1)
         {
-            myAnimator.SetInteger("quickAttack", 2);
+            myAnimator.SetInteger("quickAttack", 4);
             myAnimator.SetFloat("Mirrored", mirroredAttack() ? 0f : 1f);
             yield break;
         }
 
         float dist = Vector3.Distance(transform.position, CurrentEnemy.transform.position);
-        float firstAttackTravelDist = targetMatching.margins[0] + targetMatching.desiredDistances[0];
-
+        float firstAttackTravelDist = targetMatching.Margins[0] + targetMatching.DesiredDistances[0];
+        int newQA = 0;
         switch (myAnimator.GetInteger("quickAttack"))
         {
             case 1:
-                myAnimator.SetInteger("quickAttack",
-                    (Random.Range(0f, 1f) < 0.5f) ? 3 : 2);
+                newQA = pickAttackByDistance();
+                if (newQA == 1) newQA = Random.Range(0f, 1f) < 0.5f ? 4 : 5;
                 break;
             case 2:
-                myAnimator.SetInteger("quickAttack", Random.Range(0f, 1f) < 0.8f && firstAttackTravelDist < dist ? 3 : 1);
+                newQA =  (Random.Range(0f, 1f) < 0.8f && firstAttackTravelDist < dist) ? 3 : 
+                    Random.Range(0f, 1f) < 0.3f ? 1: Random.Range(0f, 1f) < 0.5f ? 4 : 5;
                 break;
             case 3:
-                myAnimator.SetInteger("quickAttack", Random.Range(0f, 1f) < 0.8f && firstAttackTravelDist < dist ? 2 : 1);
+                newQA = (Random.Range(0f, 1f) < 0.8f && firstAttackTravelDist < dist) ? 2 : 
+                    Random.Range(0f, 1f) < 0.3f ? 1 : Random.Range(0f, 1f) < 0.5f ? 4 : 5;
+                break;
+            case 4:
+                newQA = Random.Range(0f, 1f) < 0.8f ? pickAttackByDistance() : 1;
+                if (newQA == 4) newQA = 5;
+                break;
+            case 5:
+                newQA = Random.Range(0f, 1f) < 0.8f ? pickAttackByDistance() : 1;
+                if (newQA == 5) newQA = 4;
                 break;
             default:
                 Debug.LogAssertion("quickAttack is not set to 1-3, look at DevCombat.cs script");
                 break;
         }
 
+        myAnimator.SetInteger("quickAttack", newQA);
         if (Random.Range(0f, 1f) < 0.7f)
             myAnimator.SetFloat("Mirrored", mirroredAttack() ? 0f : 1f);
+        if (newQA == 4)
+            myAnimator.SetFloat("Mirrored", 0f);
+        else if (newQA == 5)
+            myAnimator.SetFloat("Mirrored", 1f);
     }
 
     #region getters
