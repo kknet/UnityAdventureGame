@@ -17,123 +17,163 @@ public class RockThrowScript : MonoBehaviour {
         Idle,
         Rising,
         Floating,
-        Traveling
+        Striking
     }
+
+    [HideInInspector] public bool startThrow;
 
     public List<RockTuple> rockTuples;
 
-    List<GameObject> rocks;
-    List<Vector3> goalPositions;
-    State rockState;
+    Transform playerTransform;
+    GameObject[] rocks;
+    State[] rockStates;
 
+    private bool testingThrow = true;
 
 	void Start () {
-        rockState = State.Idle;
+        playerTransform = DevMain.Player.transform;
+        rockStates = new State[rockTuples.Count];
+        rocks = new GameObject[rockTuples.Count];
+
+        int idx = 0;
         foreach (RockTuple tuple in rockTuples)
         {
+            rockStates[idx++] = State.Idle;
             tuple.spawnPos.localPosition = tuple.spawnPos.position - transform.position;
             tuple.floatPos.localPosition = tuple.floatPos.position - transform.position;
         }
+
+        startThrow = true;
 	}
+
+    bool allIdle()
+    {
+        foreach(State curState in rockStates)
+            if (!curState.Equals(State.Idle))
+                return false;
+        return true;
+    }
 
     void Update()
     {
-        if (rockState.Equals(State.Idle))
-            StartCoroutine(RockThrow());
+        if (startThrow && allIdle())
+        {
+            startThrow = false;
+            StartCoroutine(handleNewThrow());
+        }
     }
 
-    IEnumerator RockThrow()
+    IEnumerator handleNewThrow()
     {
-        if (!rockState.Equals(State.Idle))
+        for (int rockIdx = 0; rockIdx < rockTuples.Count; ++rockIdx)
+        {
+            StartCoroutine(RockThrow(rockIdx));
+
+            for(int waitFrames = 0; waitFrames < 5; ++waitFrames)
+                yield return new WaitForFixedUpdate();
+        }
+    }
+
+    IEnumerator RockThrow(int rockIdx)
+    {
+        if (!rockStates[rockIdx].Equals(State.Idle))
         {
             Debug.LogError("Already throwing rocks rn!");
             yield break;
         }
 
-        yield return StartCoroutine(Rise());
-        yield return StartCoroutine(Float());
-        yield return StartCoroutine(Travel());
+        yield return StartCoroutine(Rise(rockIdx));
+        yield return StartCoroutine(Float(rockIdx));
+        yield return StartCoroutine(Strike(rockIdx));
     }
 
-    IEnumerator Rise()
+    IEnumerator Rise(int rockIdx)
     {
-        rockState = State.Rising;
-        rocks = new List<GameObject>();
-        goalPositions = new List<Vector3>();
+        rockStates[rockIdx] = State.Rising;
 
-        foreach (RockTuple tuple in rockTuples)
-        {
-            GameObject newRock = GameObject.Instantiate(tuple.rockPrefab, transform.position, Quaternion.LookRotation(Vector3.up), transform);
-            newRock.transform.localPosition = tuple.spawnPos.localPosition;
-            rocks.Add(newRock);
-            goalPositions.Add(tuple.floatPos.localPosition);
-        }
+        RockTuple tuple = rockTuples[rockIdx];
+        GameObject newRock = GameObject.Instantiate(tuple.rockPrefab, transform.position, Quaternion.LookRotation(transform.forward), transform);
+        newRock.transform.localPosition = tuple.spawnPos.localPosition;
+        rocks[rockIdx] = newRock;
 
+        Vector3 goalPos = tuple.floatPos.localPosition;
+        Transform curRock = rocks[rockIdx].transform;
         float distance = float.MaxValue;
-
-        while (distance > 0.001f)
+        while (curRock.gameObject && distance > 0.001f)
         {
-            distance = 0f;
-
-            for (int rockIdx = 0; rockIdx < rocks.Count; ++rockIdx)
-            {
-                Transform curRock = rocks[rockIdx].transform;
-                Vector3 goalPos = goalPositions[rockIdx];
-                curRock.localPosition = Vector3.MoveTowards(curRock.localPosition, goalPos, Time.fixedDeltaTime * 0.5f);
-                distance += Vector3.Distance(curRock.localPosition, goalPos);
-            }
+            curRock.localPosition = Vector3.MoveTowards(curRock.localPosition, goalPos, Time.fixedDeltaTime * 0.5f);
+            distance = Vector3.Distance(curRock.localPosition, goalPos);
 
             yield return new WaitForFixedUpdate();
         }
 
-        Debug.Log("Done Rising");
+        Debug.Log("Done Rising: " + rockIdx);
     }
 
-    IEnumerator Float()
+    IEnumerator Float(int rockIdx)
     {
-        rockState = State.Floating;
+        rockStates[rockIdx] = State.Floating;
 
-        int numFloatIterations = 5;
+        int numFloatIterations = 2;
         float offsetMagnitude = 0.2f;
         float maxSpeed = 0.3f;
-        for (int floatIteration = 0; floatIteration < 10; ++floatIteration)
+        for (int floatIteration = 0; floatIteration < numFloatIterations; ++floatIteration)
         {
-            float speed = 0f;
-            int negativeMultiplier = (floatIteration % 2 == 0) ?  -1 : 1;
+            int negativeMultiplier = (floatIteration % 2 == 0) ? -1 : 1;
             Vector3 direction = Vector3.up.normalized * negativeMultiplier;
             Vector3 posOffset = offsetMagnitude * direction;
 
-            for (int rockIdx = 0; rockIdx < rocks.Count; ++rockIdx)
-            {
-                Vector3 curPos = rocks[rockIdx].transform.localPosition;
-                goalPositions[rockIdx] = curPos + posOffset;
-            }
-
+            Transform curRock = rocks[rockIdx].transform;
+            Vector3 curPos = curRock.localPosition;
+            Vector3 goalPos = curPos + posOffset;
+            float speed = 0f;
             float distance = float.MaxValue;
-            while (distance > 0.001f)
+            while (curRock.gameObject && distance > 0.001f)
             {
-                
                 float t = (1f - Mathf.Abs((distance - (offsetMagnitude / 2f)) / (offsetMagnitude / 2f)));
                 speed = Mathf.Lerp(maxSpeed / 2f, maxSpeed, t);
 
-                distance = 0f;
-                for (int rockIdx = 0; rockIdx < rocks.Count; ++rockIdx)
-                {
-                    Transform curRock = rocks[rockIdx].transform;
-                    Vector3 goalPos = goalPositions[rockIdx];
-                    curRock.localPosition = Vector3.MoveTowards(curRock.localPosition, goalPos, Time.fixedDeltaTime * speed);
-                    distance += Vector3.Distance(curRock.localPosition, goalPos);
-                }
+                curRock.localPosition = Vector3.MoveTowards(curRock.localPosition, goalPos, Time.fixedDeltaTime * speed);
+                distance = Vector3.Distance(curRock.localPosition, goalPos);
 
                 yield return new WaitForFixedUpdate();
             }
         }
 
-        Debug.Log("Done Floating");
+        Debug.Log("Done Floating: " + rockIdx);
     }
 
-    IEnumerator Travel()
+    IEnumerator Strike(int rockIdx)
     {
-        yield break;
+        rockStates[rockIdx] = State.Striking;
+        Vector3 playerPos = playerTransform.position;
+        Vector3 middlePos = playerPos + (7f * playerTransform.forward) + (5f * playerTransform.up);
+        Transform curRock = rocks[rockIdx].transform;
+        Rigidbody rb = curRock.gameObject.GetComponent<Rigidbody>();
+        curRock.parent = null;
+
+        float speed = 1f;
+        float goalSpeed = 8f;
+        float distance = float.MaxValue;
+        //Vector3 goalPos = middlePos;
+        curRock.transform.forward = Vector3.up;
+
+        while (curRock.gameObject && distance > 1f && curRock.position.y > 0.3f)
+        {
+            Vector3 direction = (playerPos - rb.position).normalized;
+            Vector3 rotateAmount = Vector3.Cross(direction, curRock.transform.forward);
+            rb.angularVelocity = -rotateAmount * 8f;
+            rb.velocity = curRock.transform.forward * 20f;
+
+            distance = Vector3.Distance(curRock.position, playerPos);
+            yield return new WaitForFixedUpdate();
+        }
+
+        yield return new WaitForFixedUpdate();
+        if(curRock.gameObject)
+            Destroy(curRock.gameObject);
+        rockStates[rockIdx] = State.Idle;
+        if (testingThrow)
+            startThrow = true;
     }
 }
