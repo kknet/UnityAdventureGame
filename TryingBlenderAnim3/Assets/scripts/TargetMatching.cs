@@ -49,11 +49,19 @@ public class TargetMatching : MonoBehaviour
     };
 
     private float[] margins = {
-        4f,
-        6f,
-        6f,
-        1.3f,
-        1f
+        3f,
+        5f,
+        5f,
+        0.7f,
+        0.7f
+    };
+
+    private float[] totalDistances = {
+        4.5f,
+        6.5f,
+        7f,
+        1.2f,
+        1.2f
     };
 
     private int[] attacksByDistance =  {
@@ -63,6 +71,14 @@ public class TargetMatching : MonoBehaviour
         2,
         3
     };
+
+    public float[] TotalDistances
+    {
+        get
+        {
+            return totalDistances;
+        }
+    }
 
     public int[] AttacksByDistance
     {

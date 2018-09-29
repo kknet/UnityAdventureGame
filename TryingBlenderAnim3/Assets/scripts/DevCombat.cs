@@ -177,10 +177,11 @@ public class DevCombat : MonoBehaviour
         foreach(int closestIdx in targetMatching.AttacksByDistance)
         {
             int idx = closestIdx - 1;
-            if (targetMatching.Margins[idx] + targetMatching.DesiredDistances[idx] > dist)
-                return idx + 1;
+            if (targetMatching.TotalDistances[idx] > dist)
+                if(Random.Range(0f, 1f) < 0.6f)
+                    return closestIdx;
         }
-        return targetMatching.AttacksByDistance[targetMatching.AttacksByDistance.Length];
+        return targetMatching.AttacksByDistance[targetMatching.AttacksByDistance.Length-1];
     }
 
     private void triggerQuickAttack()
@@ -236,12 +237,16 @@ public class DevCombat : MonoBehaviour
                 if (newQA == 1) newQA = Random.Range(0f, 1f) < 0.5f ? 4 : 5;
                 break;
             case 2:
-                newQA =  (Random.Range(0f, 1f) < 0.8f && firstAttackTravelDist < dist) ? 3 : 
-                    Random.Range(0f, 1f) < 0.3f ? 1: Random.Range(0f, 1f) < 0.5f ? 4 : 5;
+                //newQA =  (Random.Range(0f, 1f) < 0.8f && firstAttackTravelDist < dist) ? 3 : 
+                //    Random.Range(0f, 1f) < 0.3f ? 1: Random.Range(0f, 1f) < 0.5f ? 4 : 5;
+                newQA = pickAttackByDistance();
+                if (newQA == 2) newQA = Random.Range(0f, 1f) < 0.5f ? 3 : 1;
                 break;
             case 3:
-                newQA = (Random.Range(0f, 1f) < 0.8f && firstAttackTravelDist < dist) ? 2 : 
-                    Random.Range(0f, 1f) < 0.3f ? 1 : Random.Range(0f, 1f) < 0.5f ? 4 : 5;
+                //newQA = (Random.Range(0f, 1f) < 0.8f && firstAttackTravelDist < dist) ? 2 : 
+                //    Random.Range(0f, 1f) < 0.3f ? 1 : Random.Range(0f, 1f) < 0.5f ? 4 : 5;
+                newQA = pickAttackByDistance();
+                if (newQA == 3) newQA = Random.Range(0f, 1f) < 0.5f ? 2 : 1;
                 break;
             case 4:
                 newQA = Random.Range(0f, 1f) < 0.8f ? pickAttackByDistance() : 1;
