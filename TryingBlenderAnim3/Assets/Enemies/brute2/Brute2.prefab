@@ -26,6 +26,21 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
+--- !u!1 &1051893636929930
+GameObject:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 4300023719684486}
+  m_Layer: 0
+  m_Name: FloatPos
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
 --- !u!1 &1052232253400974
 GameObject:
   m_ObjectHideFlags: 1
@@ -530,6 +545,21 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
+--- !u!1 &1475253004791874
+GameObject:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 4880173177052094}
+  m_Layer: 0
+  m_Name: SpawnPos
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
 --- !u!1 &1477069885405530
 GameObject:
   m_ObjectHideFlags: 1
@@ -715,6 +745,21 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
+--- !u!1 &1577454410040576
+GameObject:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 4276241819651152}
+  m_Layer: 0
+  m_Name: Rock Positioner 1
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
 --- !u!1 &1617319650503464
 GameObject:
   m_ObjectHideFlags: 1
@@ -726,6 +771,21 @@ GameObject:
   - component: {fileID: 82162920008100352}
   m_Layer: 0
   m_Name: Quick Attack
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!1 &1634963701785732
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 4602894337066850}
+  m_Layer: 0
+  m_Name: RockStuff
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -796,6 +856,7 @@ GameObject:
   - component: {fileID: 114373539421324790}
   - component: {fileID: 114461811412413928}
   - component: {fileID: 114184765883175284}
+  - component: {fileID: 114593652620281350}
   m_Layer: 0
   m_Name: Brute2
   m_TagString: Enemy
@@ -1313,6 +1374,34 @@ Transform:
   m_Father: {fileID: 4146422807029780}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!4 &4276241819651152
+Transform:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1577454410040576}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children:
+  - {fileID: 4880173177052094}
+  - {fileID: 4300023719684486}
+  m_Father: {fileID: 4602894337066850}
+  m_RootOrder: 0
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!4 &4300023719684486
+Transform:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1051893636929930}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0.15100479, y: 2.577, z: -1.0499992}
+  m_LocalScale: {x: 0.1, y: 0.1, z: 0.1}
+  m_Children: []
+  m_Father: {fileID: 4276241819651152}
+  m_RootOrder: 1
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!4 &4316146807222748
 Transform:
   m_ObjectHideFlags: 1
@@ -1607,6 +1696,20 @@ Transform:
   m_Father: {fileID: 4191748086098244}
   m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!4 &4602894337066850
+Transform:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1634963701785732}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children:
+  - {fileID: 4276241819651152}
+  m_Father: {fileID: 4669805608565338}
+  m_RootOrder: 3
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!4 &4633222936474136
 Transform:
   m_ObjectHideFlags: 1
@@ -1702,6 +1805,7 @@ Transform:
   - {fileID: 4486292162945808}
   - {fileID: 4146422807029780}
   - {fileID: 4683919323687050}
+  - {fileID: 4602894337066850}
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -1870,6 +1974,19 @@ Transform:
   m_Children:
   - {fileID: 4674264512034600}
   m_Father: {fileID: 4441107728493854}
+  m_RootOrder: 0
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!4 &4880173177052094
+Transform:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1475253004791874}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 0.652, z: -1.0499992}
+  m_LocalScale: {x: 0.1, y: 0.1, z: 0.1}
+  m_Children: []
+  m_Father: {fileID: 4276241819651152}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!4 &4896658272531050
@@ -2722,7 +2839,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ad348097618aa1a4e9986245fde6b6f7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  setBlocking: 0
   setLookAtDev: 1
   quickAttack1: {fileID: 82162920008100352}
   quickAttack2: {fileID: 82550250378681168}
@@ -2742,6 +2858,22 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   hurtCollider: {fileID: 65742838869119346}
   recoveringFromHit: 0
+--- !u!114 &114593652620281350
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1672571178609684}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ab6083a3e67c18a49b4dc391e90d5594, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  rockTuples:
+  - rockPrefab: {fileID: 1070231650050496, guid: 1d8678f73ddb16249b324778a4923884,
+      type: 2}
+    spawnPos: {fileID: 4880173177052094}
+    floatPos: {fileID: 4300023719684486}
 --- !u!114 &114901520402531936
 MonoBehaviour:
   m_ObjectHideFlags: 1

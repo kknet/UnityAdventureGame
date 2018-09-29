@@ -115,8 +115,8 @@ public class EnemyCheckHit : MonoBehaviour
     IEnumerator translateEnemyFall()
     {
         float tt = 0f;
-        float multiplier = 0.045f;
-        float decrement = multiplier / 100f;
+        float multiplier = 0.015f;
+        float decrement = multiplier / 70f;
 
         float angle = Random.Range(-30f, -70f);
         if (devCombat.mirroredAttack()) angle *= -1f;
@@ -127,8 +127,8 @@ public class EnemyCheckHit : MonoBehaviour
         {
             Debug.DrawLine(transform.position + Vector3.up, transform.position + Vector3.up + (30f * direction), Color.magenta);
 
-            if (animator.speed < 0.6f)
-                transform.Translate(direction * (multiplier + 0.25f), Space.World);
+            if (animator.speed < 0.2f)
+                transform.Translate(direction * (multiplier + 0.7f), Space.World);
             else
                 transform.Translate(direction * multiplier, Space.World);
 

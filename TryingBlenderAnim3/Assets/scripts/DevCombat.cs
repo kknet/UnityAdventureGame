@@ -18,7 +18,6 @@ public class DevCombat : MonoBehaviour
     public AudioSource strongHit;
     public bool canHit;
 
-    [HideInInspector] public Quaternion rollRotation;
     [HideInInspector] public bool startRolling;
     [HideInInspector] public bool startAttacking;
     private CharacterController characterController;
@@ -28,16 +27,6 @@ public class DevCombat : MonoBehaviour
     private AudioSource[] enemyAttackReactionSounds;
     private DevCombatReactions devCombatReactionsScript;
     private TargetMatching targetMatching;
-
-    private float[] strongHitCrossFadeTimes, quickAttackOffsets;
-    private string[] quickAttackStateNames;
-
-    private float lerpT, lerpSpeedMultiplier, desiredOffset,
-                         spaceBarPressedTime, leftMousePressedTime,
-                         FPressedTime, twoButtonPressTimeMax,
-                         jumpAttackStartingOffset;
-
-    private bool needToAttack, doneLerping, needsRunningAnimation;
 
     private bool blockingEnabled = false;
     private bool alwaysLocked = false;
@@ -57,14 +46,7 @@ public class DevCombat : MonoBehaviour
         myAnimator = GetComponent<Animator>();
         cam = Camera.main;
         currentType = AttackType.none;
-        quickAttackStateNames = new string[] { "quick_1", "quick_2", "quick_3" };
         enemyAttackReactionSounds = new AudioSource[] { quickAttack, quickAttack2, quickAttack3, quickAttack3 };
-
-        /*variables to tweak*/
-        strongHitCrossFadeTimes = new float[] { 0.2f, 0.2f, 0.05f };
-        quickAttackOffsets = new float[] { 1.8f, 1.8f, 1.0f };
-        twoButtonPressTimeMax = 0.1f;
-        jumpAttackStartingOffset = 3.7f;
     }
 
     public void ProcessInputs(bool interact, bool rightMouseHeld, bool rightMouseReleased, bool stealthAttack)
@@ -162,26 +144,35 @@ public class DevCombat : MonoBehaviour
     void stopRolling()
     {
         myAnimator.SetBool("roll", false);
-        rollRotation = Quaternion.identity;
     }
 
-    private void handleLeftMousePressed()
+    private int pickRandom(int a, int b)
     {
-        leftMousePressedTime = Time.time;
+        return Random.Range(0f, 1f) > 0.5f ? a : b;
     }
 
-    private int pickAttackByDistance()
+    private int pickAttackByDistance(int curAttack)
     {
         float dist = Vector3.Distance(transform.position, CurrentEnemy.transform.position);
         Debug.Log(dist);
-        foreach(int closestIdx in targetMatching.AttacksByDistance)
+
+        if (targetMatching.TotalDistances[targetMatching.AttacksByDistance[0] - 1] > dist)
         {
-            int idx = closestIdx - 1;
-            if (targetMatching.TotalDistances[idx] > dist)
-                if(Random.Range(0f, 1f) < 0.6f)
-                    return closestIdx;
+            if (curAttack == targetMatching.AttacksByDistance[0]) return targetMatching.AttacksByDistance[1];
+            else if (curAttack == targetMatching.AttacksByDistance[1]) return targetMatching.AttacksByDistance[0];
+            else return pickRandom(targetMatching.AttacksByDistance[0], targetMatching.AttacksByDistance[1]);
         }
-        return targetMatching.AttacksByDistance[targetMatching.AttacksByDistance.Length-1];
+        else if (targetMatching.TotalDistances[targetMatching.AttacksByDistance[2] - 1] > dist)
+        {
+            if (curAttack == targetMatching.AttacksByDistance[2]) return pickRandom(targetMatching.AttacksByDistance[2], targetMatching.AttacksByDistance[1]);
+            else return targetMatching.AttacksByDistance[2];
+        }
+        else
+        {
+            if (curAttack == targetMatching.AttacksByDistance[3]) return targetMatching.AttacksByDistance[4];
+            else if (curAttack == targetMatching.AttacksByDistance[4]) return targetMatching.AttacksByDistance[3];
+            else return pickRandom(targetMatching.AttacksByDistance[3], targetMatching.AttacksByDistance[4]);
+        }
     }
 
     private void triggerQuickAttack()
@@ -196,9 +187,6 @@ public class DevCombat : MonoBehaviour
         myAnimator.SetBool("doFlipAttack", false);
         myAnimator.SetBool("doJumpAttack", false);
         currentType = AttackType.none;
-        needToAttack = false;
-        lerpT = 0f;
-        doneLerping = false;
     }
 
     public void switchAttack()
@@ -213,12 +201,6 @@ public class DevCombat : MonoBehaviour
 
     IEnumerator switchAttackOnceDoneAttacking()
     {
-        //while (myAnimator.GetCurrentAnimatorStateInfo(0).IsTag("attacking"))
-        //    yield return null;
-
-        //while (myAnimator.GetCurrentAnimatorStateInfo(0).normalizedTime < 0.5f)
-        //    yield return null;
-
         bool testing1 = false;
         if (testing1)
         {
@@ -227,39 +209,37 @@ public class DevCombat : MonoBehaviour
             yield break;
         }
 
-        float dist = Vector3.Distance(transform.position, CurrentEnemy.transform.position);
-        float firstAttackTravelDist = targetMatching.Margins[0] + targetMatching.DesiredDistances[0];
-        int newQA = 0;
-        switch (myAnimator.GetInteger("quickAttack"))
-        {
-            case 1:
-                newQA = pickAttackByDistance();
-                if (newQA == 1) newQA = Random.Range(0f, 1f) < 0.5f ? 4 : 5;
-                break;
-            case 2:
-                //newQA =  (Random.Range(0f, 1f) < 0.8f && firstAttackTravelDist < dist) ? 3 : 
-                //    Random.Range(0f, 1f) < 0.3f ? 1: Random.Range(0f, 1f) < 0.5f ? 4 : 5;
-                newQA = pickAttackByDistance();
-                if (newQA == 2) newQA = Random.Range(0f, 1f) < 0.5f ? 3 : 1;
-                break;
-            case 3:
-                //newQA = (Random.Range(0f, 1f) < 0.8f && firstAttackTravelDist < dist) ? 2 : 
-                //    Random.Range(0f, 1f) < 0.3f ? 1 : Random.Range(0f, 1f) < 0.5f ? 4 : 5;
-                newQA = pickAttackByDistance();
-                if (newQA == 3) newQA = Random.Range(0f, 1f) < 0.5f ? 2 : 1;
-                break;
-            case 4:
-                newQA = Random.Range(0f, 1f) < 0.8f ? pickAttackByDistance() : 1;
-                if (newQA == 4) newQA = 5;
-                break;
-            case 5:
-                newQA = Random.Range(0f, 1f) < 0.8f ? pickAttackByDistance() : 1;
-                if (newQA == 5) newQA = 4;
-                break;
-            default:
-                Debug.LogAssertion("quickAttack is not set to 1-3, look at DevCombat.cs script");
-                break;
-        }
+        int newQA = pickAttackByDistance(myAnimator.GetInteger("quickAttack"));
+
+        //float dist = Vector3.Distance(transform.position, CurrentEnemy.transform.position);
+        //float firstAttackTravelDist = targetMatching.Margins[0] + targetMatching.DesiredDistances[0];
+        //int newQA = 0;
+        //switch (myAnimator.GetInteger("quickAttack"))
+        //{
+        //    case 1:
+        //        newQA = pickAttackByDistance();
+        //        if (newQA == 1) newQA = Random.Range(0f, 1f) < 0.5f ? 4 : 5;
+        //        break;
+        //    case 2:
+        //        newQA = pickAttackByDistance();
+        //        if (newQA == 2) newQA = Random.Range(0f, 1f) < 0.5f ? 3 : 1;
+        //        break;
+        //    case 3:
+        //        newQA = pickAttackByDistance();
+        //        if (newQA == 3) newQA = Random.Range(0f, 1f) < 0.5f ? 2 : 1;
+        //        break;
+        //    case 4:
+        //        newQA = Random.Range(0f, 1f) < 0.8f ? pickAttackByDistance() : 1;
+        //        if (newQA == 4) newQA = 5;
+        //        break;
+        //    case 5:
+        //        newQA = Random.Range(0f, 1f) < 0.8f ? pickAttackByDistance() : 1;
+        //        if (newQA == 5) newQA = 4;
+        //        break;
+        //    default:
+        //        Debug.LogAssertion("quickAttack is not set to 1-3, look at DevCombat.cs script");
+        //        break;
+        //}
 
         myAnimator.SetInteger("quickAttack", newQA);
         if (Random.Range(0f, 1f) < 0.7f)
@@ -349,7 +329,6 @@ public class DevCombat : MonoBehaviour
     }
     #endregion
 
-    //placeholders
     public void makeEnemyReact() {}
     public void setHitStrong() {}
     #endregion

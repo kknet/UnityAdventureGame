@@ -174,12 +174,15 @@
     <Compile Include="Assets\scripts\MoveDuringJumpAttack.cs" />
     <Compile Include="Assets\scripts\OldCharacterController.cs" />
     <Compile Include="Assets\scripts\OldDevCombat.cs" />
+    <Compile Include="Assets\scripts\OldEnemyCombatAI.cs" />
+    <Compile Include="Assets\scripts\OldEnemyCombatReactions.cs" />
     <Compile Include="Assets\scripts\PersonHit.cs" />
     <Compile Include="Assets\scripts\Priority Queues\GenericPriorityQueue.cs" />
     <Compile Include="Assets\scripts\Priority Queues\GenericPriorityQueueNode.cs" />
     <Compile Include="Assets\scripts\Priority Queues\IFixedSizePriorityQueue.cs" />
     <Compile Include="Assets\scripts\Priority Queues\IPriorityQueue.cs" />
     <Compile Include="Assets\scripts\Priority Queues\SimplePriorityQueue.cs" />
+    <Compile Include="Assets\scripts\RockThrowScript.cs" />
     <Compile Include="Assets\scripts\RootMotionScript.cs" />
     <Compile Include="Assets\scripts\StopBattlecry.cs" />
     <Compile Include="Assets\scripts\StopDying.cs" />

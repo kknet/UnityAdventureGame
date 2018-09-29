@@ -280,7 +280,7 @@ public class OldDevCombat : MonoBehaviour
     void makeEnemyReact(int index)
     {
         //		cam.GetComponent<MouseMovement> ().getClosestEnemyObject().GetComponent<EnemyCombatReactions> ().playReactAnimation (myAnimator.GetInteger("quickAttack"));
-        currentEnemy.GetComponent<EnemyCombatReactions>().playReactAnimation(index);
+        currentEnemy.GetComponent<OldEnemyCombatReactions>().playReactAnimation(index);
     }
 
     bool closeEnoughToAttack()
