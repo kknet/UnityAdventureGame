@@ -10,6 +10,7 @@ public class RockThrowScript : MonoBehaviour {
         public GameObject rockPrefab;
         public Transform spawnPos;
         public Transform floatPos;
+        public float rightMultiplier;
     }
 
     private enum State
@@ -152,18 +153,35 @@ public class RockThrowScript : MonoBehaviour {
         Rigidbody rb = curRock.gameObject.GetComponent<Rigidbody>();
         curRock.parent = null;
 
-        float speed = 1f;
-        float goalSpeed = 8f;
+        float speed = 20f;
+        float goalSpeed = 100f;
+        float turnSpeed = 8f;
+        float goalTurnSpeed = 30f;
         float distance = float.MaxValue;
-        //Vector3 goalPos = middlePos;
-        curRock.transform.forward = Vector3.up;
+        bool shouldSpeedUp = Vector3.Distance(transform.position, playerPos) > 7f;
 
-        while (curRock.gameObject && distance > 1f && curRock.position.y > 0.3f)
+        if (!shouldSpeedUp)
+        {
+            speed = 15f;
+            turnSpeed = 30f;
+        }
+
+        //curRock.transform.forward = Vector3.up;
+        curRock.transform.forward = (Vector3.up + 
+            (rockTuples[rockIdx].rightMultiplier * transform.right) ).normalized;
+
+        while (curRock.gameObject && distance > 1.3f && curRock.position.y > 0.3f)
         {
             Vector3 direction = (playerPos - rb.position).normalized;
             Vector3 rotateAmount = Vector3.Cross(direction, curRock.transform.forward);
-            rb.angularVelocity = -rotateAmount * 8f;
-            rb.velocity = curRock.transform.forward * 20f;
+            rb.angularVelocity = -rotateAmount * turnSpeed;
+            rb.velocity = curRock.transform.forward * speed;
+
+            if (shouldSpeedUp)
+            {
+                speed = Mathf.MoveTowards(speed, goalSpeed, Time.fixedDeltaTime * 50f);
+                turnSpeed = Mathf.MoveTowards(turnSpeed, goalTurnSpeed, Time.fixedDeltaTime * 50f);
+            }
 
             distance = Vector3.Distance(curRock.position, playerPos);
             yield return new WaitForFixedUpdate();
