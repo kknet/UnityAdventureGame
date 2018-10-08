@@ -141,7 +141,7 @@ ModelImporter:
       name: GS Long Distance 3
       takeName: mixamo.com
       firstFrame: 0
-      lastFrame: 127
+      lastFrame: 90
       wrapMode: 0
       orientationOffsetY: 0
       level: 0
@@ -161,20 +161,6 @@ ModelImporter:
       bodyMask: 01000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000
       curves: []
       events:
-      - time: 0.44929746
-        functionName: EnableHits
-        data: 
-        objectReferenceParameter: {instanceID: 0}
-        floatParameter: 0
-        intParameter: 0
-        messageOptions: 0
-      - time: 0.4642857
-        functionName: playSlashEffect
-        data: 
-        objectReferenceParameter: {instanceID: 0}
-        floatParameter: 0
-        intParameter: 0
-        messageOptions: 0
       - time: 0.48114902
         functionName: stopAttack
         data: 
@@ -182,8 +168,15 @@ ModelImporter:
         floatParameter: 0
         intParameter: 0
         messageOptions: 0
-      - time: 0.69169426
-        functionName: DisableHits
+      - time: 0.6622655
+        functionName: playSlashEffect
+        data: 
+        objectReferenceParameter: {instanceID: 0}
+        floatParameter: 0
+        intParameter: 0
+        messageOptions: 0
+      - time: 0.72606516
+        functionName: EnableHits
         data: 
         objectReferenceParameter: {instanceID: 0}
         floatParameter: 0
@@ -191,6 +184,13 @@ ModelImporter:
         messageOptions: 0
       - time: 0.8438061
         functionName: switchAttack
+        data: 
+        objectReferenceParameter: {instanceID: 0}
+        floatParameter: 0
+        intParameter: 0
+        messageOptions: 0
+      - time: 0.95634073
+        functionName: DisableHits
         data: 
         objectReferenceParameter: {instanceID: 0}
         floatParameter: 0

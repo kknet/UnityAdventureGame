@@ -108,7 +108,7 @@ public class RockThrowScript : MonoBehaviour {
             yield return new WaitForFixedUpdate();
         }
 
-        Debug.Log("Done Rising: " + rockIdx);
+        //Debug.Log("Done Rising: " + rockIdx);
     }
 
     IEnumerator Float(int rockIdx)
@@ -141,7 +141,7 @@ public class RockThrowScript : MonoBehaviour {
             }
         }
 
-        Debug.Log("Done Floating: " + rockIdx);
+        //Debug.Log("Done Floating: " + rockIdx);
     }
 
     IEnumerator Strike(int rockIdx)

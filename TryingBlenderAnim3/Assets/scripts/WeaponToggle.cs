@@ -23,7 +23,7 @@ public class WeaponToggle : MonoBehaviour
         myAnimator = GetComponent<Animator>();
         scimitarOut.SetActive(false);
         weaponOut = false;
-        Debug.Log("got here");
+        //Debug.Log("got here");
     }
 
     void Update()

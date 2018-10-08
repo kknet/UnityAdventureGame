@@ -179,7 +179,7 @@ ModelImporter:
       name: GS Short Distance 2
       takeName: mixamo.com
       firstFrame: 0
-      lastFrame: 76
+      lastFrame: 50
       wrapMode: 0
       orientationOffsetY: 0
       level: 0
@@ -199,20 +199,6 @@ ModelImporter:
       bodyMask: 01000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000
       curves: []
       events:
-      - time: 0.3663717
-        functionName: EnableHits
-        data: 
-        objectReferenceParameter: {instanceID: 0}
-        floatParameter: 0
-        intParameter: 0
-        messageOptions: 0
-      - time: 0.539823
-        functionName: DisableHits
-        data: 
-        objectReferenceParameter: {instanceID: 0}
-        floatParameter: 0
-        intParameter: 0
-        messageOptions: 0
       - time: 0.5869034
         functionName: stopAttack
         data: 
@@ -220,8 +206,22 @@ ModelImporter:
         floatParameter: 0
         intParameter: 0
         messageOptions: 0
+      - time: 0.6229373
+        functionName: EnableHits
+        data: 
+        objectReferenceParameter: {instanceID: 0}
+        floatParameter: 0
+        intParameter: 0
+        messageOptions: 0
       - time: 0.8265487
         functionName: switchAttack
+        data: 
+        objectReferenceParameter: {instanceID: 0}
+        floatParameter: 0
+        intParameter: 0
+        messageOptions: 0
+      - time: 0.9216412
+        functionName: DisableHits
         data: 
         objectReferenceParameter: {instanceID: 0}
         floatParameter: 0

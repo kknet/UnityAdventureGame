@@ -43,6 +43,7 @@ public class EnemyCheckHit : MonoBehaviour
         AnimatorStateInfo animState = animator.GetCurrentAnimatorStateInfo(0);
         if (devCombat.canHit && !recoveringFromHit && !deflector.deflectingEnabled)
         {
+            Debug.Log("can hit");
             if (CheckHit())
             {
                 recoveringFromHit = true;

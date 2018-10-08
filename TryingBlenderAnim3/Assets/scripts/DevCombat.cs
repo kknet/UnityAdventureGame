@@ -123,7 +123,7 @@ public class DevCombat : MonoBehaviour
             if (other.Equals(attackCollider))
                 continue;
 
-            Debug.Log("Dev was Hurt by: " + other.transform.root.name);
+            //Debug.Log("Dev was Hurt by: " + other.transform.root.name);
         }
 
         cols = Physics.OverlapBox(attackCollider.bounds.center, attackCollider.bounds.extents,
@@ -204,8 +204,10 @@ public class DevCombat : MonoBehaviour
         bool testing1 = false;
         if (testing1)
         {
-            myAnimator.SetInteger("quickAttack", 4);
-            myAnimator.SetFloat("Mirrored", mirroredAttack() ? 0f : 1f);
+            bool mirrored = mirroredAttack();
+            //myAnimator.SetInteger("quickAttack", mirrored ? 4 : 5);
+            myAnimator.SetInteger("quickAttack", 3);
+            myAnimator.SetFloat("Mirrored", mirrored ? 0f : 1f);
             yield break;
         }
 
