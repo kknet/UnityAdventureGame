@@ -25,11 +25,11 @@ public class TargetMatching : MonoBehaviour
     //};
 
     private float[] matchEndTimes = {
-        0.35f,
+        0.5f,
         0.45f,
-        0.472f,
-        0.25f,
-        0.25f
+        0.29f,
+        0.35f,
+        0.35f
     };
 
     private float[] attackDistances = {
@@ -52,16 +52,16 @@ public class TargetMatching : MonoBehaviour
         3f,
         5f,
         5f,
-        0.7f,
-        0.3f
+        2f,
+        2f
     };
 
     private float[] totalDistances = {
         4.5f,
         6.5f,
         7f,
-        1.2f,
-        0.8f
+        2.5f,
+        2.5f
     };
 
     private int[] attacksByDistance =  {

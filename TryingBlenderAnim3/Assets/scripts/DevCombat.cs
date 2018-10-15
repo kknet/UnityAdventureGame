@@ -154,7 +154,7 @@ public class DevCombat : MonoBehaviour
     private int pickAttackByDistance(int curAttack)
     {
         float dist = Vector3.Distance(transform.position, CurrentEnemy.transform.position);
-        Debug.Log(dist);
+        //Debug.Log(dist);
 
         if (targetMatching.TotalDistances[targetMatching.AttacksByDistance[0] - 1] > dist)
         {

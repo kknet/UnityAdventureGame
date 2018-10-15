@@ -24,17 +24,22 @@ public class EnemyCheckHit : MonoBehaviour
     public Collider hurtCollider;
     public bool recoveringFromHit;
     DevCombat devCombat;
+    CameraShake cameraShake;
     Animator animator;
     Rigidbody rb;
     CheckHitDeflectorShield deflector;
+
+    private int hitCounter = 0;
 
 	// Use this for initialization
 	void Start () {
         animator = GetComponent<Animator>();
         rb = GetComponent<Rigidbody>();
+        cameraShake = Camera.main.GetComponent<CameraShake>();
         devCombat = DevMain.Player.GetComponent<DevCombat>();
         deflector = DevMain.Player.GetComponent<CheckHitDeflectorShield>();
 
+        hitCounter = 0;
         recoveringFromHit = false;
     }
 
@@ -47,9 +52,14 @@ public class EnemyCheckHit : MonoBehaviour
             if (CheckHit())
             {
                 recoveringFromHit = true;
+                ++hitCounter;
+
+                bool fallBack = hitCounter > 2;
+                hitCounter = fallBack ? 0 : hitCounter;
+
                 Direction enemyFallDirection = DevToEnemyHitDirection();
-                HurtReaction(enemyFallDirection);
-                StartCoroutine(animatorSpeedChanges());
+                string anim = HurtReaction(enemyFallDirection, fallBack);
+                StartCoroutine(animatorSpeedChanges(fallBack, anim));
             }
         }
     }
@@ -71,7 +81,7 @@ public class EnemyCheckHit : MonoBehaviour
         else return Direction.Forward;
     }
 
-    void HurtReaction (Direction enemyFallDirection)
+    string HurtReaction (Direction enemyFallDirection, bool fallBack)
     {
         //switch (enemyFallDirection)
         //{
@@ -89,10 +99,24 @@ public class EnemyCheckHit : MonoBehaviour
         //        break;
         //}
 
-        if(devCombat.mirroredAttack())
-            animator.Play("Fall Back Mirrored");
+        string anim = "";
+        if (fallBack)
+        {
+            if (devCombat.mirroredAttack())
+                anim = "Fall Back Mirrored";
+            else
+                anim = "Fall Back";
+        }
         else
-            animator.Play("Fall Back");
+        {
+            if (devCombat.mirroredAttack())
+                anim = "React Right";
+            else
+                anim = "React Left";
+        }
+
+        animator.Play(anim);
+        return anim;
     }
 
     bool CheckHit()
@@ -113,58 +137,92 @@ public class EnemyCheckHit : MonoBehaviour
         return false;
     }
 
-    IEnumerator translateEnemyFall()
+    IEnumerator translateEnemyFall(bool fallBack, string anim)
     {
-        float tt = 0f;
-        float multiplier = 0.015f;
-        float decrement = multiplier / 70f;
-
-        float angle = Random.Range(-30f, -70f);
-        if (devCombat.mirroredAttack()) angle *= -1f;
-        //Vector3 direction = Quaternion.AngleAxis(angle, Vector3.up) * DevMain.Player.transform.forward.normalized;
-        Vector3 direction = Quaternion.AngleAxis(angle, transform.up) * -transform.forward.normalized;
-
-        while (tt < 70f)
+        if (fallBack)
         {
-            Debug.DrawLine(transform.position + Vector3.up, transform.position + Vector3.up + (30f * direction), Color.magenta);
+            float tt = 0f;
+            float multiplier = 0.015f;
+            float initialBoost = 0.7f;
+            float decrement = multiplier / 70f;
 
-            if (animator.speed < 0.2f)
-                transform.Translate(direction * (multiplier + 0.7f), Space.World);
-            else
-                transform.Translate(direction * multiplier, Space.World);
+            float angle = Random.Range(-30f, -70f);
+            if (devCombat.mirroredAttack()) angle *= -1f;
+            //Vector3 direction = Quaternion.AngleAxis(angle, Vector3.up) * DevMain.Player.transform.forward.normalized;
+            Vector3 direction = Quaternion.AngleAxis(angle, transform.up) * -transform.forward.normalized;
 
-            tt += 1f;
-            multiplier = Mathf.Max(multiplier - decrement, 0.01f);
-            yield return null;
+            while (tt < 70f)
+            {
+                Debug.DrawLine(transform.position + Vector3.up, transform.position + Vector3.up + (30f * direction), Color.magenta);
+
+                if (animator.speed < 0.2f)
+                    transform.Translate(direction * (multiplier + initialBoost), Space.World);
+                else
+                    transform.Translate(direction * multiplier, Space.World);
+
+
+                tt += 1f;
+                multiplier = Mathf.Max(multiplier - decrement, 0.01f);
+                yield return null;
+            }
+
+            recoveringFromHit = false;
         }
+        else
+        {
+            float magnitude = Random.Range(0.05f, 0.1f);
+            float angle = Random.Range(-10f, -20f);
 
-        recoveringFromHit = false;
+            if (devCombat.mirroredAttack()) angle *= -1f;
+            Vector3 direction = Quaternion.AngleAxis(angle, transform.up) * -transform.forward.normalized;
+
+            AnimatorStateInfo info = animator.GetCurrentAnimatorStateInfo(0);
+            while (info.normalizedTime < 0.2f && info.IsName(anim))
+            {
+                Debug.Log(magnitude);
+                transform.Translate(direction * magnitude, Space.World);
+                info = animator.GetCurrentAnimatorStateInfo(0);
+                yield return null;
+            }
+        }
     }
 
-    IEnumerator animatorSpeedChanges()
+    IEnumerator animatorSpeedChanges(bool fallBack, string anim)
     {
-        Animator devAnimator = DevMain.Player.GetComponent<Animator>();
-        animator.speed = 0f;
-        devAnimator.speed = 0f;
-        while (animator.speed > 0f)
+        if (fallBack)
         {
-            animator.speed -= 0.05f;
-            devAnimator.speed -= 0.05f;
-            yield return null;
+            Animator devAnimator = DevMain.Player.GetComponent<Animator>();
+            animator.speed = 0f;
+            devAnimator.speed = 0f;
+
+            yield return new WaitForSecondsRealtime(0.2f);
+
+            StartCoroutine(translateEnemyFall(fallBack, anim));
+
+            while (animator.speed < 1f)
+            {
+                animator.speed += 0.05f;
+                devAnimator.speed += 0.05f;
+                yield return null;
+            }
         }
 
-        if (Random.Range(0f, 1f) < 0.2f)
-            yield return new WaitForSecondsRealtime(0.2f);
         else
-            yield return new WaitForSecondsRealtime(0.07f);
-
-        StartCoroutine(translateEnemyFall());
-
-        while (animator.speed < 1f)
         {
-            animator.speed += 0.05f;
-            devAnimator.speed += 0.05f;
-            yield return null;
+
+            //cameraShake.TriggerCameraShake();
+
+            AnimatorStateInfo info = animator.GetCurrentAnimatorStateInfo(0);
+            if(info.normalizedTime < 0.95f)
+                StartCoroutine(translateEnemyFall(fallBack, anim));
+
+            while (info.IsName(anim))
+            {
+                info = animator.GetCurrentAnimatorStateInfo(0);
+                yield return null;
+            }
+
+            recoveringFromHit = false;
         }
     }
 

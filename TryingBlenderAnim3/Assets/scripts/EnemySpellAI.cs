@@ -7,6 +7,7 @@ public class EnemySpellAI : MonoBehaviour {
     GameObject deflectionSphere;
     Animator devAnimator;
     Animator enemyAnimator;
+    RockThrowScript rockThrow;
 
     bool deflectingEnabledForTesting = false;
     bool spellEnabledForTesting = false;
@@ -14,12 +15,17 @@ public class EnemySpellAI : MonoBehaviour {
 	// Use this for initialization
 	void Start () {
         enemyAnimator = GetComponent<Animator>();
+        rockThrow = GetComponent<RockThrowScript>();
         devAnimator = DevMain.Player.GetComponent<Animator>();
         deflectionSphere = transform.GetChild(0).gameObject;
+
         if (deflectingEnabledForTesting)
             StartCoroutine(alternateEveryFewSeconds());
         else
             deflectionSphere.SetActive(false);
+
+        if (!spellEnabledForTesting)
+            rockThrow.enabled = false;
     }
 
     IEnumerator alternateEveryFewSeconds()

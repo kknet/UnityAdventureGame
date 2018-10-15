@@ -148,6 +148,7 @@
     <Compile Include="Assets\scripts\AStarMovement.cs" />
     <Compile Include="Assets\scripts\CameraBob.cs" />
     <Compile Include="Assets\scripts\CameraController.cs" />
+    <Compile Include="Assets\scripts\CameraShake.cs" />
     <Compile Include="Assets\scripts\CharacterController.cs" />
     <Compile Include="Assets\scripts\CharacterEvents.cs" />
     <Compile Include="Assets\scripts\CheckHitDeflectorShield.cs" />

@@ -19,6 +19,7 @@ public class CameraController : MonoBehaviour
     public Transform target;
     public Transform rollingHelper;
     public bool cameraBobEnabled;
+    public bool cameraShakeEnabled;
     public bool cameraCollisionZoom;
     public bool autoAdjustCam;
     public bool drawGizmos;
@@ -26,6 +27,7 @@ public class CameraController : MonoBehaviour
 
     InputController inputController;
     CameraBob cameraBob;
+    CameraShake cameraShake;
     CharacterController characterScript;
     Camera cam;
     Vector3 screenPoint;
@@ -106,6 +108,7 @@ public class CameraController : MonoBehaviour
         inputController = Player.GetComponent<InputController>();
         devCombat = Player.GetComponent<DevCombat>();
         cameraBob = GetComponent<CameraBob>();
+        cameraShake = GetComponent<CameraShake>();
         camScript = GetComponent<CameraController>();
         cam = Camera.main;
         cam.nearClipPlane = 0.01f;
@@ -157,7 +160,8 @@ public class CameraController : MonoBehaviour
         camPos = targetPos + rotation * negDistance + backPosOffset;
         if(cameraBobEnabled)
             camPos = cameraBob.AddCameraBob(camPos, characterScript.m_Animator.GetFloat("Forward"), cameraShouldBob(), characterScript.crouching());
-
+        if (cameraShakeEnabled)
+            camPos = cameraShake.AddCameraShake(camPos);
         Vector3 defaultNegDistance = new Vector3(0.0f, 0.0f, -initialDistance());
         desiredCamPos = targetPos + rotation * defaultNegDistance;
 
