@@ -175,7 +175,7 @@ ModelImporter:
         floatParameter: 0
         intParameter: 0
         messageOptions: 0
-      - time: 0.51798433
+      - time: 0.55838835
         functionName: EnableHits
         data: 
         objectReferenceParameter: {instanceID: 0}

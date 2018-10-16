@@ -25,8 +25,8 @@ public class TargetMatching : MonoBehaviour
     //};
 
     private float[] matchEndTimes = {
-        0.5f,
-        0.45f,
+        0.4f,
+        0.35f,
         0.29f,
         0.35f,
         0.35f
@@ -49,17 +49,17 @@ public class TargetMatching : MonoBehaviour
     };
 
     private float[] margins = {
-        3f,
-        5f,
-        5f,
+        4f,
+        6f,
+        6f,
         2f,
         2f
     };
 
     private float[] totalDistances = {
-        4.5f,
-        6.5f,
-        7f,
+        5.5f,
+        7.5f,
+        8f,
         2.5f,
         2.5f
     };

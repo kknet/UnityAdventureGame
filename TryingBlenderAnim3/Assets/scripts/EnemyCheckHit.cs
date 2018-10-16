@@ -30,6 +30,7 @@ public class EnemyCheckHit : MonoBehaviour
     CheckHitDeflectorShield deflector;
 
     private int hitCounter = 0;
+    private const int fallBackCountThreshold = 4;
 
 	// Use this for initialization
 	void Start () {
@@ -54,7 +55,7 @@ public class EnemyCheckHit : MonoBehaviour
                 recoveringFromHit = true;
                 ++hitCounter;
 
-                bool fallBack = hitCounter > 2;
+                bool fallBack = hitCounter >= fallBackCountThreshold;
                 hitCounter = fallBack ? 0 : hitCounter;
 
                 Direction enemyFallDirection = DevToEnemyHitDirection();
@@ -143,7 +144,8 @@ public class EnemyCheckHit : MonoBehaviour
         {
             float tt = 0f;
             float multiplier = 0.015f;
-            float initialBoost = 0.7f;
+            //float initialBoost = 0.7f;
+            float initialBoost = 1f;
             float decrement = multiplier / 70f;
 
             float angle = Random.Range(-30f, -70f);
@@ -165,13 +167,13 @@ public class EnemyCheckHit : MonoBehaviour
                 multiplier = Mathf.Max(multiplier - decrement, 0.01f);
                 yield return null;
             }
-
-            recoveringFromHit = false;
         }
         else
         {
-            float magnitude = Random.Range(0.05f, 0.1f);
-            float angle = Random.Range(-10f, -20f);
+            //float magnitude = Random.Range(0.05f, 0.1f);
+            //float angle = Random.Range(-10f, -20f);
+            float magnitude = Random.Range(0.1f, 0.2f);
+            float angle = Random.Range(-30f, -50f);
 
             if (devCombat.mirroredAttack()) angle *= -1f;
             Vector3 direction = Quaternion.AngleAxis(angle, transform.up) * -transform.forward.normalized;
@@ -185,16 +187,26 @@ public class EnemyCheckHit : MonoBehaviour
                 yield return null;
             }
         }
+
+        recoveringFromHit = false;
     }
 
     IEnumerator animatorSpeedChanges(bool fallBack, string anim)
     {
+
+        AnimatorStateInfo info = animator.GetCurrentAnimatorStateInfo(0);
+        while (!info.IsName(anim))
+        {
+            info = animator.GetCurrentAnimatorStateInfo(0);
+            yield return null;
+        }
+
+        Animator devAnimator = DevMain.Player.GetComponent<Animator>();
+        animator.speed = 0f;
+        devAnimator.speed = 0f;
+
         if (fallBack)
         {
-            Animator devAnimator = DevMain.Player.GetComponent<Animator>();
-            animator.speed = 0f;
-            devAnimator.speed = 0f;
-
             yield return new WaitForSecondsRealtime(0.2f);
 
             StartCoroutine(translateEnemyFall(fallBack, anim));
@@ -206,23 +218,18 @@ public class EnemyCheckHit : MonoBehaviour
                 yield return null;
             }
         }
-
         else
         {
+            yield return new WaitForSecondsRealtime(0.03f);
 
-            //cameraShake.TriggerCameraShake();
+            StartCoroutine(translateEnemyFall(fallBack, anim));
 
-            AnimatorStateInfo info = animator.GetCurrentAnimatorStateInfo(0);
-            if(info.normalizedTime < 0.95f)
-                StartCoroutine(translateEnemyFall(fallBack, anim));
-
-            while (info.IsName(anim))
+            while (animator.speed < 1f)
             {
-                info = animator.GetCurrentAnimatorStateInfo(0);
+                animator.speed += 0.2f;
+                devAnimator.speed += 0.2f;
                 yield return null;
             }
-
-            recoveringFromHit = false;
         }
     }
 

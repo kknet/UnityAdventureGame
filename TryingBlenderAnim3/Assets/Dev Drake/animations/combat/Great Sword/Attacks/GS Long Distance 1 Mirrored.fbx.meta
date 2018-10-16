@@ -168,15 +168,15 @@ ModelImporter:
         floatParameter: 0
         intParameter: 0
         messageOptions: 0
-      - time: 0.5090067
-        functionName: EnableHits
+      - time: 0.57091564
+        functionName: stopAttack
         data: 
         objectReferenceParameter: {instanceID: 0}
         floatParameter: 0
         intParameter: 0
         messageOptions: 0
-      - time: 0.57091564
-        functionName: stopAttack
+      - time: 0.58577436
+        functionName: EnableHits
         data: 
         objectReferenceParameter: {instanceID: 0}
         floatParameter: 0
