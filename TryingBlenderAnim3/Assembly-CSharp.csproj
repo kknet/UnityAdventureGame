@@ -147,6 +147,7 @@
     <Compile Include="Assets\PostProcessing\Runtime\Utils\MaterialFactory.cs" />
     <Compile Include="Assets\PostProcessing\Runtime\Utils\RenderTextureFactory.cs" />
     <Compile Include="Assets\PostProcessing\Utilities\CustomMotionTexture\ExampleWheelController.cs" />
+    <Compile Include="Assets\RockHitPlayer.cs" />
     <Compile Include="Assets\scripts\AStarMovement.cs" />
     <Compile Include="Assets\scripts\CameraBob.cs" />
     <Compile Include="Assets\scripts\CameraController.cs" />

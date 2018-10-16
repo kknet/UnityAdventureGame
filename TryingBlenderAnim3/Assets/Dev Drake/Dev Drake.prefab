@@ -66,9 +66,10 @@ GameObject:
   - component: {fileID: 114887636510261534}
   - component: {fileID: 114725196006021550}
   - component: {fileID: 114573407896835134}
+  - component: {fileID: 114779848263014544}
   m_Layer: 0
   m_Name: Dev Drake
-  m_TagString: Untagged
+  m_TagString: Player
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -2948,8 +2949,8 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1016785826906548}
-  m_LocalRotation: {x: -0, y: -0.38102865, z: -0, w: 0.9245632}
-  m_LocalPosition: {x: 95.6, y: 0, z: 85.2}
+  m_LocalRotation: {x: -0, y: 0.44924307, z: -0, w: 0.89340955}
+  m_LocalPosition: {x: 93.6769, y: 0, z: 85.432976}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 4050235321397678}
@@ -2959,7 +2960,7 @@ Transform:
   - {fileID: 4925370451783254}
   m_Father: {fileID: 0}
   m_RootOrder: 0
-  m_LocalEulerAnglesHint: {x: 0, y: -44.795002, z: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 53.390003, z: 0}
 --- !u!4 &4603898379416576
 Transform:
   m_ObjectHideFlags: 1
@@ -6157,7 +6158,7 @@ MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1016785826906548}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 7f2622be985699645980499307d4dd80, type: 3}
   m_Name: 
@@ -6202,10 +6203,20 @@ MonoBehaviour:
   quickAttack3: {fileID: 82403090567832940}
   strongHit: {fileID: 82989817162967570}
   canHit: 0
-  rollRotation: {x: 0, y: 0, z: 0, w: 0}
   startRolling: 0
   startAttacking: 0
   Locked: 0
+--- !u!114 &114779848263014544
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1016785826906548}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 370011a53361d3c449bf8cf18213ee17, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!114 &114794440776048536
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -6310,6 +6321,7 @@ MonoBehaviour:
   Unsheath: {fileID: 82740593393496242}
   scimitarIn: {fileID: 1922244371240958}
   scimitarOut: {fileID: 1215617239339596}
+  disabled: 0
 --- !u!136 &136235511472400916
 CapsuleCollider:
   m_ObjectHideFlags: 1

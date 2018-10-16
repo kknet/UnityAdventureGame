@@ -10,7 +10,7 @@ public class EnemySpellAI : MonoBehaviour {
     RockThrowScript rockThrow;
 
     bool deflectingEnabledForTesting = false;
-    bool spellEnabledForTesting = false;
+    bool spellEnabledForTesting = true;
 
 	// Use this for initialization
 	void Start () {
