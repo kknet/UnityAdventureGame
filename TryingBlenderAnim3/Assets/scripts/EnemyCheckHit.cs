@@ -181,7 +181,6 @@ public class EnemyCheckHit : MonoBehaviour
             AnimatorStateInfo info = animator.GetCurrentAnimatorStateInfo(0);
             while (info.normalizedTime < 0.2f && info.IsName(anim))
             {
-                Debug.Log(magnitude);
                 transform.Translate(direction * magnitude, Space.World);
                 info = animator.GetCurrentAnimatorStateInfo(0);
                 yield return null;

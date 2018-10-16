@@ -27,6 +27,8 @@ public class DevCombat : MonoBehaviour
     private AudioSource[] enemyAttackReactionSounds;
     private DevCombatReactions devCombatReactionsScript;
     private TargetMatching targetMatching;
+    private ManageTargetEnemyByKeys manageEnemyTarget;
+    private bool previouslyLocked;
 
     private bool blockingEnabled = false;
     private bool alwaysLocked = false;
@@ -43,10 +45,12 @@ public class DevCombat : MonoBehaviour
         targetMatching = GetComponent<TargetMatching>();
         characterController = GetComponent<CharacterController>();
         devCombatReactionsScript = GetComponent<DevCombatReactions>();
+        manageEnemyTarget = GetComponent<ManageTargetEnemyByKeys>();
         myAnimator = GetComponent<Animator>();
         cam = Camera.main;
         currentType = AttackType.none;
         enemyAttackReactionSounds = new AudioSource[] { quickAttack, quickAttack2, quickAttack3, quickAttack3 };
+        previouslyLocked = false;
     }
 
     public void ProcessInputs(bool interact, bool rightMouseHeld, bool rightMouseReleased, bool stealthAttack)
@@ -68,6 +72,17 @@ public class DevCombat : MonoBehaviour
         if (startAttacking) //quick attack
         {
             startAttacking = false;
+            previouslyLocked = Locked;
+            Locked = true;
+
+            float h = InputController.controlsManager.GetAxis(ControlsManager.ButtonType.Horizontal);
+            float v = InputController.controlsManager.GetAxis(ControlsManager.ButtonType.Vertical);
+            Vector3 keyDir = ((transform.forward.normalized * v) + (transform.right.normalized * h)).normalized;
+
+            DebugExtension.DebugCone(transform.position, keyDir, Color.green, 45f, 5f);
+            //Debug.DrawLine(transform.position, transform.position + (10f * keyDir), Color.green, 5f);
+            manageEnemyTarget.UpdateTargetEnemy(keyDir);
+
             switchAttackInternal();
             triggerQuickAttack();
         }
@@ -99,6 +114,12 @@ public class DevCombat : MonoBehaviour
     public void stopStealthAttack()
     {
         myAnimator.SetBool("Stealth Attack", false);
+    }
+
+    public void RestorePreviousLockingState()
+    {
+        Locked = previouslyLocked;
+        Debug.Log("locked" + Locked);
     }
 
     public void EnableHits()

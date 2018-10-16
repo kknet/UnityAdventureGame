@@ -18,8 +18,10 @@ public class EnsureAttackStopped : StateMachineBehaviour {
 
     override public void OnStateExit(Animator animator, AnimatorStateInfo stateInfo, int layerIndex)
     {
-        animator.GetComponent<DevCombat>().stopAttack();
-        animator.GetComponent<DevCombat>().DisableHits();
+        DevCombat devCombat = animator.GetComponent<DevCombat>();
+        devCombat.stopAttack();
+        devCombat.DisableHits();
+        devCombat.RestorePreviousLockingState();
     }
 
     // OnStateMove is called right after Animator.OnAnimatorMove(). Code that processes and affects root motion should be implemented here

@@ -61,6 +61,8 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Assets\DebugDrawingExtension\DebugExtension.cs" />
+    <Compile Include="Assets\DebugDrawingExtension\Example\Example.cs" />
     <Compile Include="Assets\Environment\NatureStarterKit2\Standard Assets\Effects\ImageEffects\Scripts\Antialiasing.cs" />
     <Compile Include="Assets\Environment\NatureStarterKit2\Standard Assets\Effects\ImageEffects\Scripts\Bloom.cs" />
     <Compile Include="Assets\Environment\NatureStarterKit2\Standard Assets\Effects\ImageEffects\Scripts\BloomAndFlares.cs" />
@@ -168,7 +170,8 @@
     <Compile Include="Assets\scripts\InputController.cs" />
     <Compile Include="Assets\scripts\MaintainLocalPositionDuringRootMotion.cs" />
     <Compile Include="Assets\scripts\ManageHealth.cs" />
-    <Compile Include="Assets\scripts\ManageTargetEnemy.cs" />
+    <Compile Include="Assets\scripts\ManageTargetEnemyByKeys.cs" />
+    <Compile Include="Assets\scripts\ManageTargetEnemyByMouse.cs" />
     <Compile Include="Assets\scripts\mapNode.cs" />
     <Compile Include="Assets\scripts\MapPathfind.cs" />
     <Compile Include="Assets\scripts\MouseMovement.cs" />
@@ -212,6 +215,7 @@
     <None Include="Assets\Environment\NatureStarterKit2\Standard Assets\Effects\GlassRefraction\Shaders\GlassStainedBumpDistort.shader" />
     <None Include="Assets\Environment\NatureStarterKit2\Standard Assets\Effects\ImageEffects\Shaders\_BloomAndFlares\BlendOneOne.shader" />
     <None Include="Assets\SoxAnimationToolkit\ReadMe.txt" />
+    <None Include="Assets\DebugDrawingExtension\readme.txt" />
     <None Include="Assets\Environment\NatureStarterKit2\Standard Assets\Effects\ImageEffects\Shaders\NoiseEffectShaderRGB.shader" />
     <None Include="Assets\Environment\NatureStarterKit2\Standard Assets\Effects\ToonShading\Shaders\ToonBasic.shader" />
     <None Include="Assets\Environment\NatureStarterKit2\Standard Assets\Effects\ImageEffects\Shaders\_DepthOfField\SeparableWeightedBlurDof34.shader" />
