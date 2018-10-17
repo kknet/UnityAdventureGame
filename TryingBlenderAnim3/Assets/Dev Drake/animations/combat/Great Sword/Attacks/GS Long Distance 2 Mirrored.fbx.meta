@@ -155,12 +155,19 @@ ModelImporter:
       loopBlendPositionXZ: 0
       keepOriginalOrientation: 1
       keepOriginalPositionY: 1
-      keepOriginalPositionXZ: 0
+      keepOriginalPositionXZ: 1
       heightFromFeet: 0
       mirror: 1
       bodyMask: 01000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000
       curves: []
       events:
+      - time: 0.0908227
+        functionName: stopAttack
+        data: 
+        objectReferenceParameter: {instanceID: 0}
+        floatParameter: 0
+        intParameter: 0
+        messageOptions: 0
       - time: 0.33584496
         functionName: playSlashEffect
         data: 
@@ -170,13 +177,6 @@ ModelImporter:
         messageOptions: 0
       - time: 0.48369032
         functionName: EnableHits
-        data: 
-        objectReferenceParameter: {instanceID: 0}
-        floatParameter: 0
-        intParameter: 0
-        messageOptions: 0
-      - time: 0.5107702
-        functionName: stopAttack
         data: 
         objectReferenceParameter: {instanceID: 0}
         floatParameter: 0

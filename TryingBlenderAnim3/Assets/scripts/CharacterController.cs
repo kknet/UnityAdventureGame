@@ -175,8 +175,16 @@ public class CharacterController : MonoBehaviour
 
         if (inCombatMode() && InputController.IsInputEnabled())
         {
-            sideAmount = InputController.controlsManager.GetAxis(ControlsManager.ButtonType.Horizontal);
-            forwardAmount = InputController.controlsManager.GetAxis(ControlsManager.ButtonType.Vertical);
+            if (DevCombat.attacking())
+            {
+                sideAmount = 0f;
+                forwardAmount = 0f;
+            }
+            else
+            {
+                sideAmount = InputController.controlsManager.GetAxis(ControlsManager.ButtonType.Horizontal);
+                forwardAmount = InputController.controlsManager.GetAxis(ControlsManager.ButtonType.Vertical);
+            }
         }
 
         if (!inCombatMode() && turnAmount > 0f && forwardAmount < 0.33f)
@@ -229,8 +237,16 @@ public class CharacterController : MonoBehaviour
         {
             if (inCombatMode())
             {
-                m_Animator.SetFloat("Forward", Mathf.MoveTowards(m_Animator.GetFloat("Forward"), forwardAmount, 3f * Time.fixedDeltaTime));
-                m_Animator.SetFloat("HorizSpeed", Mathf.MoveTowards(m_Animator.GetFloat("HorizSpeed"), sideAmount, 3f * Time.fixedDeltaTime));
+                if (DevCombat.attacking())
+                {
+                    m_Animator.SetFloat("Forward", 0f);
+                    m_Animator.SetFloat("HorizSpeed", 0f);
+                }
+                else
+                {
+                    m_Animator.SetFloat("Forward", Mathf.MoveTowards(m_Animator.GetFloat("Forward"), forwardAmount, 3f * Time.fixedDeltaTime));
+                    m_Animator.SetFloat("HorizSpeed", Mathf.MoveTowards(m_Animator.GetFloat("HorizSpeed"), sideAmount, 3f * Time.fixedDeltaTime));
+                }
             }
             else
             {
@@ -268,22 +284,13 @@ public class CharacterController : MonoBehaviour
                     //else
                         transform.Translate(Vector3.forward * Time.fixedDeltaTime * m_RollingSpeedMultiplier);
                 }
-                else
+                else if(!DevCombat.attacking())
                 {
-                    bool attackMoveEnabled = false;
-                    AnimatorStateInfo anim = m_Animator.GetCurrentAnimatorStateInfo(0);
-                    if (attackMoveEnabled && anim.IsTag("attacking"))
-                    {
-                        transform.Translate(Vector3.forward * m_CombatMoveSpeedMultiplier * 0.5f * Time.fixedDeltaTime);
-                    }
-                    else
-                    {
-                        Vector3 fwd = m_Animator.GetFloat("Forward") * Vector3.forward;
-                        Vector3 side = m_Animator.GetFloat("HorizSpeed") * Vector3.right;
-                        Vector3 total = fwd + side;
-                        if (total.magnitude > 1f) total.Normalize();
-                        transform.Translate(total * Time.fixedDeltaTime * m_CombatMoveSpeedMultiplier);
-                    }
+                    Vector3 fwd = m_Animator.GetFloat("Forward") * Vector3.forward;
+                    Vector3 side = m_Animator.GetFloat("HorizSpeed") * Vector3.right;
+                    Vector3 total = fwd + side;
+                    if (total.magnitude > 1f) total.Normalize();
+                    transform.Translate(total * Time.fixedDeltaTime * m_CombatMoveSpeedMultiplier);
                 }
             }
             else

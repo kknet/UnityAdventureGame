@@ -49,19 +49,19 @@ public class TargetMatching : MonoBehaviour
     };
 
     private float[] margins = {
-        3f,
+        4f,
         6f,
         4f,
-        2f,
-        2f
+        3f,
+        3f
     };
 
     private float[] totalDistances = {
-        3.5f,
+        4.5f,
         6.5f,
         6f,
-        2.7f,
-        2.7f
+        3.7f,
+        3.7f
     };
 
     private int[] attacksByDistance =  {
@@ -117,20 +117,24 @@ public class TargetMatching : MonoBehaviour
 
     public void MatchTargetUpdate()
     {
-        if (recoveringFromHit) return;
-        if (!shouldMatchTarget) return;
-        if (!animator.GetCurrentAnimatorStateInfo(0).IsTag("attacking") || !animator.GetBool("doAttack") || animator.GetBool("Dodge"))
+        if (recoveringFromHit || 
+            !shouldMatchTarget || 
+            !animator.GetCurrentAnimatorStateInfo(0).IsTag("attacking") || 
+            animator.GetBool("Dodge"))
         {
+            animator.InterruptMatchTarget(false);
             Debug.LogWarning("NOT");
             return;
         }
 
-        Debug.LogWarning("DOING");
-
         float normalizedTime = animator.GetCurrentAnimatorStateInfo(0).normalizedTime;
 
         if (normalizedTime > matchEndTimes[attackIndex])
+        {
+            animator.InterruptMatchTarget(false);
+            Debug.LogWarning("NOT");
             return;
+        }
 
         MatchTargetWeightMask mask = new MatchTargetWeightMask(new Vector3(1, 1, 1), 0);
         float startTime = normalizedTime;
