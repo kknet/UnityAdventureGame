@@ -30,7 +30,7 @@ public class EnemyCheckHit : MonoBehaviour
     CheckHitDeflectorShield deflector;
 
     private int hitCounter = 0;
-    private const int fallBackCountThreshold = 4;
+    private const int fallBackCountThreshold = 6;
 
 	// Use this for initialization
 	void Start () {
@@ -42,6 +42,11 @@ public class EnemyCheckHit : MonoBehaviour
 
         hitCounter = 0;
         recoveringFromHit = false;
+    }
+
+    public bool fallBackNext()
+    {
+        return hitCounter + 1 >= fallBackCountThreshold;
     }
 
     void Update()
@@ -144,14 +149,13 @@ public class EnemyCheckHit : MonoBehaviour
         {
             float tt = 0f;
             float multiplier = 0.015f;
-            //float initialBoost = 0.7f;
             float initialBoost = 1f;
             float decrement = multiplier / 70f;
 
             float angle = Random.Range(-30f, -70f);
             if (devCombat.mirroredAttack()) angle *= -1f;
-            //Vector3 direction = Quaternion.AngleAxis(angle, Vector3.up) * DevMain.Player.transform.forward.normalized;
-            Vector3 direction = Quaternion.AngleAxis(angle, transform.up) * -transform.forward.normalized;
+            Vector3 direction = Quaternion.AngleAxis(angle, Vector3.up) * DevMain.Player.transform.forward.normalized;
+            //Vector3 direction = Quaternion.AngleAxis(angle, transform.up) * -transform.forward.normalized;
 
             while (tt < 70f)
             {
@@ -170,16 +174,15 @@ public class EnemyCheckHit : MonoBehaviour
         }
         else
         {
-            //float magnitude = Random.Range(0.05f, 0.1f);
-            //float angle = Random.Range(-10f, -20f);
-            float magnitude = Random.Range(0.1f, 0.2f);
-            float angle = Random.Range(-30f, -50f);
+            float magnitude = 0.2f;
+            float angle = Random.Range(-20f, -40f);
 
             if (devCombat.mirroredAttack()) angle *= -1f;
-            Vector3 direction = Quaternion.AngleAxis(angle, transform.up) * -transform.forward.normalized;
+            Vector3 direction = Quaternion.AngleAxis(angle, Vector3.up) * DevMain.Player.transform.forward.normalized;
+            //Vector3 direction = Quaternion.AngleAxis(angle, transform.up) * -transform.forward.normalized;
 
             AnimatorStateInfo info = animator.GetCurrentAnimatorStateInfo(0);
-            while (info.normalizedTime < 0.2f && info.IsName(anim))
+            while (info.normalizedTime < 0.1f && info.IsName(anim))
             {
                 transform.Translate(direction * magnitude, Space.World);
                 info = animator.GetCurrentAnimatorStateInfo(0);
@@ -219,7 +222,9 @@ public class EnemyCheckHit : MonoBehaviour
         }
         else
         {
-            yield return new WaitForSecondsRealtime(0.03f);
+            yield return new WaitForSecondsRealtime(0.02f);
+
+            //yield return new WaitForSecondsRealtime(0.03f);
 
             StartCoroutine(translateEnemyFall(fallBack, anim));
 

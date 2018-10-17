@@ -170,7 +170,7 @@ public class RockThrowScript : MonoBehaviour {
         curRock.transform.forward = (Vector3.up + 
             (rockTuples[rockIdx].rightMultiplier * transform.right) ).normalized;
 
-        while (curRock.gameObject && distance > 1.3f/* && curRock.position.y > 0.3f*/)
+        while (curRock!= null && curRock.gameObject != null && distance > 1.3f/* && curRock.position.y > 0.3f*/)
         {
             Vector3 direction = (playerPos - rb.position).normalized;
             Vector3 rotateAmount = Vector3.Cross(direction, curRock.transform.forward);
@@ -189,7 +189,7 @@ public class RockThrowScript : MonoBehaviour {
         }
 
         yield return new WaitForFixedUpdate();
-        if(curRock.gameObject)
+        if(curRock != null)
             Destroy(curRock.gameObject);
         rockStates[rockIdx] = State.Idle;
         if (testingThrow)

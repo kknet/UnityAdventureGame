@@ -40,7 +40,7 @@ public class CameraController : MonoBehaviour
     Vector3 verticalPosOffset = Vector3.up * 1.5f;
     float horizontalPosOffsetMultiplier = 0.6f;
     float normalDistance = 1.5f;
-    float combatDistance = 2f;
+    float combatDistance = 2.2f;
     float distance;
     float controllerSensitivityMultiplier = 3f;
     [SerializeField] float mouseSensitivityX = 20f;
@@ -356,6 +356,7 @@ public class CameraController : MonoBehaviour
     {
         float multiplierGoal;
         Vector3 direction = transform.right;
+        //multiplierGoal = characterScript.inCombatMode() ? 0.9f : 0.6f;
         multiplierGoal = characterScript.inCombatMode() ? 0.9f : 0.6f;
         horizontalPosOffsetMultiplier = Mathf.Lerp(horizontalPosOffsetMultiplier, multiplierGoal, 3f * Time.fixedDeltaTime);
         return direction * horizontalPosOffsetMultiplier;

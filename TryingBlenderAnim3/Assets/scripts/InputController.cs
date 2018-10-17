@@ -180,7 +180,7 @@ public class InputController : MonoBehaviour
         {
             AnimatorStateInfo info = animator.GetCurrentAnimatorStateInfo(0);
             if ( characterController.inCombatMode() && !animator.GetBool("doAttack") 
-                && (!info.IsTag("attacking") || (info.IsTag("attacking") && info.normalizedTime > 0.9f)) )
+                && (!info.IsTag("attacking") || (info.IsTag("attacking") && info.normalizedTime > 0.99f)) )
             {
                 devCombat.startAttacking = true;
                 Debug.LogWarning("Start Attacking");

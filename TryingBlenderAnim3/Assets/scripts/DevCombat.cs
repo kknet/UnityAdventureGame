@@ -172,12 +172,18 @@ public class DevCombat : MonoBehaviour
         return Random.Range(0f, 1f) > 0.5f ? a : b;
     }
 
+    private bool FallBackAttack()
+    {
+        EnemyCheckHit ech = CurrentEnemy.GetComponent<EnemyCheckHit>();
+        return ech.fallBackNext();
+    }
+
     private int pickAttackByDistance(int curAttack)
     {
         float dist = Vector3.Distance(transform.position, CurrentEnemy.transform.position);
         //Debug.Log(dist);
-
-        if (targetMatching.TotalDistances[targetMatching.AttacksByDistance[0] - 1] > dist)
+        
+        if (!FallBackAttack() && targetMatching.TotalDistances[targetMatching.AttacksByDistance[0] - 1] > dist)
         {
             if (curAttack == targetMatching.AttacksByDistance[0]) return targetMatching.AttacksByDistance[1];
             else if (curAttack == targetMatching.AttacksByDistance[1]) return targetMatching.AttacksByDistance[0];
@@ -190,9 +196,11 @@ public class DevCombat : MonoBehaviour
         }
         else
         {
-            if (curAttack == targetMatching.AttacksByDistance[3]) return targetMatching.AttacksByDistance[4];
-            else if (curAttack == targetMatching.AttacksByDistance[4]) return targetMatching.AttacksByDistance[3];
-            else return pickRandom(targetMatching.AttacksByDistance[3], targetMatching.AttacksByDistance[4]);
+            return targetMatching.AttacksByDistance[4]; //disabling 3 for now
+
+            //if (curAttack == targetMatching.AttacksByDistance[3]) return targetMatching.AttacksByDistance[4];
+            //else if (curAttack == targetMatching.AttacksByDistance[4]) return targetMatching.AttacksByDistance[3];
+            //else return pickRandom(targetMatching.AttacksByDistance[3], targetMatching.AttacksByDistance[4]);
         }
     }
 
