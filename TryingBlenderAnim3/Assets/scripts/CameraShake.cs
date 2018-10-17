@@ -4,34 +4,33 @@ using UnityEngine;
 
 public class CameraShake : MonoBehaviour
 {
-    private enum ShakeState
-    {
-        ToShake,
-        ToNormal
-    }
 
-    private ShakeState state;
     private Vector3 shakeOffset;
 
-    private float magnitude = 0.05f;
+    private const float maxMagnitude = 0.04f;
+    private const float minMagnitude = 0.01f;
+    private const float duration = 0.2f;
+
+    private float magnitude;
+    private float startTime;
 
     private void Start()
     {
         shakeOffset = Vector3.zero;
-        state = ShakeState.ToNormal;
+        magnitude = maxMagnitude;
     }
 
     public Vector3 AddCameraShake(Vector3 normalPosition)
     {
-        if (state.Equals(ShakeState.ToShake))
+        float timeElapsed = Time.fixedTime - startTime;
+        if (timeElapsed < duration)
         {
-            Vector3 curPos = transform.position;
-            curPos = Vector3.MoveTowards(curPos, normalPosition + shakeOffset, Time.fixedDeltaTime * 20f);
+            float timeFraction = Mathf.Max(0f, duration - timeElapsed) / duration;
+            timeFraction = Mathf.Clamp(timeFraction, 0f, 1f);
+            magnitude = Mathf.Lerp(minMagnitude, maxMagnitude, timeFraction);
 
-            if (Vector3.Distance(transform.position, normalPosition + shakeOffset) < 0.000001f)
-                state = ShakeState.ToNormal;
-
-            return curPos;
+            Vector3 shakeOffset = shakeOffset = Random.insideUnitCircle * magnitude;
+            return normalPosition + shakeOffset;
         }
         else
         {
@@ -41,9 +40,7 @@ public class CameraShake : MonoBehaviour
 
     public void TriggerCameraShake()
     {
-        state = ShakeState.ToShake;
-        //shakeOffset = new Vector2(0f, Random.Range(-1f, 1f) * magnitude);
-        shakeOffset = Random.insideUnitSphere * magnitude;
+        startTime = Time.fixedTime;
     }
     
     //private IEnumerator shakeInternal()

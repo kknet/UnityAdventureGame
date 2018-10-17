@@ -222,9 +222,9 @@ public class EnemyCheckHit : MonoBehaviour
         }
         else
         {
-            yield return new WaitForSecondsRealtime(0.02f);
+            cameraShake.TriggerCameraShake();
 
-            //yield return new WaitForSecondsRealtime(0.03f);
+            yield return new WaitForSecondsRealtime(0.02f);
 
             StartCoroutine(translateEnemyFall(fallBack, anim));
 
