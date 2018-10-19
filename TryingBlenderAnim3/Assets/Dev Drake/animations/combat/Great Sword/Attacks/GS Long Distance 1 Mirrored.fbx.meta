@@ -161,25 +161,18 @@ ModelImporter:
       bodyMask: 01000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000
       curves: []
       events:
+      - time: 0.07605829
+        functionName: whooshSound
+        data: 
+        objectReferenceParameter: {instanceID: 0}
+        floatParameter: 0.7
+        intParameter: 0
+        messageOptions: 0
       - time: 0.10372403
         functionName: stopAttack
         data: 
         objectReferenceParameter: {instanceID: 0}
         floatParameter: 0
-        intParameter: 0
-        messageOptions: 0
-      - time: 0.123302385
-        functionName: whooshSound
-        data: 
-        objectReferenceParameter: {instanceID: 0}
-        floatParameter: 0.6
-        intParameter: 0
-        messageOptions: 0
-      - time: 0.32003838
-        functionName: whooshSound
-        data: 
-        objectReferenceParameter: {instanceID: 0}
-        floatParameter: 0.7
         intParameter: 0
         messageOptions: 0
       - time: 0.4581625
@@ -215,6 +208,13 @@ ModelImporter:
         data: 
         objectReferenceParameter: {instanceID: 0}
         floatParameter: 0
+        intParameter: 0
+        messageOptions: 0
+      - time: 0.33656174
+        functionName: whooshSound
+        data: 
+        objectReferenceParameter: {instanceID: 0}
+        floatParameter: 0.8
         intParameter: 0
         messageOptions: 0
       transformMask: []
