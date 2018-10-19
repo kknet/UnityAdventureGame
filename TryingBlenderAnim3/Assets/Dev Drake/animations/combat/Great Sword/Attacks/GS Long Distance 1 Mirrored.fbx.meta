@@ -168,6 +168,20 @@ ModelImporter:
         floatParameter: 0
         intParameter: 0
         messageOptions: 0
+      - time: 0.123302385
+        functionName: whooshSound
+        data: 
+        objectReferenceParameter: {instanceID: 0}
+        floatParameter: 0.6
+        intParameter: 0
+        messageOptions: 0
+      - time: 0.32003838
+        functionName: whooshSound
+        data: 
+        objectReferenceParameter: {instanceID: 0}
+        floatParameter: 0.7
+        intParameter: 0
+        messageOptions: 0
       - time: 0.4581625
         functionName: playSlashEffect
         data: 

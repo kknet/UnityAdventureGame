@@ -31,6 +31,9 @@ public class CharacterEvents : MonoBehaviour
     [Tooltip("Hand transforms used for particle effect postioning. Don't change!")]
     public Transform leftHand, rightHand;
 
+    [SerializeField]
+    public AudioSource whoosh;
+
     private Animator m_Animator;
 
     private int runCounter;
@@ -244,6 +247,12 @@ public class CharacterEvents : MonoBehaviour
     {
         m_Animator.SetBool("shouldFrontFlip", false);
         applyJumpTrans = false;
+    }
+
+    public void whooshSound(float pitch)
+    {
+        whoosh.pitch = pitch;
+        whoosh.Play();
     }
     #endregion
 

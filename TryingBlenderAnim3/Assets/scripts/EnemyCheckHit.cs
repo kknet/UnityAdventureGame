@@ -29,6 +29,8 @@ public class EnemyCheckHit : MonoBehaviour
     Rigidbody rb;
     CheckHitDeflectorShield deflector;
 
+    AudioSource hitSound;
+
     private int hitCounter = 0;
     private const int fallBackCountThreshold = 6;
 
@@ -42,6 +44,7 @@ public class EnemyCheckHit : MonoBehaviour
 
         hitCounter = 0;
         recoveringFromHit = false;
+        hitSound = GetComponent<AudioSource>();
     }
 
     public bool fallBackNext()
@@ -208,13 +211,19 @@ public class EnemyCheckHit : MonoBehaviour
             yield return null;
         }
 
+        hitSound.pitch = Random.Range(0.9f, 1.1f);
+        hitSound.Play();
+
         Animator devAnimator = DevMain.Player.GetComponent<Animator>();
         animator.speed = 0f;
         devAnimator.speed = 0f;
 
         if (fallBack)
         {
-            yield return new WaitForSecondsRealtime(0.2f);
+
+            yield return new WaitForSecondsRealtime(0.1f);
+
+            yield return new WaitForSecondsRealtime(0.1f);
 
             StartCoroutine(translateEnemyFall(fallBack, anim));
 
