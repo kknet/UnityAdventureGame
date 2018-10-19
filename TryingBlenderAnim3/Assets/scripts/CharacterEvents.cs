@@ -21,6 +21,9 @@ public class CharacterEvents : MonoBehaviour
                       slashEffect2, slashEffect2Mirrored,
                       slashEffect3, slashEffect3Mirrored;
 
+    [SerializeField]
+    public GameObject normalSwordParticles, specialSwordParticles;
+
     [Tooltip("Feet transforms used for particle effect postioning. Don't change!")]
     [SerializeField]
     public Transform leftFoot, rightFoot;
@@ -33,15 +36,56 @@ public class CharacterEvents : MonoBehaviour
     private int runCounter;
     private bool applyJumpTrans;
     private AudioSource[] footSteps;
+    private DevCombat devCombat;
 
     CheckHitDeflectorShield deflector;
 
+    bool fallBackEffects;
+
+
+    private const bool oldSlashEnabled = false;
 
     public void Init()
     {
         m_Animator = GetComponent<Animator>();
         footSteps = new AudioSource[]{footstep1, footstep2, footstep3, footstep4};
         deflector = GetComponent<CheckHitDeflectorShield>();
+        devCombat = GetComponent<DevCombat>();
+        normalSwordParticles.gameObject.SetActive(false);
+        specialSwordParticles.gameObject.SetActive(false);
+        fallBackEffects = false;
+    }
+
+    private void Update()
+    {
+        if (devCombat.FallBackAttackNext())
+        {
+            fallBackEffects = true;
+        }
+        else if(fallBackEffects)
+        {
+            if (!devCombat.attacking())
+                fallBackEffects = false;
+        }
+
+
+
+        if (fallBackEffects)
+        {
+            normalSwordParticles.gameObject.SetActive(false);
+            if (devCombat.attacking())
+                specialSwordParticles.gameObject.SetActive(true);
+            else
+                specialSwordParticles.gameObject.SetActive(false);
+        }
+        else
+        {
+            specialSwordParticles.gameObject.SetActive(false);
+            if (devCombat.attacking())
+                normalSwordParticles.gameObject.SetActive(true);
+            else
+                normalSwordParticles.gameObject.SetActive(false);
+        }
     }
 
     private float rand(float a, float b)
@@ -103,6 +147,9 @@ public class CharacterEvents : MonoBehaviour
     #region methods called by animation events
     public void playSlashEffect()
     {
+        if (!oldSlashEnabled)
+            return;
+
         if (!m_Animator.GetBool("doAttack") && deflector.deflectingEnabled)
             return;
         int attackIndex = m_Animator.GetInteger("quickAttack");

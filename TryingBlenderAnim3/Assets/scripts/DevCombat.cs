@@ -172,10 +172,16 @@ public class DevCombat : MonoBehaviour
         return Random.Range(0f, 1f) > 0.5f ? a : b;
     }
 
-    private bool FallBackAttack()
+    public bool FallBackAttackNext()
     {
         EnemyCheckHit ech = CurrentEnemy.GetComponent<EnemyCheckHit>();
         return ech.fallBackNext();
+    }
+
+    public bool FallBackAttackRightNow()
+    {
+        EnemyCheckHit ech = CurrentEnemy.GetComponent<EnemyCheckHit>();
+        return ech.fallBackRightNow();
     }
 
     private int pickAttackByDistance(int curAttack)
@@ -183,7 +189,7 @@ public class DevCombat : MonoBehaviour
         float dist = Vector3.Distance(transform.position, CurrentEnemy.transform.position);
         //Debug.Log(dist);
         
-        if (!FallBackAttack() && targetMatching.TotalDistances[targetMatching.AttacksByDistance[0] - 1] > dist)
+        if (!FallBackAttackNext() && targetMatching.TotalDistances[targetMatching.AttacksByDistance[0] - 1] > dist)
         {
             if (curAttack == targetMatching.AttacksByDistance[0]) return targetMatching.AttacksByDistance[1];
             else if (curAttack == targetMatching.AttacksByDistance[1]) return targetMatching.AttacksByDistance[0];

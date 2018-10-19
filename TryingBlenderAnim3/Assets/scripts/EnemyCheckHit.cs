@@ -49,6 +49,11 @@ public class EnemyCheckHit : MonoBehaviour
         return hitCounter + 1 >= fallBackCountThreshold;
     }
 
+    public bool fallBackRightNow()
+    {
+        return hitCounter == 0;
+    }
+
     void Update()
     {
         AnimatorStateInfo animState = animator.GetCurrentAnimatorStateInfo(0);
