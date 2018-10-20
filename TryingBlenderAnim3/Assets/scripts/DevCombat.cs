@@ -69,22 +69,28 @@ public class DevCombat : MonoBehaviour
         else if (interact) //locking
             Locked = !Locked;
 
+        float h = InputController.controlsManager.GetAxis(ControlsManager.ButtonType.Horizontal);
+        float v = InputController.controlsManager.GetAxis(ControlsManager.ButtonType.Vertical);
+        Vector3 keyDir = ((transform.forward.normalized * v) + (transform.right.normalized * h)).normalized;
+        if (Vector3.Distance(keyDir, Vector3.zero) < 0.01f)
+            keyDir = transform.forward;
+
         if (startAttacking) //quick attack
         {
             startAttacking = false;
             previouslyLocked = Locked;
             Locked = true;
 
-            float h = InputController.controlsManager.GetAxis(ControlsManager.ButtonType.Horizontal);
-            float v = InputController.controlsManager.GetAxis(ControlsManager.ButtonType.Vertical);
-            Vector3 keyDir = ((transform.forward.normalized * v) + (transform.right.normalized * h)).normalized;
-
             DebugExtension.DebugCone(transform.position, keyDir, Color.green, 45f, 5f);
             //Debug.DrawLine(transform.position, transform.position + (10f * keyDir), Color.green, 5f);
-            manageEnemyTarget.UpdateTargetEnemy(keyDir);
+            manageEnemyTarget.UpdateTargetEnemy(keyDir, previouslyLocked);
 
             switchAttackInternal();
             triggerQuickAttack();
+        }
+        else if (!attacking())
+        {
+            manageEnemyTarget.UpdateTargetEnemy(keyDir, Locked);
         }
 
         if (startRolling) //roll

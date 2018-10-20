@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using cakeslice;
 
 public class ManageTargetEnemyByKeys : MonoBehaviour {
 
@@ -9,8 +10,8 @@ public class ManageTargetEnemyByKeys : MonoBehaviour {
     Dictionary<GameObject, float> angles;
     Dictionary<GameObject, float> distances;
 
-    private const float halfAngle = 45f;
-    private const float priorityDistance = 10f;
+    private const float halfAngle = 70f;
+    private const float priorityDistance = 7f;
 
     private void Start()
     {
@@ -18,6 +19,7 @@ public class ManageTargetEnemyByKeys : MonoBehaviour {
         enemies = GameObject.FindGameObjectsWithTag("Enemy");
         InitDicts();
         devCombat.CurrentEnemy = PickTarget(transform.forward.normalized);
+        ToggleOutlines(true);
     }
 
     void Update()
@@ -25,10 +27,29 @@ public class ManageTargetEnemyByKeys : MonoBehaviour {
         Debug.DrawLine(transform.position, transform.position + (transform.forward * priorityDistance), Color.green);
     }
 
-    public void UpdateTargetEnemy(Vector3 keyDir)
+    public void UpdateTargetEnemy(Vector3 keyDir, bool lockedOnToATarget)
     {
-        UpdateDicts(keyDir);
-        devCombat.CurrentEnemy = PickTarget(keyDir);
+        if (lockedOnToATarget)
+        {
+            //keep the target you already have
+            return;
+        }
+        else
+        {
+            UpdateDicts(keyDir);
+
+            if (devCombat.CurrentEnemy != null)
+                ToggleOutlines(false);
+            devCombat.CurrentEnemy = PickTarget(keyDir);
+            ToggleOutlines(true);
+        }
+    }
+
+    private void ToggleOutlines(bool on)
+    {
+        Outline[] allOutlines = devCombat.CurrentEnemy.GetComponentsInChildren<Outline>();
+        foreach (Outline o in allOutlines)
+            o.enabled = on;
     }
 
     private void InitDicts()

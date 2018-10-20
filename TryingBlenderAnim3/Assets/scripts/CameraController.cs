@@ -40,7 +40,8 @@ public class CameraController : MonoBehaviour
     Vector3 verticalPosOffset = Vector3.up * 1.5f;
     float horizontalPosOffsetMultiplier = 0.6f;
     float normalDistance = 1.5f;
-    float combatDistance = 2.2f;
+    //float combatDistance = 2.2f;
+    float combatDistance = 3f;
     float distance;
     float controllerSensitivityMultiplier = 3f;
     [SerializeField] float mouseSensitivityX = 20f;
@@ -59,7 +60,7 @@ public class CameraController : MonoBehaviour
     float moveDirection = -1;
 
     public Reason combatSmoothReason;
-    float combatRotationYAxisSmoothMin = 1f;
+    float combatRotationYAxisSmoothMin = 2f;
     float combatRotationYAxisSmoothRoll = 3f;
     float combatRotationYAxisSmoothMax = 5f;
     float combatRotationYAxisSmooth = 1f;
@@ -297,7 +298,7 @@ public class CameraController : MonoBehaviour
 
     private void UpdateCombatRotationSmooth()
     {
-        if (!characterScript.inCombatMode())
+        if (!characterScript.inCombatMode() || !devCombat.Locked)
         {
             combatRotationYAxisSmooth = combatRotationYAxisSmoothMin;
             combatSmoothReason = Reason.NotInCombat;
@@ -317,7 +318,6 @@ public class CameraController : MonoBehaviour
         float goalY = UnwrapEulerAngle(rollingHelper.eulerAngles.y, previousGoalY);
 
         rotationYAxis = Mathf.Lerp(rotationYAxis, goalY, combatRotationYAxisSmooth * Time.fixedDeltaTime);
-        //rotationYAxis = Mathf.Lerp(rotationYAxis, goalY, 5f * Time.fixedDeltaTime);
 
         previousGoalY = goalY;
     }

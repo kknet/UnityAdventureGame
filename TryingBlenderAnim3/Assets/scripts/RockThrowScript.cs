@@ -100,7 +100,7 @@ public class RockThrowScript : MonoBehaviour {
         Vector3 goalPos = tuple.floatPos.localPosition;
         Transform curRock = rocks[rockIdx].transform;
         float distance = float.MaxValue;
-        while (curRock.gameObject && distance > 0.001f)
+        while (curRock!= null && curRock.gameObject && distance > 0.001f)
         {
             curRock.localPosition = Vector3.MoveTowards(curRock.localPosition, goalPos, Time.fixedDeltaTime * 0.5f);
             distance = Vector3.Distance(curRock.localPosition, goalPos);
@@ -129,7 +129,7 @@ public class RockThrowScript : MonoBehaviour {
             Vector3 goalPos = curPos + posOffset;
             float speed = 0f;
             float distance = float.MaxValue;
-            while (curRock.gameObject && distance > 0.001f)
+            while (curRock != null && curRock.gameObject && distance > 0.001f)
             {
                 float t = (1f - Mathf.Abs((distance - (offsetMagnitude / 2f)) / (offsetMagnitude / 2f)));
                 speed = Mathf.Lerp(maxSpeed / 2f, maxSpeed, t);
