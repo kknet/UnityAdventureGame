@@ -5,7 +5,7 @@ using UnityEngine;
 
 public class CameraBob : MonoBehaviour
 {
-    float maxBobSpeed = 12f;
+    float maxBobSpeed = 6f;
     float maxBobAmountDefault = 0.03f;
     float timer = Mathf.PI / 2;
     float bobAmount, bobSpeed; 

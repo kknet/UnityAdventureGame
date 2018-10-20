@@ -7,10 +7,10 @@ public class CameraShake : MonoBehaviour
 
     private Vector3 shakeOffset;
 
-    private const float maxMagnitude = 0.04f;
+    private const float maxMagnitude = 0.06f;
     private const float minMagnitude = 0.01f;
-    private const float duration = 0.2f;
-
+    private const float duration = 0.3f;
+    
     private float magnitude;
     private float startTime;
 

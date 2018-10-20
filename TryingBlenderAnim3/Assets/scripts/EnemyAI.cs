@@ -42,9 +42,9 @@ public class EnemyAI : MonoBehaviour
 
     private const float rotSpeed = 20f;
     private const float startingHealth = 100f;
-    private const float defaultMoveSpeed = 5f;
-    private const float dashMoveSpeed = 10f;
-    private const float scanMoveSpeed = 2f;
+    private const float defaultMoveSpeed = 1f;
+    private const float dashMoveSpeed = 5f;
+    private const float runToPlayerSpeed = 2f;
     private const float attackDistance = 10f;
     private const float dashFrequency = 5f;
     private const float attackFrequency = 5f;
@@ -82,6 +82,7 @@ public class EnemyAI : MonoBehaviour
     {
         if (state == States.patrol)
         {
+            moveSpeed = defaultMoveSpeed;
             targetIsPlayer = false;
             if (useWaypoints)
             {
@@ -107,12 +108,14 @@ public class EnemyAI : MonoBehaviour
         if (state == States.investigate)
         {
             targetIsPlayer = false;
+            moveSpeed = defaultMoveSpeed;
             targetPos = detection.LastHeardPos;
             move();
         }
 
         if (state == States.runToPlayer)
         {
+            moveSpeed = runToPlayerSpeed;
             alert();
             targetIsPlayer = false;
             targetPos = detection.LastSeenPlayerPos;
@@ -124,12 +127,15 @@ public class EnemyAI : MonoBehaviour
         if (state == States.attack)
         {
             targetIsPlayer = false;
+            moveSpeed = runToPlayerSpeed;
             if (timeSinceLastAttack > attackFrequency)
             {
                 timeSinceLastAttack = 0f;
                 Attack();
             }
         }
+
+        Debug.Log(state);
     }
 
     private States stateDecision()
@@ -227,16 +233,18 @@ public class EnemyAI : MonoBehaviour
 
     private void move()
     {
+        float enemySpeedGoal = 0f;
         if (moveDirection != Vector3.zero)
         {
-            transform.forward = Vector3.RotateTowards(transform.forward, moveDirection, rotSpeed * Time.fixedDeltaTime, 0.0f);
+            transform.forward = Vector3.RotateTowards(transform.forward, moveDirection, rotSpeed * Time.deltaTime, 0.0f);
             Vector3 tempPos = transform.position + (1f * moveDirection);
-            transform.position = Vector3.MoveTowards(transform.position, tempPos, moveSpeed * Time.fixedDeltaTime);
+            transform.position = Vector3.MoveTowards(transform.position, tempPos, moveSpeed * Time.deltaTime);
+            enemySpeedGoal = moveSpeed / dashMoveSpeed * 4f;
         }
-        enemyAnim.SetFloat("enemySpeed", Mathf.MoveTowards(enemyAnim.GetFloat("enemySpeed"), 1f, 5f * Time.fixedDeltaTime));
+        enemyAnim.SetFloat("enemySpeed", Mathf.MoveTowards(enemyAnim.GetFloat("enemySpeed"), enemySpeedGoal, 5f * Time.deltaTime));
     }
 
-    public void FixedUpdate()
+    public void Update()
     {
         timeSinceLastAttack += Time.deltaTime;
         timeSinceLastDash += Time.deltaTime;
@@ -329,7 +337,7 @@ public class EnemyAI : MonoBehaviour
         //for (int i = 0; i < 3; ++i){
         while (state.Equals(States.scan))
         {
-            moveSpeed = scanMoveSpeed;
+            moveSpeed = defaultMoveSpeed;
             SetIdleAnimation();
 
             while (scanLocked) //true means locked, false means open

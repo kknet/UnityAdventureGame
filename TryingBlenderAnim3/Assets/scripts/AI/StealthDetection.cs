@@ -14,7 +14,7 @@ public class StealthDetection : MonoBehaviour
     public GameObject playerOutlinePrefab;
     private const bool outlineEnabled = false;
 
-    [Range(3f, 20f)]
+    [Range(10f, 50f)]
     [Tooltip("How far enemies can see")]
     public float maxLookDistance;
 
