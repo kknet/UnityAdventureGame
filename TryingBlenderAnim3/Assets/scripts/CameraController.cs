@@ -103,9 +103,9 @@ public class CameraController : MonoBehaviour
     #endregion
 
     #region important methods
-    public void Init()
+    public void Start()
     {
-        Player = DevMain.Player;
+        Player = DevRef.Player;
         inputController = Player.GetComponent<InputController>();
         devCombat = Player.GetComponent<DevCombat>();
         cameraBob = GetComponent<CameraBob>();
@@ -138,7 +138,7 @@ public class CameraController : MonoBehaviour
         positionSmoothTime = smoothTime * 2f;
     }
 
-    public void PhysicsUpdate()
+    public void FixedUpdate()
     {
         moveCamera();
 
@@ -401,7 +401,7 @@ public class CollisionHandler
 
     public void Initialize(Camera cam)
     {
-        Player = DevMain.Player;
+        Player = DevRef.Player;
         camera = cam;
         adjustedCameraClipPoints = new Vector3[5];
         desiredCameraClipPoints = new Vector3[5];

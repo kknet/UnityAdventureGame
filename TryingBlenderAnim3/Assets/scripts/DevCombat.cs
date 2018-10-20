@@ -25,7 +25,6 @@ public class DevCombat : MonoBehaviour
     private Camera cam;
     private GameObject currentEnemy;
     private AudioSource[] enemyAttackReactionSounds;
-    private DevCombatReactions devCombatReactionsScript;
     private TargetMatching targetMatching;
     private ManageTargetEnemyByKeys manageEnemyTarget;
     private bool previouslyLocked;
@@ -40,11 +39,10 @@ public class DevCombat : MonoBehaviour
 
     #region high level methods
 
-    public void Init()
+    public void Start()
     {
         targetMatching = GetComponent<TargetMatching>();
         characterController = GetComponent<CharacterController>();
-        devCombatReactionsScript = GetComponent<DevCombatReactions>();
         manageEnemyTarget = GetComponent<ManageTargetEnemyByKeys>();
         myAnimator = GetComponent<Animator>();
         cam = Camera.main;
@@ -327,7 +325,7 @@ public class DevCombat : MonoBehaviour
 
     public bool notInCombatMove()
     {
-        return !attacking() && !devCombatReactionsScript.isBlocking();
+        return !attacking();
     }
 
     public bool blocking()
@@ -346,29 +344,29 @@ public class DevCombat : MonoBehaviour
 
     public void playQuickAttackSound(int index)
     {
-        if (strongHit.isPlaying)
-            strongHit.Stop();
-        if (quickAttack2.isPlaying)
-            quickAttack2.Stop();
-        if (quickAttack.isPlaying)
-            quickAttack.Stop();
-        if (quickAttack3.isPlaying)
-            quickAttack3.Stop();
+        //if (strongHit.isPlaying)
+        //    strongHit.Stop();
+        //if (quickAttack2.isPlaying)
+        //    quickAttack2.Stop();
+        //if (quickAttack.isPlaying)
+        //    quickAttack.Stop();
+        //if (quickAttack3.isPlaying)
+        //    quickAttack3.Stop();
 
-        bool rotationAllows = currentEnemy.GetComponent<EnemyCombatReactions>().rotationAllowsBlock();
+        //bool rotationAllows = currentEnemy.GetComponent<EnemyCombatReactions>().rotationAllowsBlock();
 
-        if (currentEnemy.GetComponent<EnemyCombatReactions>().isBlocking() && rotationAllows)
-        {
-            strongHit.Play();
-        }
-        else if (rotationAllows)
-        {
-            enemyAttackReactionSounds[index - 1].Play();
-        }
-        else
-        {
-            quickAttack.Play();
-        }
+        //if (currentEnemy.GetComponent<EnemyCombatReactions>().isBlocking() && rotationAllows)
+        //{
+        //    strongHit.Play();
+        //}
+        //else if (rotationAllows)
+        //{
+        //    enemyAttackReactionSounds[index - 1].Play();
+        //}
+        //else
+        //{
+        //    quickAttack.Play();
+        //}
     }
     #endregion
 

@@ -24,11 +24,10 @@ public class InputController : MonoBehaviour
     private GameObject blockCameraPanel;
 
     public static ControlsManager controlsManager;
-    [HideInInspector] public bool combatEnabled;
+    const bool combatEnabled = true;
 
-    public void Init()
+    public void Start()
     {
-        combatEnabled = false;
         inputEnabled = true;
         cameraEnabled = true;
         prevDisabledInput = false;
@@ -39,19 +38,15 @@ public class InputController : MonoBehaviour
         cameraController = m_Cam.GetComponent<CameraController>();
         devCombat = GetComponent<DevCombat>();
         animator = GetComponent<Animator>();
-
-        controlsManager.Init();
-        characterController.Init();
-        cameraController.Init();
+        controlsManager.Start();
     }
 
-
-    public void PhysicsUpdate()
+    public void FixedUpdate()
     {
         HandleInputs();
     }
 
-    public void FrameUpdate()
+    public void Update()
     {
         if (!inputEnabled) return;
 
@@ -78,7 +73,7 @@ public class InputController : MonoBehaviour
             characterController.forwardAmount = 0f;
             GetComponent<Animator>().SetFloat("Forward", 0f);
             characterController.ProcessInputs(Vector3.zero, false);
-            if (cameraEnabled) cameraController.PhysicsUpdate();
+            if (cameraEnabled) cameraController.FixedUpdate();
             return;
         }
 
@@ -121,7 +116,7 @@ public class InputController : MonoBehaviour
         
         // pass all parameters to character scripts to process and translate inputs into character actions
         characterController.ProcessInputs(m_Move, toggleCrouching);
-        cameraController.PhysicsUpdate();
+        cameraController.FixedUpdate();
         if(combatEnabled)
             devCombat.ProcessInputs(interact, rightMouseHeld, rightMouseReleased, stealthAttack);
     }

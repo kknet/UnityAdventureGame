@@ -4,324 +4,421 @@ using UnityEngine;
 
 public class EnemyAI : MonoBehaviour
 {
+    public enum DashState
+    {
+        InDash,
+        NotInDash
+    }
 
-    #region imports
-    public int enemyID;
-    public mapNode finalDest;
-    public bool doneStarting;
-    public bool inPosition = false;
-    public GameObject terrain;
-    public mapNode start;
-    public mapNode nextDest = null;
-    public Queue<mapNode> path = null;
-    public bool inPathGen = false;
-    public float pathGenTime = 0f;
-    public float moveTime = 0f;
-    public bool moving = false;
-    public bool gotPath = false;
+    private enum States
+    {
+        patrol,
+        scan,
+        investigate,
+        runToPlayer,
+        attack,
+    }
 
-    private float nextDestWaitTime = 0f;
-    private float finalDestWaitTime = 0f;
+    public static bool scanLocked;
+    public bool useWaypoints;
+    [SerializeField] public Transform[] waypoints;
+    [SerializeField] public int enemyID;
+
     private Animator enemyAnim;
-    private GameObject Dev;
-    private float rotSpeed;
+    private AStar aStar;
+    private StealthDetection detection;
+    private Transform Player;
+
+    private Vector3 moveDirection, targetPos;
+    private float screenMaxZ, screenMinZ, screenMaxX, screenMinX;
+    private bool targetIsPlayer;
+    private States state;
+    private DashState dashAttackState;
+    private float timeSinceLastAttack, timeSinceLastDash;
+    private float health;
     private float moveSpeed;
-    private Vector3 dif;
-    private Vector3 oldDev;
-    private float restStartTime;
-    private bool resting;
-    private mapNode oldDevCell;
-    private GameObject[] enemies;
-    private bool allReady = false;
-    #endregion
+    private bool dashDoneSignal;
+    private int curWaypoint;
 
-    #region major methods
+    private const float rotSpeed = 20f;
+    private const float startingHealth = 100f;
+    private const float defaultMoveSpeed = 5f;
+    private const float dashMoveSpeed = 10f;
+    private const float scanMoveSpeed = 2f;
+    private const float attackDistance = 10f;
+    private const float dashFrequency = 5f;
+    private const float attackFrequency = 5f;
+    private const float dashStopDistance = 0.5f;
 
-    public void Init()
+
+    public void Start()
     {
-        doneStarting = false;
-        terrain = GameObject.Find("Terrain");
-        inPosition = false;
         enemyAnim = GetComponent<Animator>();
-        Dev = DevMain.Player;
-        rotSpeed = 12f;
-        moveSpeed = 4f;
+        Player = DevRef.Player.transform;
+        aStar = Player.GetComponent<AStar>();
+        detection = GetComponent<StealthDetection>();
 
-        resting = false;
-        restStartTime = Time.time;
-        enemies = GameObject.FindGameObjectsWithTag("Enemy");
+        moveDirection = Vector3.zero;
+        targetPos = transform.position;
+        targetIsPlayer = false;
+        moveSpeed = defaultMoveSpeed;
+        health = startingHealth;
+        timeSinceLastAttack = 0f;
+        timeSinceLastDash = 0f;
+        dashDoneSignal = false;
+        state = States.patrol;
+        dashAttackState = DashState.NotInDash;
+        curWaypoint = 0;
+
+        aStar.moveDirection(transform.position, gameObject);
+
+        screenMaxX = aStar.backRight.position.x;
+        screenMinX = aStar.backLeft.position.x;
+        screenMaxZ = aStar.forwardLeft.position.z;
+        screenMinZ = aStar.backLeft.position.z;
     }
 
-    public void initCell()
+    void ExecuteStateActions()
     {
-        start = terrain.GetComponent<MapPathfind>().containingCell(transform.position);
-    }
-
-    public void FrameUpdate()
-    {
-        checkIfAllReady();
-        updateYourCell();
-        moveToDev();
-    }
-
-    private bool checkIfAllReady()
-    {
-        if (allReady)
-            return true;
-        foreach (GameObject enemy in enemies)
+        if (state == States.patrol)
         {
-            if (!enemy.GetComponent<EnemyAI>().doneStarting)
-                return false;
-        }
-        allReady = true;
-        return true;
-    }
-
-    //keep track of this agent's current location
-    public void updateYourCell()
-    {
-        mapNode oldStart = start;
-        start = terrain.GetComponent<MapPathfind>().containingCell(transform.position);
-        if (!oldStart.equalTo(start))
-        {
-            oldStart.setEmpty();
-        }
-        start.setFull(enemyID);
-    }
-
-
-    public void moveToDev()
-    {
-
-        if (hasGoalNode() && (path == null || nextDest == null))
-        {
-            if (Time.realtimeSinceStartup >= pathGenTime)
+            targetIsPlayer = false;
+            if (useWaypoints)
             {
-                terrain.GetComponent<ClosestNodes>().markAllPositionedEnemies();
-                gotPath = setNewPath();
-                if (!gotPath)
+                if (Vector3.Distance(transform.position, waypoints[curWaypoint].position) < 1f)
                 {
-                    terrain.GetComponent<ClosestNodes>().assignTimes();
-                    return;
+                    if (curWaypoint < waypoints.Length - 1)
+                    {
+                        curWaypoint += 1;
+                    }
+                    else
+                    {
+                        curWaypoint = 0;
+                    }
                 }
+
+                targetPos = waypoints[curWaypoint].position;
+                move();
             }
             else
+                SetIdleAnimation();
+        }
+
+        if (state == States.investigate)
+        {
+            targetIsPlayer = false;
+            targetPos = detection.LastHeardPos;
+            move();
+        }
+
+        if (state == States.runToPlayer)
+        {
+            alert();
+            targetIsPlayer = false;
+            targetPos = detection.LastSeenPlayerPos;
+            move();
+
+            detection.DisplayLastSeenPosition();
+        }
+
+        if (state == States.attack)
+        {
+            targetIsPlayer = false;
+            if (timeSinceLastAttack > attackFrequency)
             {
-                stop();
-                return;
+                timeSinceLastAttack = 0f;
+                Attack();
             }
         }
-        else if (!hasGoalNode())
-        {
-            /*ONLY TIME THAT WE REPATH ALL*/
-            repathAll();
-            return;
-        }
-
-
-        if (nextSpotIsFull())
-        {
-            stop();
-            inPosition = false;
-            moving = false;
-            if (nextDestWaitTime == 0f)
-                nextDestWaitTime = Time.realtimeSinceStartup;
-            else if (Time.realtimeSinceStartup - nextDestWaitTime >= 1f)
-            {
-                gotPath = false;
-                terrain.GetComponent<ClosestNodes>().assignTimes();
-                nextDestWaitTime = 0f;
-                nextDest = null;
-            }
-            return;
-        }
-        else if (nextDest != null && nextDestWaitTime > 0f)
-        {
-            nextDestWaitTime = 0f;
-        }
-
-        if (goalNodeIsFull())
-        {
-            if (finalDestWaitTime == 0f)
-                finalDestWaitTime = Time.realtimeSinceStartup;
-            else if (Time.realtimeSinceStartup - finalDestWaitTime >= 3f)
-            {
-                gotPath = false;
-                finalDestWaitTime = 0f;
-                mapNode[] options = terrain.GetComponent<MapPathfind>().getEmptySpacedDevCombatCircle(3, enemyID, finalDest, 0);
-                finalDest = terrain.GetComponent<MapPathfind>().findClosestNode(options, start);
-                path = null;
-                terrain.GetComponent<ClosestNodes>().assignTimes();
-                moving = false;
-                inPosition = false;
-                return;
-            }
-        }
-
-        if (gotPath && (start.equalTo(finalDest) || nextDest == null))
-        {
-            inPosition = true;
-            moving = false;
-            stop();
-            rotateToTarget(Dev.transform.position);
-            return;
-        }
-
-        //reached intermediate destination
-        if (path != null && (nextDest == null || start.equalTo(nextDest)))
-        {
-            nextDest = path.Dequeue();
-
-            if (nextDest.hasOtherOwner(enemyID))
-            {
-                stop();
-                moving = false;
-                return;
-            }
-            if (nextDest == null || nextDest.getCenter() == null)
-            {
-                Debug.LogAssertion("nextDest is messed up");
-                return;
-            }
-        }
-        //rotate towards nextDest
-        rotateToTarget(nextDest.getCenter());
-
-        //move towards nextDest
-        moveToTarget();
-        moving = true;
     }
 
-    #endregion
-
-    #region helpers
-
-    void moveToTarget()
+    private States stateDecision()
     {
-        if (finalDest == null || start.equalTo(finalDest))
+        float distanceToPlayer = Vector3.Distance(transform.position, Player.position);
+        bool seePlayer = detection.seePlayer();
+        bool hearSomething = detection.hearSomething();
+        detection.acknowledgeSound();
+        bool atLastSeenPos = Vector3.Distance(detection.LastSeenPlayerPos, transform.position) < 2f;
+        bool atLastHeardPos = Vector3.Distance(detection.LastHeardPos, transform.position) < 3f;
+
+        if (state.Equals(States.patrol))
         {
-            stop();
+            if (seePlayer)
+                return States.runToPlayer;
+
+            if (hearSomething)
+            {
+                return States.investigate;
+            }
+
+            return States.patrol;
+        }
+
+        if (state.Equals(States.investigate))
+        {
+            if (seePlayer)
+                return States.runToPlayer;
+
+            if (atLastHeardPos)
+            {
+                StartCoroutine(scan());
+                return States.scan;
+            }
+
+            if (hearSomething)
+            {
+                return States.investigate;
+            }
+
+            return States.investigate;
+        }
+
+        if (state.Equals(States.scan))
+        {
+            if (seePlayer)
+            {
+                StopCoroutine(scan());
+                return States.runToPlayer;
+            }
+
+            if (hearSomething)
+            {
+                StopCoroutine(scan());
+                return States.investigate;
+            }
+            return States.scan;
+        }
+
+        if (state.Equals(States.runToPlayer))
+        {
+            if (distanceToPlayer <= attackDistance && seePlayer)
+            {
+                return States.attack;
+            }
+
+            if (atLastSeenPos && !seePlayer)
+            {
+                if (hearSomething)
+                {
+                    return States.investigate;
+                }
+                else
+                {
+                    StartCoroutine(scan());
+                    return States.scan;
+                }
+            }
+
+            return States.runToPlayer;
+        }
+
+        if (state.Equals(States.attack))
+        {
+            if (dashAttackState.Equals(DashState.InDash))
+                return States.attack;
+            else if (seePlayer && distanceToPlayer <= attackDistance)
+                return States.attack;
+            else
+                return States.runToPlayer;
+        }
+
+        return state;
+    }
+
+    private void move()
+    {
+        if (moveDirection != Vector3.zero)
+        {
+            transform.forward = Vector3.RotateTowards(transform.forward, moveDirection, rotSpeed * Time.fixedDeltaTime, 0.0f);
+            Vector3 tempPos = transform.position + (1f * moveDirection);
+            transform.position = Vector3.MoveTowards(transform.position, tempPos, moveSpeed * Time.fixedDeltaTime);
+        }
+        enemyAnim.SetFloat("enemySpeed", Mathf.MoveTowards(enemyAnim.GetFloat("enemySpeed"), 1f, 5f * Time.fixedDeltaTime));
+    }
+
+    public void FixedUpdate()
+    {
+        timeSinceLastAttack += Time.deltaTime;
+        timeSinceLastDash += Time.deltaTime;
+
+        if (health <= 0)
+            Destroy(gameObject);
+
+        state = stateDecision();
+
+        ExecuteStateActions();
+    }
+
+    public bool TargetIsPlayer
+    {
+        get
+        {
+            return targetIsPlayer;
+        }
+    }
+
+    public void setMoveDirection(Vector3 dir)
+    {
+        moveDirection = dir.normalized;
+        targetPos = clampLoc(targetPos);
+        aStar.moveDirection(targetPos, gameObject);
+    }
+
+    private Vector3 clampLoc(Vector3 loc)
+    {
+        if (loc.x > screenMaxX)
+            loc.x = screenMaxX - 1f;
+        if (loc.x < screenMinX)
+            loc.x = screenMinX + 1f;
+        if (loc.z > screenMaxZ)
+            loc.z = screenMaxZ - 1f;
+        if (loc.z < screenMinZ)
+            loc.z = screenMinZ + 1f;
+        return loc;
+    }
+
+    private void alert()
+    {
+        float range = 100f;
+        detection.SourceOfLastSeen = StealthDetection.Source.Self;
+        GameObject[] objects = GameObject.FindGameObjectsWithTag("Enemy");
+        foreach (GameObject obj in objects)
+        {
+            if (Vector3.Distance(transform.position, obj.transform.position) < range)
+            {
+                EnemyAI enemy = obj.GetComponent<EnemyAI>();
+                if (enemy != null)
+                    enemy.recieveAlert(detection.LastSeenPlayerPos);
+            }
+        }
+    }
+
+    public void recieveAlert(Vector3 lastSeenPos)
+    {
+        if (state != States.attack && state != States.scan)
+            state = States.runToPlayer;
+        float curDistance = Vector3.Distance(detection.LastSeenPlayerPos, Player.position);
+        float newDistance = Vector3.Distance(lastSeenPos, Player.position);
+        if (newDistance < curDistance)
+        {
+            detection.LastSeenPlayerPos = lastSeenPos;
+            detection.SourceOfLastSeen = StealthDetection.Source.Others;
         }
         else
         {
-
-            enemyAnim.SetFloat("enemySpeed", Mathf.MoveTowards(enemyAnim.GetFloat("enemySpeed"), 1f, 5f * Time.deltaTime));
-            transform.Translate(Vector3.forward * enemyAnim.GetFloat("enemySpeed") * Time.deltaTime * moveSpeed);
+            detection.SourceOfLastSeen = StealthDetection.Source.Self;
         }
     }
 
-    void rotateToTarget(Vector3 targ)
+    void SetIdleAnimation()
     {
-        dif = targ - transform.position;
-        dif.x = clampAngle(dif.x);
-        dif.z = clampAngle(dif.z);
-        dif = new Vector3(dif.x, 0f, dif.z);
-        transform.forward = Vector3.RotateTowards(transform.forward, dif, rotSpeed * Time.deltaTime, 0.0f);
+        enemyAnim.SetFloat("enemySpeed", 0f);
     }
 
-
-    public mapNode getDevCell()
+    IEnumerator scan()
     {
-        mapNode ret = terrain.GetComponent<MapPathfind>().devCell;
-        if (ret == null)
-        {
-            Debug.LogAssertion("Why doesn't it already have the value of dev cell?");
-            ret = terrain.GetComponent<MapPathfind>().devCell;
-        }
-        return ret;
-    }
+        while (!state.Equals(States.scan))
+            yield return null;
 
-    public bool canPathGen()
-    {
-        inPathGen = false;
-        foreach (GameObject enemy in enemies)
+        Debug.Log("Scan started");
+
+        yield return new WaitForSeconds(1f);
+
+        float minRadius = 5f;
+
+        //for (int i = 0; i < 3; ++i){
+        while (state.Equals(States.scan))
         {
-            if (enemy.GetComponent<EnemyAI>().inPathGen)
+            moveSpeed = scanMoveSpeed;
+            SetIdleAnimation();
+
+            while (scanLocked) //true means locked, false means open
+                yield return null;
+
+            scanLocked = true; //set to true to reserve
+
+            int counter = 0;
+            Vector3 center = detection.LastSeenPlayerPos;
+            if (minRadius > 20)
+                center = Vector3.zero;
+
+            Vector3 randomPos = center + (Vector3)(Random.insideUnitCircle.normalized * minRadius);
+            randomPos = clampLoc(randomPos);
+            while (!aStar.legalPositionInGrid(randomPos, enemyID))
             {
-                return false;
+                ++counter;
+                if (counter > 100)
+                    Debug.LogError("Doesn't work!");
+
+                randomPos = center + (Vector3)(Random.insideUnitCircle.normalized * minRadius);
+                randomPos = clampLoc(randomPos);
             }
+            targetPos = randomPos;
+
+            scanLocked = false;
+
+            const float maxDuration = 10f;
+            float startTime = Time.time;
+            while (Vector3.Distance(targetPos, transform.position) > 1f &&
+                Time.time - startTime < maxDuration)
+            {
+                move();
+                yield return null;
+            }
+
+            minRadius *= 1.5f;
+            SetIdleAnimation();
         }
-        return true;
+
+        targetPos = transform.position;
+        moveSpeed = defaultMoveSpeed;
+        state = States.patrol;
+        detection.DestroyLastSeenGraphic();
     }
 
-    public void cleanOldPath()
+    private void Attack()
     {
-        updateYourCell();
-        while (path != null && path.Count > 0)
+        meleeAttack();
+    }
+
+    private void meleeAttack()
+    {
+        float distance = Vector3.Distance(transform.position, Player.position);
+        if (timeSinceLastDash >= dashFrequency && dashAttackState.Equals(DashState.NotInDash))
+            StartCoroutine(dash());
+    }
+
+    IEnumerator dash()
+    {
+        dashAttackState = DashState.InDash;
+        timeSinceLastDash = 0f;
+        dashDoneSignal = false;
+
+        yield return new WaitForSeconds(0.3f);
+
+        moveSpeed = dashMoveSpeed;
+        enemyAnim.SetFloat("Speed", dashMoveSpeed/defaultMoveSpeed);
+
+        Vector3 dir = (Player.position - transform.position).normalized;
+        Vector3 posBehindPlayer = Player.position + (dir * 5f);
+        targetPos = posBehindPlayer;
+
+        yield return new WaitForSeconds(0.4f);
+
+        float dashStart = Time.time;
+        while (Vector3.Distance(transform.position, targetPos) > dashStopDistance)
         {
-            mapNode trashNode = path.Dequeue();
-            trashNode.setEmpty();
-        }
-        inPosition = false;
-        finalDest = null;
-        nextDest = null;
-        path = null;
-    }
+            if (dashDoneSignal) //true if we collide with player
+                break;
 
-    public bool setNewPath()
-    {
-        if (!canPathGen())
-        {//only one enemy can generate a path at a time, to reduce lag in game
-            inPathGen = false;
-            return false;
+            move();
+            yield return null;
         }
 
-        inPathGen = true;
-        mapNode goal = GetComponent<AStarMovement>().shortestPath(start, finalDest);
-        if (goal == null || !goal.equalTo(finalDest))
-        {//means that the path gen failed!
-            inPathGen = false;
-            return false;
-        }
-        path = GetComponent<AStarMovement>().traceBackFromGoal(start, finalDest);
-        inPathGen = false;
-
-        if (path == null)
-        {
-            return false;
-        }
-        if (path.Count == 0)
-        {
-            path = null;
-            return false;
-        }
-        nextDest = path.Dequeue();
-        return true;
+        dashAttackState = DashState.NotInDash;
+        moveSpeed = defaultMoveSpeed;
+        enemyAnim.SetFloat("Speed", 1f);
     }
-
-    public void repathAll()
-    {
-        terrain.GetComponent<ClosestNodes>().regenPathsLongQuick();
-    }
-
-    private bool hasGoalNode()
-    {
-        return finalDest != null;
-    }
-
-    private bool nextSpotIsFull()
-    {
-        return nextDest != null && nextDest.hasOtherOwner(enemyID);
-    }
-
-    private bool goalNodeIsFull()
-    {
-        return finalDest != null && finalDest.hasOtherOwner(enemyID);
-    }
-
-    void stop()
-    {
-        enemyAnim.SetFloat("enemySpeed", Mathf.MoveTowards(enemyAnim.GetFloat("enemySpeed"), 0f, 2f * Time.deltaTime));
-    }
-
-    //	public bool isEnemyAttacking() {
-    //		AnimatorStateInfo info = enemyAnim.GetCurrentAnimatorStateInfo (0);
-    //		return info.IsName ("QUICK1") || info.IsName ("QUICK2") || info.IsName ("QUICK3") || info.IsName ("QUICK4") || info.IsName ("QUICK5");
-    //	}
-
-    #endregion
-
-    #region util
 
     float clampAngle(float orig)
     {
@@ -331,16 +428,4 @@ public class EnemyAI : MonoBehaviour
             orig += 360f;
         return orig;
     }
-
-    private float rand(float a, float b)
-    {
-        return UnityEngine.Random.Range(a, b);
-    }
-
-    private bool Approx(Vector3 a, Vector3 b)
-    {
-        return Mathf.Approximately(a.x, b.x) && Mathf.Approximately(a.y, b.y) && Mathf.Approximately(a.z, b.z);
-    }
-
-    #endregion
 }

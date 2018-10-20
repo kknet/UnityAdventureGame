@@ -48,7 +48,7 @@ public class CharacterEvents : MonoBehaviour
 
     private const bool oldSlashEnabled = false;
 
-    public void Init()
+    public void Start()
     {
         m_Animator = GetComponent<Animator>();
         footSteps = new AudioSource[]{footstep1, footstep2, footstep3, footstep4};

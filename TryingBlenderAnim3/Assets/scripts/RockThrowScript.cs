@@ -32,7 +32,7 @@ public class RockThrowScript : MonoBehaviour {
     private bool testingThrow = true;
 
 	void Start () {
-        playerTransform = DevMain.Player.transform;
+        playerTransform = DevRef.Player.transform;
         rockStates = new State[rockTuples.Count];
         rocks = new GameObject[rockTuples.Count];
 
@@ -124,7 +124,11 @@ public class RockThrowScript : MonoBehaviour {
             Vector3 direction = Vector3.up.normalized * negativeMultiplier;
             Vector3 posOffset = offsetMagnitude * direction;
 
-            Transform curRock = rocks[rockIdx].transform;
+            GameObject curRockObj = rocks[rockIdx];
+            if (!curRockObj)
+                continue;
+
+            Transform curRock = curRockObj.transform;
             Vector3 curPos = curRock.localPosition;
             Vector3 goalPos = curPos + posOffset;
             float speed = 0f;
@@ -149,7 +153,11 @@ public class RockThrowScript : MonoBehaviour {
         rockStates[rockIdx] = State.Striking;
         Vector3 playerPos = playerTransform.position;
         Vector3 middlePos = playerPos + (7f * playerTransform.forward) + (5f * playerTransform.up);
-        Transform curRock = rocks[rockIdx].transform;
+        GameObject curRockObj = rocks[rockIdx];
+        if (!curRockObj)
+            yield break;
+
+        Transform curRock = curRockObj.transform;
         Rigidbody rb = curRock.gameObject.GetComponent<Rigidbody>();
         curRock.parent = null;
 

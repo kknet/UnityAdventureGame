@@ -71,9 +71,8 @@ public class ControlsManager
         }
     }
 
-    public void Init()
+    public void Start()
     {
-
         keyboard = new InputValues(keyboardAppend, inputNames[0], inputNames[1], inputNames[2], inputNames[3], inputNames[4], inputNames[5], inputNames[6], inputNames[7], inputNames[8], inputNames[9], inputNames[10], inputNames[11]);
 
         bool windows = (Application.platform.Equals(RuntimePlatform.WindowsPlayer) || Application.platform.Equals(RuntimePlatform.WindowsEditor));

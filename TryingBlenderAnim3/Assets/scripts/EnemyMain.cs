@@ -1,72 +1,59 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿//using System.Collections;
+//using System.Collections.Generic;
+//using UnityEngine;
 
-public class EnemyMain : MonoBehaviour
-{
+//public class EnemyMain : MonoBehaviour
+//{
 
-    private bool doCombat = false, doPathfinding = false;
+//    private bool doCombat = false, doPathfinding = true;
 
-    EnemyAI enemyAI;
-    ManageHealth manageHealth;
-    AStarMovement aStarMovement;
-    EnemyCombatAI enemyCombatAI;
-    EnemyCombatReactions enemyCombatReactions;
+//    EnemyAI enemyAI;
+//    ManageHealth manageHealth;
+//    EnemyCombatAI enemyCombatAI;
+//    EnemyCombatReactions enemyCombatReactions;
 
-    // Use this for initialization
-    public void Init()
-    {
-        if (doPathfinding)
-        {
-            enemyAI = GetComponent<EnemyAI>();
-            aStarMovement = GetComponent<AStarMovement>();
-            enemyAI.Init();
-            aStarMovement.Init();
-        }
-        if (doCombat)
-        {
-            manageHealth = GetComponent<ManageHealth>();
-            enemyCombatAI = GetComponent<EnemyCombatAI>();
-            enemyCombatReactions = GetComponent<EnemyCombatReactions>();
-            enemyCombatAI.Init();
-            enemyCombatReactions.Init();
-        }
-    }
+//    // Use this for initialization
+//    public void Init()
+//    {
+//        if (doPathfinding)
+//        {
+//            enemyAI = GetComponent<EnemyAI>();
+//            enemyAI.Init();
+//        }
+//        if (doCombat)
+//        {
+//            manageHealth = GetComponent<ManageHealth>();
+//            enemyCombatAI = GetComponent<EnemyCombatAI>();
+//            enemyCombatReactions = GetComponent<EnemyCombatReactions>();
+//            enemyCombatAI.Init();
+//            enemyCombatReactions.Init();
+//        }
+//    }
 
-    public void initCell()
-    {
-        enemyAI.initCell();
-    }
+//    // Update is called once per frame
+//    public void Update()
+//    {
 
-    public void repathAll()
-    {
-        enemyAI.repathAll();
-    }
+//        if (doPathfinding)
+//        {
+//            enemyAI.Update();
+//        }
 
-    // Update is called once per frame
-    public void FrameUpdate()
-    {
+//        if (doCombat)
+//        {
+//            enemyCombatAI.Update();
+//            enemyCombatReactions.Update();
+//        }
+//    }
 
-        if (doPathfinding)
-        {
-            enemyAI.FrameUpdate();
-        }
+//    public void setCombat(bool _doCombat)
+//    {
+//        doCombat = _doCombat;
+//    }
 
-        if (doCombat)
-        {
-            enemyCombatAI.FrameUpdate();
-            enemyCombatReactions.FrameUpdate();
-        }
-    }
+//    public void setPathfinding(bool _doPathfinding)
+//    {
+//        doPathfinding = _doPathfinding;
+//    }
 
-    public void setCombat(bool _doCombat)
-    {
-        doCombat = _doCombat;
-    }
-
-    public void setPathfinding(bool _doPathfinding)
-    {
-        doPathfinding = _doPathfinding;
-    }
-
-}
+//}

@@ -95,10 +95,6 @@ public class CharacterController : MonoBehaviour
     {
         //detectionTargets.Sort();
         //detectionTargets.Reverse();
-    }
-
-    public void Init()
-    {
         DevCombat = GetComponent<DevCombat>();
         CameraController = GetComponent<CameraController>();
         m_Animator = GetComponent<Animator>();
@@ -113,7 +109,6 @@ public class CharacterController : MonoBehaviour
         lastGroundedTime = Time.time;
         InputController = GetComponent<InputController>();
         CharacterEvents = GetComponent<CharacterEvents>();
-        CharacterEvents.Init();
         modelTransform = transform.GetChild(2);
     }
 

@@ -908,18 +908,14 @@ GameObject:
   - component: {fileID: 4669805608565338}
   - component: {fileID: 95535913941582544}
   - component: {fileID: 143341790841960138}
-  - component: {fileID: 114079542909828684}
   - component: {fileID: 136121035921378310}
-  - component: {fileID: 114416960678283852}
+  - component: {fileID: 82911478546930254}
   - component: {fileID: 54699533357999588}
-  - component: {fileID: 114901520402531936}
-  - component: {fileID: 114190098863537900}
-  - component: {fileID: 114421306892316130}
-  - component: {fileID: 114373539421324790}
+  - component: {fileID: 114079542909828684}
   - component: {fileID: 114461811412413928}
   - component: {fileID: 114184765883175284}
   - component: {fileID: 114593652620281350}
-  - component: {fileID: 82911478546930254}
+  - component: {fileID: 114652758226788370}
   m_Layer: 0
   m_Name: Brute2
   m_TagString: Enemy
@@ -3289,22 +3285,16 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1d7e6d09930f2b24b9d6c19b48fe2a3f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  useWaypoints: 0
+  waypoints: []
   enemyID: 1
-  doneStarting: 0
-  inPosition: 0
-  terrain: {fileID: 0}
-  inPathGen: 0
-  pathGenTime: 0
-  moveTime: 0
-  moving: 0
-  gotPath: 0
 --- !u!114 &114128239161087086
 MonoBehaviour:
   m_ObjectHideFlags: 1
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1142100915820204}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: fbf3575480402db40813e763382412fb, type: 3}
   m_Name: 
@@ -3324,26 +3314,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7afc4425b5ea993419af83fa8a00a45a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
---- !u!114 &114190098863537900
-MonoBehaviour:
-  m_ObjectHideFlags: 1
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 1672571178609684}
-  m_Enabled: 0
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 97162f452b4099040817cb9f0c1bb692, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  health: 10
-  enemyHealthBar: {fileID: 0}
 --- !u!114 &114255368276125916
 MonoBehaviour:
   m_ObjectHideFlags: 1
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1477069885405530}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: fbf3575480402db40813e763382412fb, type: 3}
   m_Name: 
@@ -3358,7 +3335,7 @@ MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1755820073397084}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: fbf3575480402db40813e763382412fb, type: 3}
   m_Name: 
@@ -3367,46 +3344,6 @@ MonoBehaviour:
   eraseRenderer: 0
   originalLayer: 0
   originalMaterials: []
---- !u!114 &114373539421324790
-MonoBehaviour:
-  m_ObjectHideFlags: 1
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 1672571178609684}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: cc87077b00cec4942b683fb4a2b9e32e, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
---- !u!114 &114416960678283852
-MonoBehaviour:
-  m_ObjectHideFlags: 1
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 1672571178609684}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 15756cb86dca6f44a842734dc857c91b, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  health: 100
---- !u!114 &114421306892316130
-MonoBehaviour:
-  m_ObjectHideFlags: 1
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 1672571178609684}
-  m_Enabled: 0
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: ad348097618aa1a4e9986245fde6b6f7, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  setLookAtDev: 1
-  quickAttack1: {fileID: 82162920008100352}
-  quickAttack2: {fileID: 82550250378681168}
-  quickAttack3: {fileID: 82284981506602364}
-  battleCry: {fileID: 82900272646241400}
-  strongHit: {fileID: 82171405255690070}
 --- !u!114 &114461811412413928
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -3458,7 +3395,7 @@ MonoBehaviour:
     spawnPos: {fileID: 4125831360462526}
     floatPos: {fileID: 4958775577057894}
     rightMultiplier: -2.5
---- !u!114 &114901520402531936
+--- !u!114 &114652758226788370
 MonoBehaviour:
   m_ObjectHideFlags: 1
   m_CorrespondingSourceObject: {fileID: 0}
@@ -3466,10 +3403,11 @@ MonoBehaviour:
   m_GameObject: {fileID: 1672571178609684}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 0201875f5d75d294ab588cbb09e3afb9, type: 3}
+  m_Script: {fileID: 11500000, guid: dfa44154e86e7f24dab0a7d57f1d8547, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  doneStarting: 0
+  playerOutlinePrefab: {fileID: 0}
+  maxLookDistance: 20
 --- !u!135 &135477603166831596
 SphereCollider:
   m_ObjectHideFlags: 1

@@ -16,7 +16,7 @@ public class EnemySpellAI : MonoBehaviour {
 	void Start () {
         enemyAnimator = GetComponent<Animator>();
         rockThrow = GetComponent<RockThrowScript>();
-        devAnimator = DevMain.Player.GetComponent<Animator>();
+        devAnimator = DevRef.Player.GetComponent<Animator>();
         deflectionSphere = transform.GetChild(0).gameObject;
 
         if (deflectingEnabledForTesting)

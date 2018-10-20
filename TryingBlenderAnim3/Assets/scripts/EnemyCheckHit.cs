@@ -39,8 +39,8 @@ public class EnemyCheckHit : MonoBehaviour
         animator = GetComponent<Animator>();
         rb = GetComponent<Rigidbody>();
         cameraShake = Camera.main.GetComponent<CameraShake>();
-        devCombat = DevMain.Player.GetComponent<DevCombat>();
-        deflector = DevMain.Player.GetComponent<CheckHitDeflectorShield>();
+        devCombat = DevRef.Player.GetComponent<DevCombat>();
+        deflector = DevRef.Player.GetComponent<CheckHitDeflectorShield>();
 
         hitCounter = 0;
         recoveringFromHit = false;
@@ -82,7 +82,7 @@ public class EnemyCheckHit : MonoBehaviour
     public Direction DevToEnemyHitDirection()
     {
         Vector3 enemyForward = devCombat.CurrentEnemy.transform.forward;
-        Vector3 devForward = DevMain.Player.transform.forward;
+        Vector3 devForward = DevRef.Player.transform.forward;
         float angle = Vector3.SignedAngle(enemyForward, devForward, Vector3.up);
         float absAngle = Mathf.Abs(angle);
 
@@ -162,7 +162,7 @@ public class EnemyCheckHit : MonoBehaviour
 
             float angle = Random.Range(-30f, -70f);
             if (devCombat.mirroredAttack()) angle *= -1f;
-            Vector3 direction = Quaternion.AngleAxis(angle, Vector3.up) * DevMain.Player.transform.forward.normalized;
+            Vector3 direction = Quaternion.AngleAxis(angle, Vector3.up) * DevRef.Player.transform.forward.normalized;
             //Vector3 direction = Quaternion.AngleAxis(angle, transform.up) * -transform.forward.normalized;
 
             while (tt < 70f)
@@ -186,7 +186,7 @@ public class EnemyCheckHit : MonoBehaviour
             float angle = Random.Range(-20f, -40f);
 
             if (devCombat.mirroredAttack()) angle *= -1f;
-            Vector3 direction = Quaternion.AngleAxis(angle, Vector3.up) * DevMain.Player.transform.forward.normalized;
+            Vector3 direction = Quaternion.AngleAxis(angle, Vector3.up) * DevRef.Player.transform.forward.normalized;
             //Vector3 direction = Quaternion.AngleAxis(angle, transform.up) * -transform.forward.normalized;
 
             AnimatorStateInfo info = animator.GetCurrentAnimatorStateInfo(0);
@@ -214,7 +214,7 @@ public class EnemyCheckHit : MonoBehaviour
         hitSound.pitch = Random.Range(0.9f, 1.1f);
         hitSound.Play();
 
-        Animator devAnimator = DevMain.Player.GetComponent<Animator>();
+        Animator devAnimator = DevRef.Player.GetComponent<Animator>();
         animator.speed = 0f;
         devAnimator.speed = 0f;
 
