@@ -68,6 +68,17 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 77fa6c30737729c47975e9fd04a46482, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &114759316512067742
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 63e75c81941892d4e916ac24b9162ddd, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!206 &206519260855596634
 BlendTree:
   m_ObjectHideFlags: 3
@@ -1045,11 +1056,12 @@ AnimatorState:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
   m_Name: Mutant Jump Attack
-  m_Speed: 1
+  m_Speed: 1.5
   m_CycleOffset: 0
   m_Transitions:
   - {fileID: 1101649724999116782}
-  m_StateMachineBehaviours: []
+  m_StateMachineBehaviours:
+  - {fileID: 114759316512067742}
   m_Position: {x: 50, y: 50, z: 0}
   m_IKOnFeet: 0
   m_WriteDefaultValues: 1

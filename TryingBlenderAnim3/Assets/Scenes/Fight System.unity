@@ -19599,7 +19599,7 @@ Prefab:
       objectReference: {fileID: 0}
     - target: {fileID: 4669805608565338, guid: ee2092bdb03ba8247a96692036f8ca9f, type: 2}
       propertyPath: m_RootOrder
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 0}
       propertyPath: enemyHealthBar
@@ -19708,7 +19708,7 @@ Prefab:
       objectReference: {fileID: 0}
     - target: {fileID: 4669805608565338, guid: ee2092bdb03ba8247a96692036f8ca9f, type: 2}
       propertyPath: m_RootOrder
-      value: 5
+      value: 4
       objectReference: {fileID: 0}
     - target: {fileID: 0}
       propertyPath: enemyHealthBar
@@ -19720,7 +19720,7 @@ Prefab:
       objectReference: {fileID: 0}
     - target: {fileID: 1672571178609684, guid: ee2092bdb03ba8247a96692036f8ca9f, type: 2}
       propertyPath: m_IsActive
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 0}
       propertyPath: m_Enabled
@@ -38553,7 +38553,7 @@ Prefab:
       objectReference: {fileID: 0}
     - target: {fileID: 4669805608565338, guid: ee2092bdb03ba8247a96692036f8ca9f, type: 2}
       propertyPath: m_RootOrder
-      value: 2
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 0}
       propertyPath: enemyHealthBar
@@ -38565,7 +38565,7 @@ Prefab:
       objectReference: {fileID: 0}
     - target: {fileID: 1672571178609684, guid: ee2092bdb03ba8247a96692036f8ca9f, type: 2}
       propertyPath: m_IsActive
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 0}
       propertyPath: m_Enabled
@@ -58022,7 +58022,7 @@ Prefab:
       objectReference: {fileID: 0}
     - target: {fileID: 4669805608565338, guid: ee2092bdb03ba8247a96692036f8ca9f, type: 2}
       propertyPath: m_RootOrder
-      value: 3
+      value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 0}
       propertyPath: enemyHealthBar
@@ -58034,7 +58034,7 @@ Prefab:
       objectReference: {fileID: 0}
     - target: {fileID: 1672571178609684, guid: ee2092bdb03ba8247a96692036f8ca9f, type: 2}
       propertyPath: m_IsActive
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 0}
       propertyPath: m_Enabled
@@ -58124,12 +58124,12 @@ Transform:
   m_LocalPosition: {x: 46.9, y: 0, z: 51.6}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
-  - {fileID: 2067480851}
   - {fileID: 437779998}
   - {fileID: 2024126448}
   - {fileID: 1641279114}
   - {fileID: 1015747560}
   - {fileID: 703212200}
+  - {fileID: 2067480851}
   m_Father: {fileID: 0}
   m_RootOrder: 4
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -63117,7 +63117,7 @@ Prefab:
       objectReference: {fileID: 0}
     - target: {fileID: 4669805608565338, guid: ee2092bdb03ba8247a96692036f8ca9f, type: 2}
       propertyPath: m_RootOrder
-      value: 0
+      value: 5
       objectReference: {fileID: 0}
     - target: {fileID: 114079542909828684, guid: ee2092bdb03ba8247a96692036f8ca9f,
         type: 2}
@@ -67840,7 +67840,7 @@ Prefab:
       objectReference: {fileID: 0}
     - target: {fileID: 4669805608565338, guid: ee2092bdb03ba8247a96692036f8ca9f, type: 2}
       propertyPath: m_RootOrder
-      value: 4
+      value: 3
       objectReference: {fileID: 0}
     - target: {fileID: 0}
       propertyPath: enemyHealthBar
@@ -67852,7 +67852,7 @@ Prefab:
       objectReference: {fileID: 0}
     - target: {fileID: 1672571178609684, guid: ee2092bdb03ba8247a96692036f8ca9f, type: 2}
       propertyPath: m_IsActive
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 0}
       propertyPath: m_Enabled

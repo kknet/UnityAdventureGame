@@ -21,10 +21,13 @@ public class EnemyAI : MonoBehaviour
 
     public static Vector3 xzMask = new Vector3(1f, 0f, 1f);
     public static bool scanLocked;
+    public static bool attackLocked;
     public bool useWaypoints;
     [SerializeField] public GameObject waypointsParent;
     [SerializeField] public int enemyID;
 
+    private ParticleSystem landingParticles;
+    private CameraShake cameraShake;
     private List<Transform> waypoints;
     private Animator enemyAnim;
     private AStar aStar;
@@ -50,18 +53,20 @@ public class EnemyAI : MonoBehaviour
     private const float defaultMoveSpeed = 1f;
     private const float dashMoveSpeed = 10f;
     private const float runToPlayerSpeed = 6f;
-    private const float attackDistance = 6f;
-    private const float dashFrequency = 5f;
+    private const float attackDistance = 10f;
+    private const float dashFrequency = 15f;
     private const float attackFrequency = 2f;
     private const float dashStopDistance = 2f;
 
 
     public void Start()
     {
+        landingParticles = GetComponent<ParticleSystem>();
         enemyAnim = GetComponent<Animator>();
         Player = DevRef.Player.transform;
         aStar = Player.GetComponent<AStar>();
         detection = GetComponent<StealthDetection>();
+        cameraShake = Camera.main.GetComponent<CameraShake>();
 
         moveDirection = Vector3.zero;
         targetPos = transform.position;
@@ -174,9 +179,9 @@ public class EnemyAI : MonoBehaviour
                     enemyAnim.InterruptMatchTarget(false);
                 else
                 {
-                    MatchTargetDesiredPos = Player.position;
-                    Vector3 dif = MatchTargetDesiredPos - transform.position;
-                    dif = new Vector3(dif.x, 0f, dif.z);
+                    Vector3 dif = Player.position - transform.position;
+                    dif = new Vector3(dif.x, 0f, dif.z).normalized;
+                    MatchTargetDesiredPos = clampLoc(Player.position + (-1f * dif));
                     Quaternion correctRot = Quaternion.LookRotation(dif);
                     MatchTargetWeightMask mask = new MatchTargetWeightMask(new Vector3(1, 1, 1), 0);
                     enemyAnim.MatchTarget(MatchTargetDesiredPos, correctRot, AvatarTarget.Root, mask, startTime, endTime);
@@ -187,7 +192,9 @@ public class EnemyAI : MonoBehaviour
                 enemyAnim.InterruptMatchTarget(false);
                 if (canMove && StartNewAttack())
                 {
-                    MatchTargetDesiredPos = Player.position;
+                    Vector3 dif = Player.position - transform.position;
+                    dif = new Vector3(dif.x, 0f, dif.z).normalized;
+                    MatchTargetDesiredPos = clampLoc(Player.position + (-1f * dif));
                 }
             }
         }
@@ -320,6 +327,13 @@ public class EnemyAI : MonoBehaviour
         state = stateDecision();
 
         ExecuteStateActions();
+    }
+
+    public void landingEffects()
+    {
+        landingParticles.Play();
+        if(xzDist(Player.position, transform.position) < 10f)
+            cameraShake.TriggerCameraShake();
     }
 
     public bool TargetIsPlayer
@@ -469,8 +483,11 @@ public class EnemyAI : MonoBehaviour
     private bool StartNewAttack()
     {
         float distance = xzDist(transform.position, Player.position);
-        if (timeSinceLastAttack >= attackFrequency && !enemyAnim.GetBool("enemyAttack"))
+        if (timeSinceLastAttack >= attackFrequency && 
+            !enemyAnim.GetBool("enemyAttack")
+            && !attackLocked)
         {
+            attackLocked = true;
             enemyAnim.SetBool("enemyAttack", true);
             return true;
         }
