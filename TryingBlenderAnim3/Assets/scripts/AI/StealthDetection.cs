@@ -12,6 +12,7 @@ public class StealthDetection : MonoBehaviour
     }
 
     public GameObject playerOutlinePrefab;
+    public Transform visionSource;
     private const bool outlineEnabled = false;
     private const bool sightEnabled = true;
 
@@ -131,7 +132,7 @@ public class StealthDetection : MonoBehaviour
             return false;
 
         Vector3 directionToPos = (pos - transform.position).normalized;
-        float angle = Vector3.Angle(transform.forward, directionToPos);
+        float angle = Vector3.Angle(visionSource.forward, directionToPos);
 
         if (angle > maxLookAngle)
             return false;
@@ -141,9 +142,9 @@ public class StealthDetection : MonoBehaviour
 
     private bool inClearLineOfSight(Vector3 pos)
     {
-        Vector2 direction = (pos - transform.position).normalized;
+        Vector2 direction = (pos - visionSource.position).normalized;
         float distance = Vector2.Distance(transform.position, pos);
-        RaycastHit[] allSight = Physics.RaycastAll(transform.position, direction, distance/*, layerMask*/);
+        RaycastHit[] allSight = Physics.RaycastAll(visionSource.position, direction, distance/*, layerMask*/);
 
         foreach (RaycastHit sight in allSight)
         {
@@ -185,6 +186,12 @@ public class StealthDetection : MonoBehaviour
         {
             sourceOfLastSeen = value;
         }
+    }
+
+    private void OnDrawGizmos()
+    {
+        DebugExtension.DrawCone(visionSource.position, visionSource.forward, maxLookAngle);
+        Gizmos.DrawLine(visionSource.position, visionSource.position + (maxLookDistance * visionSource.forward));
     }
 
 }

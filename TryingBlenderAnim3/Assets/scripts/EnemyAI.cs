@@ -30,6 +30,7 @@ public class EnemyAI : MonoBehaviour
     private AStar aStar;
     private StealthDetection detection;
     private Transform Player;
+    private Vector3 MatchTargetDesiredPos;
 
     private Vector3 moveDirection, targetPos;
     private float screenMaxZ, screenMinZ, screenMaxX, screenMinX;
@@ -44,15 +45,15 @@ public class EnemyAI : MonoBehaviour
     private float lookAroundStartTime;
 
     private const float lookAroundDuration = 8f;
-    private const float rotSpeed = 1f;
+    private const float rotSpeed = 4f;
     private const float startingHealth = 100f;
     private const float defaultMoveSpeed = 1f;
-    private const float dashMoveSpeed = 5f;
-    private const float runToPlayerSpeed = 2f;
-    private const float attackDistance = 10f;
+    private const float dashMoveSpeed = 10f;
+    private const float runToPlayerSpeed = 6f;
+    private const float attackDistance = 6f;
     private const float dashFrequency = 5f;
-    private const float attackFrequency = 5f;
-    private const float dashStopDistance = 0.5f;
+    private const float attackFrequency = 2f;
+    private const float dashStopDistance = 2f;
 
 
     public void Start()
@@ -92,6 +93,7 @@ public class EnemyAI : MonoBehaviour
     {
         if (state == States.patrol)
         {
+            enemyAnim.InterruptMatchTarget(false);
             moveSpeed = defaultMoveSpeed;
             targetIsPlayer = false;
             if (useWaypoints)
@@ -132,6 +134,7 @@ public class EnemyAI : MonoBehaviour
 
         if (state == States.investigate)
         {
+            enemyAnim.InterruptMatchTarget(false);
             targetIsPlayer = false;
             moveSpeed = defaultMoveSpeed;
             targetPos = detection.LastHeardPos;
@@ -140,6 +143,8 @@ public class EnemyAI : MonoBehaviour
 
         if (state == States.runToPlayer)
         {
+            enemyAnim.InterruptMatchTarget(false);
+            enemyAnim.SetBool("LookAround", false);
             moveSpeed = runToPlayerSpeed;
             alert();
             targetIsPlayer = false;
@@ -152,15 +157,42 @@ public class EnemyAI : MonoBehaviour
         if (state == States.attack)
         {
             targetIsPlayer = false;
-            moveSpeed = runToPlayerSpeed;
-            if (timeSinceLastAttack > attackFrequency)
+            enemyAnim.SetBool("LookAround", false);
+            enemyAnim.SetFloat("enemySpeed", 0f);
+
+            AnimatorStateInfo info = enemyAnim.GetCurrentAnimatorStateInfo(0);
+            bool canMove = !info.IsTag("fallback") && !info.IsTag("getup") && !enemyAnim.GetBool("LookAround");
+
+            if (canMove && inAttack())
             {
-                timeSinceLastAttack = 0f;
-                Attack();
+                float normalizedTime = enemyAnim.GetCurrentAnimatorStateInfo(0).normalizedTime;
+                float startTime =  0.16f;
+                startTime = Mathf.Max(startTime, normalizedTime);
+                float endTime = 0.37f;
+
+                if (normalizedTime < startTime || normalizedTime > endTime)
+                    enemyAnim.InterruptMatchTarget(false);
+                else
+                {
+                    MatchTargetDesiredPos = Player.position;
+                    Vector3 dif = MatchTargetDesiredPos - transform.position;
+                    dif = new Vector3(dif.x, 0f, dif.z);
+                    Quaternion correctRot = Quaternion.LookRotation(dif);
+                    MatchTargetWeightMask mask = new MatchTargetWeightMask(new Vector3(1, 1, 1), 0);
+                    enemyAnim.MatchTarget(MatchTargetDesiredPos, correctRot, AvatarTarget.Root, mask, startTime, endTime);
+                }
+            }
+            else
+            {
+                enemyAnim.InterruptMatchTarget(false);
+                if (canMove && StartNewAttack())
+                {
+                    MatchTargetDesiredPos = Player.position;
+                }
             }
         }
 
-        //Debug.Log(state + " " + curWaypoint);
+        //Debug.Log(state + " " + curWaypoint + " " + dashAttackState);
     }
 
     public static float xzDist(Vector3 a, Vector3 b)
@@ -250,7 +282,7 @@ public class EnemyAI : MonoBehaviour
 
         if (state.Equals(States.attack))
         {
-            if (dashAttackState.Equals(DashState.InDash))
+            if (inAttack())
                 return States.attack;
             else if (seePlayer && distanceToPlayer <= attackDistance)
                 return States.attack;
@@ -264,12 +296,15 @@ public class EnemyAI : MonoBehaviour
     private void move()
     {
         float enemySpeedGoal = 0f;
-        if (moveDirection != Vector3.zero && !enemyAnim.GetBool("LookAround"))
+        AnimatorStateInfo info = enemyAnim.GetCurrentAnimatorStateInfo(0);
+        bool canMove = !info.IsTag("fallback") && !info.IsTag("getup") && !enemyAnim.GetBool("LookAround") && !inAttack();
+        if (moveDirection != Vector3.zero && canMove)
         {
             transform.forward = Vector3.RotateTowards(transform.forward, moveDirection, rotSpeed * Time.deltaTime, 0.0f);
-            Vector3 tempPos = transform.position + (1f * moveDirection);
-            //transform.position = Vector3.MoveTowards(transform.position, tempPos, moveSpeed * Time.deltaTime);
-            enemySpeedGoal = (state.Equals(States.attack) || state.Equals(States.runToPlayer)) ? 1f : 0.4f;
+            bool run = (state.Equals(States.attack) || state.Equals(States.runToPlayer));
+            enemySpeedGoal = run ? 1f : 0.5f;
+            if (run)
+                transform.Translate(Vector3.forward * moveSpeed * Time.deltaTime);
         }
         enemyAnim.SetFloat("enemySpeed", Mathf.MoveTowards(enemyAnim.GetFloat("enemySpeed"), enemySpeedGoal, 5f * Time.deltaTime));
     }
@@ -297,8 +332,12 @@ public class EnemyAI : MonoBehaviour
 
     public void setMoveDirection(Vector3 dir)
     {
-        moveDirection = dir.normalized;
-        targetPos = clampLoc(targetPos);
+        if (!inAttack())
+        {
+            moveDirection = dir.normalized;
+            targetPos = clampLoc(targetPos);
+        }
+
         aStar.moveDirection(targetPos, gameObject);
     }
 
@@ -367,6 +406,7 @@ public class EnemyAI : MonoBehaviour
         //for (int i = 0; i < 3; ++i){
         while (state.Equals(States.scan))
         {
+            enemyAnim.SetBool("LookAround", false);
             moveSpeed = defaultMoveSpeed;
             SetIdleAnimation();
 
@@ -405,7 +445,14 @@ public class EnemyAI : MonoBehaviour
             }
 
             minRadius *= 1.5f;
-            SetIdleAnimation();
+
+            enemyAnim.SetBool("LookAround", true);
+            if (enemyAnim.GetFloat("Mirrored") > 0.9f)
+                enemyAnim.SetFloat("Mirrored", 0f);
+            else
+                enemyAnim.SetFloat("Mirrored", 1f);
+
+            yield return new WaitForSeconds(lookAroundDuration);
         }
 
         targetPos = transform.position;
@@ -414,20 +461,30 @@ public class EnemyAI : MonoBehaviour
         detection.DestroyLastSeenGraphic();
     }
 
-    private void Attack()
+    public bool inAttack()
     {
-        meleeAttack();
+        return enemyAnim.GetCurrentAnimatorStateInfo(0).IsTag("attack") || enemyAnim.GetBool("enemyAttack");
     }
 
-    private void meleeAttack()
+    private bool StartNewAttack()
     {
         float distance = xzDist(transform.position, Player.position);
-        if (timeSinceLastDash >= dashFrequency && dashAttackState.Equals(DashState.NotInDash))
-            StartCoroutine(dash());
+        if (timeSinceLastAttack >= attackFrequency && !enemyAnim.GetBool("enemyAttack"))
+        {
+            enemyAnim.SetBool("enemyAttack", true);
+            return true;
+        }
+        return false;
+    }
+
+    public void stopAttack()
+    {
+        enemyAnim.SetBool("enemyAttack", false);
     }
 
     IEnumerator dash()
     {
+        enemyAnim.SetFloat("enemySpeed", 0f);
         dashAttackState = DashState.InDash;
         timeSinceLastDash = 0f;
         dashDoneSignal = false;
@@ -435,10 +492,9 @@ public class EnemyAI : MonoBehaviour
         yield return new WaitForSeconds(0.3f);
 
         moveSpeed = dashMoveSpeed;
-        enemyAnim.SetFloat("Speed", dashMoveSpeed/defaultMoveSpeed);
 
         Vector3 dir = (Player.position - transform.position).normalized;
-        Vector3 posBehindPlayer = Player.position + (dir * 5f);
+        Vector3 posBehindPlayer = Player.position + (dir * 10f);
         targetPos = posBehindPlayer;
 
         yield return new WaitForSeconds(0.4f);
@@ -455,7 +511,7 @@ public class EnemyAI : MonoBehaviour
 
         dashAttackState = DashState.NotInDash;
         moveSpeed = defaultMoveSpeed;
-        enemyAnim.SetFloat("Speed", 1f);
+        //enemyAnim.SetFloat("enemySpeed", 1f);
     }
 
     float clampAngle(float orig)
@@ -465,5 +521,14 @@ public class EnemyAI : MonoBehaviour
         while (orig < -180f)
             orig += 360f;
         return orig;
+    }
+
+    private void OnCollisionEnter(Collision collision)
+    {
+        if (collision.gameObject.tag.Equals("Player"))
+        {
+            enemyAnim.InterruptMatchTarget(false);
+            enemyAnim.SetBool("enemyAttack", false);
+        }
     }
 }

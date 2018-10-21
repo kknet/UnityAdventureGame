@@ -71,6 +71,9 @@ public class EnemyCheckHit : MonoBehaviour
                 bool fallBack = hitCounter >= fallBackCountThreshold;
                 hitCounter = fallBack ? 0 : hitCounter;
 
+                animator.InterruptMatchTarget(false);
+                animator.SetBool("enemyAttack", false);
+
                 Direction enemyFallDirection = DevToEnemyHitDirection();
                 string anim = HurtReaction(enemyFallDirection, fallBack);
                 StartCoroutine(animatorSpeedChanges(fallBack, anim));

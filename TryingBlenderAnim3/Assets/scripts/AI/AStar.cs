@@ -146,7 +146,11 @@ public class AStar : MonoBehaviour
                     int ownerId = enemyScript.enemyID;
                     bool targetIsPlayer = enemyScript.TargetIsPlayer;
                     //bool targetIsPlayer = false;
-                    Vector3 moveDir = updatePath(goal, agent, ownerId, targetIsPlayer);
+
+                    Vector3 moveDir = Vector3.zero;
+                    bool shouldUpdatePath = !enemyScript.inAttack();
+                    if(shouldUpdatePath)
+                        moveDir = updatePath(goal, agent, ownerId, targetIsPlayer);
                     enemyScript.setMoveDirection(moveDir);
                 }
             }
