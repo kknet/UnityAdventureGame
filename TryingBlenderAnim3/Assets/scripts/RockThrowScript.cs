@@ -29,7 +29,7 @@ public class RockThrowScript : MonoBehaviour {
     GameObject[] rocks;
     State[] rockStates;
 
-    private bool testingThrow = true;
+    private bool testingThrow = false;
 
 	void Start () {
         playerTransform = DevRef.Player.transform;
@@ -44,7 +44,8 @@ public class RockThrowScript : MonoBehaviour {
             tuple.floatPos.localPosition = tuple.floatPos.position - transform.position;
         }
 
-        startThrow = true;
+        if(testingThrow)
+            startThrow = true;
 	}
 
     bool allIdle()

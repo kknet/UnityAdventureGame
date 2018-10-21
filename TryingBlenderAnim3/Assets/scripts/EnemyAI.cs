@@ -19,11 +19,13 @@ public class EnemyAI : MonoBehaviour
         attack,
     }
 
+    public static Vector3 xzMask = new Vector3(1f, 0f, 1f);
     public static bool scanLocked;
     public bool useWaypoints;
-    [SerializeField] public Transform[] waypoints;
+    [SerializeField] public GameObject waypointsParent;
     [SerializeField] public int enemyID;
 
+    private List<Transform> waypoints;
     private Animator enemyAnim;
     private AStar aStar;
     private StealthDetection detection;
@@ -39,8 +41,10 @@ public class EnemyAI : MonoBehaviour
     private float moveSpeed;
     private bool dashDoneSignal;
     private int curWaypoint;
+    private float lookAroundStartTime;
 
-    private const float rotSpeed = 20f;
+    private const float lookAroundDuration = 8f;
+    private const float rotSpeed = 1f;
     private const float startingHealth = 100f;
     private const float defaultMoveSpeed = 1f;
     private const float dashMoveSpeed = 5f;
@@ -70,6 +74,12 @@ public class EnemyAI : MonoBehaviour
         dashAttackState = DashState.NotInDash;
         curWaypoint = 0;
 
+        waypoints = new List<Transform>();
+        int numWayPoints = waypointsParent.GetComponentsInChildren<Transform>().Length;
+        for (int i = 1; i <= numWayPoints; ++i)
+            waypoints.Add(waypointsParent.transform.Find("" + i));
+
+
         aStar.moveDirection(transform.position, gameObject);
 
         screenMaxX = aStar.backRight.position.x;
@@ -86,15 +96,30 @@ public class EnemyAI : MonoBehaviour
             targetIsPlayer = false;
             if (useWaypoints)
             {
-                if (Vector3.Distance(transform.position, waypoints[curWaypoint].position) < 1f)
+                if (xzDist(transform.position, waypoints[curWaypoint].position) < 2f)
                 {
-                    if (curWaypoint < waypoints.Length - 1)
+                    if (curWaypoint < waypoints.Count - 1)
                     {
                         curWaypoint += 1;
                     }
                     else
                     {
                         curWaypoint = 0;
+                    }
+
+                    lookAroundStartTime = Time.time;
+                    enemyAnim.SetBool("LookAround", true);
+                    if (enemyAnim.GetFloat("Mirrored") > 0.9f)
+                        enemyAnim.SetFloat("Mirrored", 0f);
+                    else
+                        enemyAnim.SetFloat("Mirrored", 1f);
+                }
+                else
+                {
+                    if (enemyAnim.GetBool("LookAround"))
+                    {
+                        if (Time.time - lookAroundStartTime > lookAroundDuration)
+                            enemyAnim.SetBool("LookAround", false);
                     }
                 }
 
@@ -135,17 +160,22 @@ public class EnemyAI : MonoBehaviour
             }
         }
 
-        Debug.Log(state);
+        //Debug.Log(state + " " + curWaypoint);
+    }
+
+    public static float xzDist(Vector3 a, Vector3 b)
+    {
+        return Vector3.Distance(Vector3.Scale(a, xzMask), Vector3.Scale(b, xzMask));
     }
 
     private States stateDecision()
     {
-        float distanceToPlayer = Vector3.Distance(transform.position, Player.position);
+        float distanceToPlayer = xzDist(transform.position, Player.position);
         bool seePlayer = detection.seePlayer();
         bool hearSomething = detection.hearSomething();
         detection.acknowledgeSound();
-        bool atLastSeenPos = Vector3.Distance(detection.LastSeenPlayerPos, transform.position) < 2f;
-        bool atLastHeardPos = Vector3.Distance(detection.LastHeardPos, transform.position) < 3f;
+        bool atLastSeenPos = xzDist(detection.LastSeenPlayerPos, transform.position) < 2f;
+        bool atLastHeardPos = xzDist(detection.LastHeardPos, transform.position) < 3f;
 
         if (state.Equals(States.patrol))
         {
@@ -234,12 +264,12 @@ public class EnemyAI : MonoBehaviour
     private void move()
     {
         float enemySpeedGoal = 0f;
-        if (moveDirection != Vector3.zero)
+        if (moveDirection != Vector3.zero && !enemyAnim.GetBool("LookAround"))
         {
             transform.forward = Vector3.RotateTowards(transform.forward, moveDirection, rotSpeed * Time.deltaTime, 0.0f);
             Vector3 tempPos = transform.position + (1f * moveDirection);
-            transform.position = Vector3.MoveTowards(transform.position, tempPos, moveSpeed * Time.deltaTime);
-            enemySpeedGoal = moveSpeed / dashMoveSpeed * 4f;
+            //transform.position = Vector3.MoveTowards(transform.position, tempPos, moveSpeed * Time.deltaTime);
+            enemySpeedGoal = (state.Equals(States.attack) || state.Equals(States.runToPlayer)) ? 1f : 0.4f;
         }
         enemyAnim.SetFloat("enemySpeed", Mathf.MoveTowards(enemyAnim.GetFloat("enemySpeed"), enemySpeedGoal, 5f * Time.deltaTime));
     }
@@ -292,7 +322,7 @@ public class EnemyAI : MonoBehaviour
         GameObject[] objects = GameObject.FindGameObjectsWithTag("Enemy");
         foreach (GameObject obj in objects)
         {
-            if (Vector3.Distance(transform.position, obj.transform.position) < range)
+            if (xzDist(transform.position, obj.transform.position) < range)
             {
                 EnemyAI enemy = obj.GetComponent<EnemyAI>();
                 if (enemy != null)
@@ -305,8 +335,8 @@ public class EnemyAI : MonoBehaviour
     {
         if (state != States.attack && state != States.scan)
             state = States.runToPlayer;
-        float curDistance = Vector3.Distance(detection.LastSeenPlayerPos, Player.position);
-        float newDistance = Vector3.Distance(lastSeenPos, Player.position);
+        float curDistance = xzDist(detection.LastSeenPlayerPos, Player.position);
+        float newDistance = xzDist(lastSeenPos, Player.position);
         if (newDistance < curDistance)
         {
             detection.LastSeenPlayerPos = lastSeenPos;
@@ -367,7 +397,7 @@ public class EnemyAI : MonoBehaviour
 
             const float maxDuration = 10f;
             float startTime = Time.time;
-            while (Vector3.Distance(targetPos, transform.position) > 1f &&
+            while (xzDist(targetPos, transform.position) > 1f &&
                 Time.time - startTime < maxDuration)
             {
                 move();
@@ -391,7 +421,7 @@ public class EnemyAI : MonoBehaviour
 
     private void meleeAttack()
     {
-        float distance = Vector3.Distance(transform.position, Player.position);
+        float distance = xzDist(transform.position, Player.position);
         if (timeSinceLastDash >= dashFrequency && dashAttackState.Equals(DashState.NotInDash))
             StartCoroutine(dash());
     }
@@ -414,7 +444,7 @@ public class EnemyAI : MonoBehaviour
         yield return new WaitForSeconds(0.4f);
 
         float dashStart = Time.time;
-        while (Vector3.Distance(transform.position, targetPos) > dashStopDistance)
+        while (xzDist(transform.position, targetPos) > dashStopDistance)
         {
             if (dashDoneSignal) //true if we collide with player
                 break;

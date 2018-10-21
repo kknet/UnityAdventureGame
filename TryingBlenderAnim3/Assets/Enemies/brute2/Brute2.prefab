@@ -3215,11 +3215,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   useWaypoints: 1
-  waypoints:
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
+  waypointsParent: {fileID: 0}
   enemyID: 1
 --- !u!114 &114184765883175284
 MonoBehaviour:

@@ -451,7 +451,7 @@ public class AStar : MonoBehaviour
     {
         if (grid != null)
         {
-            Debug.Log("Got here");
+            //Debug.Log("Got here");
             for (int x = 0; x < xLength; ++x)
             {
                 for (int z = 0; z < zLength; ++z)

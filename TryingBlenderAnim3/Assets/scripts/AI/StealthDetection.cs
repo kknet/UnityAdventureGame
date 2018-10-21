@@ -13,6 +13,7 @@ public class StealthDetection : MonoBehaviour
 
     public GameObject playerOutlinePrefab;
     private const bool outlineEnabled = false;
+    private const bool sightEnabled = true;
 
     [Range(10f, 50f)]
     [Tooltip("How far enemies can see")]
@@ -101,8 +102,15 @@ public class StealthDetection : MonoBehaviour
 
     public bool seePlayer()
     {
-        Vector3 playerPos = player.transform.position;
-        return canSeeThisPosition(playerPos);
+        if (sightEnabled)
+        {
+            Vector3 playerPos = player.transform.position;
+            return canSeeThisPosition(playerPos);
+        }
+        else
+        {
+            return false;
+        }
     }
 
     public bool hearSomething()
