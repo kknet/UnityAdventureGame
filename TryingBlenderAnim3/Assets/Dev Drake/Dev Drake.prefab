@@ -64,6 +64,7 @@ GameObject:
   - component: {fileID: 114725196006021550}
   - component: {fileID: 114779848263014544}
   - component: {fileID: 114084531586525488}
+  - component: {fileID: 114181470339264230}
   m_Layer: 0
   m_Name: Dev Drake
   m_TagString: Player
@@ -3039,7 +3040,7 @@ Transform:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1016785826906548}
   m_LocalRotation: {x: -0, y: 0.44924307, z: -0, w: 0.89340955}
-  m_LocalPosition: {x: 93.6769, y: 0, z: 85.432976}
+  m_LocalPosition: {x: 101.62, y: 0, z: 73.57}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 4050235321397678}
@@ -6342,6 +6343,21 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 26a3369e0bba975498be28de99af0098, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &114181470339264230
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1016785826906548}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 95c81d5ee9b2de0448387e06f0c00b0e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  arrowCanvas: {fileID: 0}
+  arrowPrefab: {fileID: 224582228895323052, guid: b2c4d580a4129b64db05887da058484d,
+    type: 2}
+  enemiesParent: {fileID: 0}
 --- !u!114 &114322591841595688
 MonoBehaviour:
   m_ObjectHideFlags: 1

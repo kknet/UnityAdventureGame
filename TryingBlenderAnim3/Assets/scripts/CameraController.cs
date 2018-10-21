@@ -40,8 +40,8 @@ public class CameraController : MonoBehaviour
     Vector3 verticalPosOffset = Vector3.up * 1.5f;
     float horizontalPosOffsetMultiplier = 0.6f;
     float normalDistance = 1.5f;
-    //float combatDistance = 2.2f;
-    float combatDistance = 3f;
+    float combatDistance = 2f;
+    //float combatDistance = 3f;
     float distance;
     float controllerSensitivityMultiplier = 3f;
     [SerializeField] float mouseSensitivityX = 20f;

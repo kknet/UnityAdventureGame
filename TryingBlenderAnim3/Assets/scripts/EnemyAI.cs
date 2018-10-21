@@ -25,6 +25,7 @@ public class EnemyAI : MonoBehaviour
     public bool useWaypoints;
     [SerializeField] public GameObject waypointsParent;
     [SerializeField] public int enemyID;
+    public RectTransform arrow;
 
     private ParticleSystem landingParticles;
     private CameraShake cameraShake;
@@ -333,7 +334,7 @@ public class EnemyAI : MonoBehaviour
     {
         landingParticles.Play();
         if(xzDist(Player.position, transform.position) < 10f)
-            cameraShake.TriggerCameraShake();
+            cameraShake.TriggerCameraShake(0.12f);
     }
 
     public bool TargetIsPlayer
