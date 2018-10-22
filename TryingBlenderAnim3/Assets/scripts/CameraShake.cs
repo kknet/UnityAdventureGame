@@ -7,9 +7,12 @@ public class CameraShake : MonoBehaviour
 
     private Vector3 shakeOffset;
 
-    private float maxMagnitude = 0.06f;
+    private const float defaultMaxMagnitude = 0.06f;
+    private const float defaultDuration = 0.2f;
     private const float minMagnitude = 0.01f;
-    private const float duration = 0.3f;
+
+    private float maxMagnitude;
+    private float duration;
     
     private float magnitude;
     private float startTime;
@@ -38,8 +41,9 @@ public class CameraShake : MonoBehaviour
         }
     }
 
-    public void TriggerCameraShake(float setMaxMagnitudeTo = 0.06f)
+    public void TriggerCameraShake(float setMaxMagnitudeTo = defaultMaxMagnitude, float setDurationTo = defaultDuration)
     {
+        duration = setDurationTo;
         maxMagnitude = setMaxMagnitudeTo;
         startTime = Time.fixedTime;
     }

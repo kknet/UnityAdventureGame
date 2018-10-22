@@ -28,6 +28,7 @@ public class EnemyCheckHit : MonoBehaviour
     Animator animator;
     Rigidbody rb;
     CheckHitDeflectorShield deflector;
+    Transform player;
 
     AudioSource hitSound;
 
@@ -36,6 +37,7 @@ public class EnemyCheckHit : MonoBehaviour
 
 	// Use this for initialization
 	void Start () {
+        player = DevRef.Player.transform;
         animator = GetComponent<Animator>();
         rb = GetComponent<Rigidbody>();
         cameraShake = Camera.main.GetComponent<CameraShake>();
@@ -94,7 +96,7 @@ public class EnemyCheckHit : MonoBehaviour
         //if (angle > 45f) return Direction.Right;
         //else return Direction.Left;
 
-        if (absAngle > 90f) return Direction.Backward;
+        if (absAngle > 120f) return Direction.Backward;
         else return Direction.Forward;
     }
 
@@ -119,6 +121,18 @@ public class EnemyCheckHit : MonoBehaviour
         string anim = "";
         if (fallBack)
         {
+            //if (enemyFallDirection.Equals(Direction.Forward))
+            //{
+            //    anim = "Fall Forward";
+            //}
+            //else
+            //{
+            //    if (devCombat.mirroredAttack())
+            //        anim = "Fall Back Mirrored";
+            //    else
+            //        anim = "Fall Back";
+            //}
+
             if (devCombat.mirroredAttack())
                 anim = "Fall Back Mirrored";
             else
@@ -168,6 +182,10 @@ public class EnemyCheckHit : MonoBehaviour
             Vector3 direction = Quaternion.AngleAxis(angle, Vector3.up) * DevRef.Player.transform.forward.normalized;
             //Vector3 direction = Quaternion.AngleAxis(angle, transform.up) * -transform.forward.normalized;
 
+            Vector3 lookDirection = (player.position - transform.position).normalized;
+            lookDirection = Quaternion.AngleAxis(angle, Vector3.up) * lookDirection;
+            transform.forward = Vector3.RotateTowards(transform.forward, lookDirection, 100f * Time.deltaTime, 0.0f);
+
             while (tt < 70f)
             {
                 Debug.DrawLine(transform.position + Vector3.up, transform.position + Vector3.up + (30f * direction), Color.magenta);
@@ -191,6 +209,10 @@ public class EnemyCheckHit : MonoBehaviour
             if (devCombat.mirroredAttack()) angle *= -1f;
             Vector3 direction = Quaternion.AngleAxis(angle, Vector3.up) * DevRef.Player.transform.forward.normalized;
             //Vector3 direction = Quaternion.AngleAxis(angle, transform.up) * -transform.forward.normalized;
+
+            Vector3 lookDirection = (player.position - transform.position).normalized;
+            lookDirection = Quaternion.AngleAxis(angle, Vector3.up) * lookDirection;
+            transform.forward = Vector3.RotateTowards(transform.forward, lookDirection, 100f * Time.deltaTime, 0.0f);
 
             AnimatorStateInfo info = animator.GetCurrentAnimatorStateInfo(0);
             while (info.normalizedTime < 0.1f && info.IsName(anim))
@@ -224,9 +246,7 @@ public class EnemyCheckHit : MonoBehaviour
         if (fallBack)
         {
 
-            yield return new WaitForSecondsRealtime(0.1f);
-
-            yield return new WaitForSecondsRealtime(0.1f);
+            yield return new WaitForSecondsRealtime(0.3f);
 
             StartCoroutine(translateEnemyFall(fallBack, anim));
 
@@ -241,7 +261,7 @@ public class EnemyCheckHit : MonoBehaviour
         {
             cameraShake.TriggerCameraShake();
 
-            yield return new WaitForSecondsRealtime(0.02f);
+            yield return new WaitForSecondsRealtime(0.05f);
 
             StartCoroutine(translateEnemyFall(fallBack, anim));
 

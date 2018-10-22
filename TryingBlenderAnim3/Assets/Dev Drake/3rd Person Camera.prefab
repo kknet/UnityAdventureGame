@@ -27,7 +27,6 @@ GameObject:
   - component: {fileID: 114332958113505298}
   - component: {fileID: 114352154014234616}
   - component: {fileID: 114068847788476852}
-  - component: {fileID: 114514316175128484}
   m_Layer: 0
   m_Name: 3rd Person Camera
   m_TagString: MainCamera
@@ -224,35 +223,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 324747560a60b064b9370cb848ac8762, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
---- !u!114 &114514316175128484
-MonoBehaviour:
-  m_ObjectHideFlags: 1
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 1099242784165372}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: a78da3f00f3328541b4526c0b0b5ec5c, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  lineThickness: 1.2
-  lineIntensity: 2
-  fillAmount: 0
-  lineColor0: {r: 0.990566, g: 0.30084288, b: 0, a: 1}
-  lineColor1: {r: 0, g: 1, b: 0, a: 1}
-  lineColor2: {r: 0, g: 0, b: 1, a: 1}
-  additiveRendering: 0
-  backfaceCulling: 1
-  cornerOutlines: 0
-  addLinesBetweenColors: 0
-  scaleWithScreenSize: 1
-  alphaCutoff: 0.5
-  flipY: 0
-  sourceCamera: {fileID: 20561802401641430}
-  outlineCamera: {fileID: 20998762146514170}
-  outlineShaderMaterial: {fileID: 0}
-  renderTexture: {fileID: 0}
-  extraRenderTexture: {fileID: 0}
 --- !u!114 &114607626359407504
 MonoBehaviour:
   m_ObjectHideFlags: 1

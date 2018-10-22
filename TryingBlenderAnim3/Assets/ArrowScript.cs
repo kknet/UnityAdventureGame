@@ -10,6 +10,8 @@ public class ArrowScript : MonoBehaviour {
     public GameObject enemiesParent;
     private EnemyAI[] enemies;
 
+    private const float maxSeeAngle = 60f;
+
 	void Start () {
         enemies = enemiesParent.GetComponentsInChildren<EnemyAI>();
         foreach (EnemyAI enemy in enemies)
@@ -20,8 +22,7 @@ public class ArrowScript : MonoBehaviour {
     }
 	
 	void Update () {
-        arrowCanvas.position = transform.position + (Vector3.up * 2f);
-        arrowCanvas.rotation = Camera.main.transform.rotation;
+        arrowCanvas.position = transform.position + (Vector3.up * 1f);
         foreach (EnemyAI enemy in enemies)
         {
             if(enemy.isActiveAndEnabled)
@@ -34,7 +35,23 @@ public class ArrowScript : MonoBehaviour {
         //Vector3 direction = Vector3.Scale((targetPos - transform.position).normalized, EnemyAI.xzMask);
         //arrow.rotation = Quaternion.Euler(new Vector3(0f, Vector3.Angle(arrow.forward, direction), 0f));
         //arrow.localEulerAngles = new Vector3(0f, Vector3.Angle(arrow.forward, direction), 0f);
-        targetPos = new Vector3(targetPos.x, arrow.eulerAngles.y, targetPos.z);
-        arrow.LookAt(targetPos);
+        Vector3 target = targetPos;
+        target.y = arrow.position.y;
+        arrow.LookAt(target);
+        arrow.eulerAngles = arrow.eulerAngles + new Vector3(90f, 180f, 0f);
+        arrow.localPosition = Vector3.zero;
+        arrow.GetChild(0).localPosition = (arrow.forward.normalized * 0.6f);
+
+        if (needToDisplayArrow(targetPos))
+            arrow.gameObject.SetActive(true);
+        else
+            arrow.gameObject.SetActive(false);
+    }
+
+    bool needToDisplayArrow(Vector3 targetPos)
+    {
+        Vector3 dir = (targetPos - transform.position).normalized;
+        float angle = Vector3.Angle(dir, Camera.main.transform.forward);
+        return angle > maxSeeAngle;
     }
 }

@@ -6355,7 +6355,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   arrowCanvas: {fileID: 0}
-  arrowPrefab: {fileID: 224582228895323052, guid: b2c4d580a4129b64db05887da058484d,
+  arrowPrefab: {fileID: 224819240086172094, guid: b2c4d580a4129b64db05887da058484d,
     type: 2}
   enemiesParent: {fileID: 0}
 --- !u!114 &114322591841595688

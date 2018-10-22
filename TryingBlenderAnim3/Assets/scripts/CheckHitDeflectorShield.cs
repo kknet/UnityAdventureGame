@@ -11,6 +11,7 @@ public class CheckHitDeflectorShield : MonoBehaviour {
     TargetMatching targetMatching;
     DevCombat devCombat;
     EnemySpellAI enemyDeflect;
+    private bool reasonDeflecting;
 
     [HideInInspector] public bool deflectingEnabled;
 
@@ -21,17 +22,12 @@ public class CheckHitDeflectorShield : MonoBehaviour {
         animator = GetComponent<Animator>();
         rb = GetComponent<Rigidbody>();
         hurtCollider = GetComponent<Collider>();
+        reasonDeflecting = false;
     }
 
 
     private bool CheckHit()
     {
-        if (!devCombat.attacking())
-            return false;
-
-        //if (animator.GetBool("Dodge"))
-        //    return false;
-
         Collider[] cols = Physics.OverlapBox(hurtCollider.bounds.center, hurtCollider.bounds.extents,
             hurtCollider.transform.rotation, LayerMask.GetMask("DeflectorShield"));
         foreach (Collider other in cols)
@@ -45,15 +41,25 @@ public class CheckHitDeflectorShield : MonoBehaviour {
         return false;
     }
 
+    public void EnemyLandHit()
+    {
+        if (!targetMatching.recoveringFromHit)
+        {
+            reasonDeflecting = false;
+            StartCoroutine(animatorSpeedChanges());
+        }
+    }
+
     private void FixedUpdate()
     {
         enemyDeflect = devCombat.CurrentEnemy.GetComponent<EnemySpellAI>();
         deflectingEnabled = enemyDeflect.DeflectingEnabled();
 
-        if (deflectingEnabled && !targetMatching.recoveringFromHit)
+        if (deflectingEnabled && !targetMatching.recoveringFromHit && devCombat.attacking()/* && !animator.GetBool("Dodge")*/)
         {
             if (CheckHit())
             {
+                reasonDeflecting = true;
                 StartCoroutine(animatorSpeedChanges());
             }
         }
@@ -61,8 +67,8 @@ public class CheckHitDeflectorShield : MonoBehaviour {
 
     IEnumerator animatorSpeedChanges()
     {
-        //animator.applyRootMotion = false;
         Debug.Log("hit defector");
+        animator.SetBool("Dodge", false);
         animator.SetBool("doAttack", false);
         targetMatching.shouldMatchTarget = false;
         animator.InterruptMatchTarget(false);
@@ -97,25 +103,23 @@ public class CheckHitDeflectorShield : MonoBehaviour {
 
         float angle = Random.Range(-1f, -10f);
         if (Random.Range(0f, 1f) > 0.5f) angle *= -1f;
-        Vector3 direction = Quaternion.AngleAxis(angle, transform.up) * -transform.forward.normalized;
+
+        Vector3 direction;
+        if(reasonDeflecting)
+            direction = Quaternion.AngleAxis(angle, transform.up) * -transform.forward.normalized;
+        else
+            direction = Quaternion.AngleAxis(angle, transform.up) * 
+                (transform.position - devCombat.CurrentEnemy.transform.position).normalized; //otherwise it's from an enemy landing
 
         while (tt < 150f)
         {
             Debug.DrawLine(transform.position + Vector3.up, transform.position + Vector3.up + (30f * direction), Color.magenta);
+            transform.forward = Vector3.MoveTowards(transform.forward, -direction, Time.fixedDeltaTime * 20f);
 
-            float speed = multiplier/* + (0.1f * Mathf.Pow(1f - animator.speed, 2f))*/;
-
-            if(animator.speed > 0.1f)
-                transform.Translate(direction * speed, Space.World);
-
-            //if (animator.speed < 0.6f)
-            //    transform.Translate(direction * (multiplier + 0.25f), Space.World);
-            //else
-            //    transform.Translate(direction * multiplier, Space.World);
-
+            if (animator.speed > 0.1f)
+                transform.Translate(direction * multiplier, Space.World);
             tt += 1f;
             multiplier = Mathf.MoveTowards(multiplier, 0f, Time.fixedDeltaTime * multiplier * 1.5f);
-            //multiplier = Mathf.Max(multiplier - decrement, 0.01f);
             yield return new WaitForFixedUpdate();
         }
 
